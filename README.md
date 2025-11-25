@@ -10,6 +10,7 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
 
 ## Architecture
 * **Hardware:** Mini PC (Intel i5 7th Gen, 16GB RAM, 256GB NVMe, 1TB HDD).
+  ![alt text](/images/server.jpeg)
 * **Hypervisor:** Proxmox VE 9.1 (Debian-based).
 * **Storage Strategy:** Tiered architecture (NVMe for Hot Data/VMs, HDD for Cold Storage/Backups).
 * **Backup Strategy:** 3-2-1 Rule implemented via Proxmox Snapshots + Offsite Rclone Sync.
