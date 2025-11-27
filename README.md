@@ -24,6 +24,7 @@ This repository documents the entire lifecycle of the lab:
 3. [Disaster Recovery Pipeline](docs/03-backup-dr.md) — End-to-end automated backup and recovery workflows: snapshot policies, offsite encrypted sync with rclone, and systemd-based orchestration for zero-touch recovery.
 4. [Infrastructure Provisioning (Terraform)](docs/04-infrastructure-provisioning.md) — Infrastructure-as-Code workflows, module development, state management, and troubleshooting strategies for provisioning and resource allocation.
 5.  [**Deep Dive: Engineering Challenges**](docs/05-infrastructure-challenges.md)
+6.  
 
 ## Key Technologies
 

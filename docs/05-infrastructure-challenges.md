@@ -27,4 +27,4 @@
 * Refactored the network definitions to include explicit interface indexing (`id = 0`), complying with the strict schema validation of the new provider version.
 
 ---
-*These resolutions demonstrate the importance of explicit resource definition in Infrastructure as Code (IaC) to prevent configuration drift.*
+> *These resolutions demonstrate the importance of explicit resource definition in Infrastructure as Code (IaC) to prevent configuration drift.*
