@@ -7,8 +7,9 @@ resource "proxmox_lxc" "gateway" {
   hostname     = "gateway"
   vmid         = 100
   ostemplate   = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
-  password     = "BasicLXC!23"
+  password     = var.passwordGW
   unprivileged = true
+  ssh_public_keys = var.ssh_key
   
   cores  = 1
   memory = 512
@@ -28,6 +29,14 @@ resource "proxmox_lxc" "gateway" {
   rootfs {
     storage = "local-lvm"
     size    = "8G"
+  }
+  provisioner "local-exec" {
+    command = <<EOT
+      echo "Host gateway
+        HostName 192.168.0.10
+        User root
+        IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
+    EOT
   }
 }
 

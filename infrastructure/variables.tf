@@ -27,6 +27,10 @@ variable "ssh_key" {
   type    = string
 }
 
+variable "passwordGW" {
+  type = string
+}
+
 # The Map Variable for all K8s VMs
 variable "vms" {
   description = "Map of VM configurations for the Kubernetes cluster"
