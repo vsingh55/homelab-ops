@@ -1,22 +1,3 @@
-terraform {
-  required_providers {
-    proxmox = {
-      source  = "Telmate/proxmox"
-      version = "3.0.1-rc6" # Using the stable version we identified
-    }
-  }
-}
-
-provider "proxmox" {
-  pm_api_url          = var.proxmox_api_url
-  pm_api_token_id     = var.proxmox_api_token_id
-  pm_api_token_secret = var.proxmox_api_token_secret
-  pm_tls_insecure     = true
-  
-  # Allow permissions bypass for Proxmox 9
-  pm_minimum_permission_check = false
-}
-
 # ==========================================
 # ZONE A: PRODUCTION (LXC Containers)
 # ==========================================
