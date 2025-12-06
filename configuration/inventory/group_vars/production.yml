@@ -1,0 +1,3 @@
+---
+# Tunnel connection through Ops-Center (Jump Host)
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q devops@ops-center"'
