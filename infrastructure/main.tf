@@ -1,6 +1,11 @@
-# ==========================================
-# ZONE A: PRODUCTION (LXC Containers)
-# ==========================================
+# ======================================================
+# Mode A (Production): Ops-Center + K3s-Prod are UP. 
+# Mode B (Academy/Lab): Ops-Center + Lab Cluster are UP. 
+# ======================================================
+# ==============================================
+# Zone A: Lab (Academy Plane)
+# consists of The KTHW Fleet and the Gateway VM
+# ==============================================
 
 resource "proxmox_lxc" "gateway" {
   target_node     = var.target_node
@@ -22,7 +27,7 @@ resource "proxmox_lxc" "gateway" {
   network {
     name   = "eth0"
     bridge = "vmbr0"
-    ip     = "192.168.0.10/24"
+    ip     = "${var.gateway_ip}/24"
     gw     = "192.168.0.1"
   }
 
@@ -40,12 +45,8 @@ resource "proxmox_lxc" "gateway" {
   }
 }
 
-# ==========================================
-# ZONE B: ACADEMY (KTHW VMs)
-# ==========================================
-
 resource "proxmox_vm_qemu" "k8s_cluster" {
-  # The Magic Loop: Creates a VM for every entry in the 'vms' variable
+  # Creates a VM for every entry in the 'vms' variable
   for_each = var.vms
 
   target_node = var.target_node
@@ -120,7 +121,7 @@ resource "proxmox_vm_qemu" "ops_center" {
   target_node = var.target_node
   name        = "ops-center"
   vmid        = var.ops_center_config.vmid
-  clone       = "ubuntu-cloud-24.04" # This could be a variable too, but standard template is fine for now.
+  clone       = "ubuntu-cloud-24.04" 
 
  # Hardware Config
   cpu {
@@ -171,6 +172,65 @@ resource "proxmox_vm_qemu" "ops_center" {
     command = <<EOT
       echo "Host ops-center
         HostName ${var.ops_center_config.ip}
+        User ${var.ci_user}
+        IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
+    EOT
+  }
+}
+
+# ==============================================
+# Zone P: PROD (APPLICATION PLANE - K3s Cluster)  
+# ==============================================
+
+resource "proxmox_vm_qemu" "k3s_prod" {
+  target_node = var.target_node
+  name        = "k3s-prod"
+  vmid        = var.k3s_prod_config.vmid
+  clone       = "ubuntu-cloud-24.04"
+
+  # Resource Allocation (Efficient)
+  
+  cpu {
+    cores = var.k3s_prod_config.cores
+  }
+  memory  = var.k3s_prod_config.memory
+  agent   = 1
+
+  network {
+    id     = 0
+    bridge = "vmbr0"
+    model  = "virtio"
+  }
+
+  boot = "order=scsi0;net0"
+  disks {
+    scsi {
+      scsi0 {
+        disk {
+          storage = "local-lvm"
+          size    = var.k3s_prod_config.disk_size
+        }
+      }
+    }
+    ide {
+      ide2 {
+        cloudinit {
+          storage = "local-lvm"
+        }
+      }
+    }
+  }
+
+  # Cloud-Init
+  ciuser    = var.ci_user
+  sshkeys   = var.ssh_key
+  ipconfig0 = "ip=${var.k3s_prod_config.ip}/24,gw=192.168.0.1"
+
+  # SSH Config Injection
+  provisioner "local-exec" {
+    command = <<EOT
+      echo "Host k3s-prod
+        HostName ${var.k3s_prod_config.ip}
         User ${var.ci_user}
         IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
     EOT

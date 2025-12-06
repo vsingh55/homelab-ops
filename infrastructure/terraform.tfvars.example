@@ -1,0 +1,67 @@
+proxmox_api_url          = "" # URL of Proxmox API endpoint (e.g., https://<ip>:8006/api2/json)
+proxmox_api_token_id     = "" # Proxmox API token ID (e.g., root@pam!terraform)
+proxmox_api_token_secret = "" # Proxmox API token secret/password
+ssh_key                  = "" # SSH public key for remote access (e.g., ssh-id_rsa AAAA...)
+passwordGW               = "" # Gateway admin password
+
+# ======================================
+# Define the Gateway Configurations 
+# ======================================
+gateway_ip = "" # Gateway VM IP address (e.g., 192.168.x.x)
+
+# ======================================
+# Define the lab-cluster Configurations 
+# ======================================
+
+vms = {
+    "jumpbox" = {
+        vmid          = "" # Unique VM ID for jumpbox
+        ip            = "" # IP address for jumpbox (e.g., 192.168.x.x)
+        cores         = "" # Number of CPU cores
+        memory        = "" # Memory in MB (e.g., 1024)
+        startup_param = "" # Startup parameters (e.g., order=4,up=40,down=40)
+    }
+    "server" = {
+        vmid          = "" # Unique VM ID for server
+        ip            = "" # IP address for server (e.g., 192.168.x.x)
+        cores         = "" # Number of CPU cores
+        memory        = "" # Memory in MB (e.g., 2048)
+        startup_param = "" # Startup parameters (e.g., order=3,up=40,down=40)
+    }
+    "node-0" = {
+        vmid          = "" # Unique VM ID for node-0
+        ip            = "" # IP address for node-0 (e.g., 192.168.x.x)
+        cores         = "" # Number of CPU cores
+        memory        = "" # Memory in MB (e.g., 2048)
+        startup_param = "" # Startup parameters (e.g., order=3,up=40,down=40)
+    }
+    "node-1" = {
+        vmid          = "" # Unique VM ID for node-1
+        ip            = "" # IP address for node-1 (e.g., 192.168.x.x)
+        cores         = "" # Number of CPU cores
+        memory        = "" # Memory in MB (e.g., 2048)
+        startup_param = "" # Startup parameters (e.g., order=3,up=20,down=20)
+    }
+}
+
+# ==============================
+# Management Zone Configuration
+# ==============================
+ops_center_config = {
+    vmid      = "" # Unique VM ID for ops center
+    ip        = "" # IP address for ops center (e.g., 192.168.x.x)
+    cores     = "" # Number of CPU cores
+    memory    = "" # Memory in MB (e.g., 2048)
+    disk_size = "" # Disk size (e.g., 20G, 50G)
+}
+
+# ==============================
+# Production Zone Configuration
+# ==============================
+k3s_prod_config = {
+    vmid      = "" # Unique VM ID for k3s production
+    ip        = "" # IP address for k3s production (e.g., 192.168.x.x)
+    cores     = "" # Number of CPU cores
+    memory    = "" # Memory in MB (e.g., 4096)
+    disk_size = "" # Disk size (e.g., 20G, 50G)
+}

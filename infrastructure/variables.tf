@@ -1,4 +1,4 @@
-# Define variables 
+# Define variables for common Proxmox and VM configurations
 
 variable "proxmox_api_url" {
   type = string
@@ -31,6 +31,11 @@ variable "passwordGW" {
   type = string
 }
 
+# The Variables for Gateway VM
+variable "gateway_ip" {
+  type = string
+}
+
 # The Map Variable for all K8s VMs
 variable "vms" {
   description = "Map of VM configurations for the Kubernetes cluster"
@@ -52,5 +57,17 @@ variable "ops_center_config" {
     cores     = number
     memory    = number
     disk_size = string # Ops-Center is bigger (20G) than the others
+  })
+}
+
+# The Variables for k3s-prod 
+variable "k3s_prod_config" {
+  description = "Configuration for the Production K3s Node"
+  type = object({
+    vmid      = number
+    ip        = string
+    cores     = number
+    memory    = number
+    disk_size = string
   })
 }
