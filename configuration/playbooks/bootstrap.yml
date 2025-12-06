@@ -1,0 +1,67 @@
+---
+- name: "Bootstrap Ops-Center (Management Node)"
+  hosts: management
+  become: true
+  vars:
+    docker_users: ["devops"]
+
+  tasks:
+    # 1. System Hygiene
+    - name: Update apt cache and upgrade packages
+      ansible.builtin.apt:
+        update_cache: yes
+        upgrade: "yes"
+
+    - name: Install required system dependencies
+      ansible.builtin.apt:
+        pkg:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - git
+          - unzip
+          - jq
+        state: present
+
+    # 2. Docker Installation 
+    - name: Create directory for Docker GPG key
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Docker's official GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+        force: true
+
+    - name: Add Docker repository to sources
+      ansible.builtin.shell: |
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+          $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+          tee /etc/apt/sources.list.d/docker.list > /dev/null
+      args:
+        creates: /etc/apt/sources.list.d/docker.list
+
+    - name: Install Docker Engine and Compose
+      ansible.builtin.apt:
+        update_cache: yes
+        pkg:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+
+    # 3. User Permissions (Security Best Practice)
+    - name: Add 'devops' user to the docker group
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: docker
+        append: yes
+      loop: "{{ docker_users }}"

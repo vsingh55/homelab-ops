@@ -1,0 +1,6 @@
+---
+- name: Deploy S3 Storage (MinIO)
+  hosts: management
+  become: true
+  roles:
+    - minio

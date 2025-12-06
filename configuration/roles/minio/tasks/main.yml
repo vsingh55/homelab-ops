@@ -1,0 +1,21 @@
+---
+- name: Ensure MinIO data directory exists
+  ansible.builtin.file:
+    path: "{{ minio_data_dir }}"
+    state: directory
+    mode: '0755'
+    owner: devops
+    group: docker
+
+- name: Copy Docker Compose definition
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "/home/{{ ansible_user }}/minio-compose.yml"
+    mode: '0640'
+
+- name: Deploy MinIO Container
+  community.docker.docker_compose_v2:
+    project_src: "/home/{{ ansible_user }}"
+    files:
+      - minio-compose.yml
+    state: present

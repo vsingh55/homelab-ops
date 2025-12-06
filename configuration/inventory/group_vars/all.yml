@@ -1,0 +1,10 @@
+# User Configuration
+ansible_user: devops
+ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+
+# Fix for "Python Interpreter" Warning
+ansible_python_interpreter: /usr/bin/python3
+
+# Fix for "Remote Tmp" Warning
+# We define a standard path that the user definitely has write access to
+ansible_remote_tmp: /tmp/.ansible-${USER}/tmp

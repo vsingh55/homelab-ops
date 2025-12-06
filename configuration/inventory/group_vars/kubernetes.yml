@@ -1,0 +1,5 @@
+# Security: Tunnel through Ops-Center to reach internal nodes
+# ansible_ssh_common_args sets SSH options for all hosts in this group.
+# The ProxyCommand option allows Ansible to connect to internal nodes via the 'ops-center' jump host.
+# Replace 'devops@ops-center' with your actual jump host user and address if different.
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q devops@ops-center"'

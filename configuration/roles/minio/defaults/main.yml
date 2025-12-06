@@ -1,0 +1,8 @@
+---
+minio_port_api: 9000
+minio_port_console: 9001
+minio_data_dir: "/opt/minio/data"
+minio_config_dir: "/opt/minio/config"
+minio_root_user: "admin"
+minio_root_password: "{{ vault_minio_root_password }}" 
+minio_domain: "ops-center"
