@@ -1,0 +1,16 @@
+# Credentials of MinIO S3 storage bucket to secure remote backend files
+
+access_key = "YOUR_ACCESS_KEY"
+secret_key = "YOUR_SECRET_KEY" 
+
+
+## --------------------------------------------------------------
+# Pro Tip: The way to generate new keys in the future is via the command line on your ops-center machine:
+# 1. SSH into your ops-center machine
+# 2. Run the following command:
+# Example command 
+# '''docker exec -it minio mc admin user svcacct add myminio admin '''
+# Or, if you are not using Docker run the following command directly:
+#    opscenter-admin-setup --generate-keys
+# Follow the prompts to create new access and secret keys.   
+## --------------------------------------------------------------

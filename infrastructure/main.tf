@@ -195,6 +195,10 @@ resource "proxmox_vm_qemu" "k3s_prod" {
   }
   memory  = var.k3s_prod_config.memory
   agent   = 1
+  scsihw = "virtio-scsi-pci"
+  vga {
+    type = "std"
+  }
 
   network {
     id     = 0
