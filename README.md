@@ -12,6 +12,13 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
 * **Hardware:** Mini PC (Intel i5 7th Gen, 16GB RAM, 256GB NVMe, 1TB HDD).
   ![alt text](/images/server.jpeg)
 * **Hypervisor:** Proxmox VE 9.1 (Debian-based).
+* **Logical Zones:**
+    * **Zone Management (Always On):** `ops-center` node for Ansible Control, S3 State, and Monitoring.
+    * **Zone Production (Always On):** `k3s-prod` node for persistent applications (Traefik, Grafana etc).
+    * **Zone Lab (On-Demand):** Ephemeral Kubernetes Cluster (`gateway`, `server`, `nodes`) for CKA study, managed by Ansible Power Automation to save RAM.
+* **Network Strategy:**
+    * **WAN Access:** Zero-Trust via Tailscale Mesh (No open ports on router).
+    * **Internal Routing:** Ansible tunnels traffic through the Management Node (Jump Host).
 * **Storage Strategy:** Tiered architecture (NVMe for Hot Data/VMs, HDD for Cold Storage/Backups).
 * **Backup Strategy:** 3-2-1 Rule implemented via Proxmox Snapshots + Offsite Rclone Sync.
 * **Security & Remote State:** To adhere to **Data Sovereignty** and **Zero Trust** principles, this project decouples state from the local machine.
@@ -31,6 +38,8 @@ This repository documents the entire lifecycle of the lab:
 4. [Infrastructure Provisioning (Terraform)](docs/04-infrastructure-provisioning.md) — IaC workflows and state management.
 5. [Deep Dive: Engineering Challenges](docs/05-infrastructure-challenges.md) — Post-mortem of technical blockers.
 6. [**Remote Operations Transformation**](docs/06-remote-ops-transformation.md) — Migration to S3 Remote State, Air-Gapped Networking (Tailscale), and Multi-Zone Architecture.
+7. [**The Automation Journey**](docs/07-ansible-automation-journey.md) — Evolution from Shell scripts to Ansible Roles, Vault, and Dynamic Inventory.
+8. [**Debugging Wan Connectivity**](docs/08-debugging-wan-connectivity.md) — A debugging journey on troubleshooting Split-Horizon SSH and Tailscale Routing.
 
 ## Key Technologies
 
