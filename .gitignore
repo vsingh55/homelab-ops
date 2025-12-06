@@ -3,3 +3,7 @@ terraform.tfstate
 terraform.tfvars
 .terraform.lock.hcl
 terraform.tfstate.backup
+backend.conf
+pack_homelab.py
+homelab_context.md
+.vscode/

@@ -24,7 +24,7 @@ variable "ci_user" {
 }
 
 variable "ssh_key" {
-  type    = string
+  type = string
 }
 
 variable "passwordGW" {
@@ -41,4 +41,16 @@ variable "vms" {
     memory        = number
     startup_param = string
   }))
+}
+
+# The Variables for ops-center VM
+variable "ops_center_config" {
+  description = "Configuration for the Management Node"
+  type = object({
+    vmid      = number
+    ip        = string
+    cores     = number
+    memory    = number
+    disk_size = string # Ops-Center is bigger (20G) than the others
+  })
 }
