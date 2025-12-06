@@ -14,6 +14,12 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
 * **Hypervisor:** Proxmox VE 9.1 (Debian-based).
 * **Storage Strategy:** Tiered architecture (NVMe for Hot Data/VMs, HDD for Cold Storage/Backups).
 * **Backup Strategy:** 3-2-1 Rule implemented via Proxmox Snapshots + Offsite Rclone Sync.
+* **Security & Remote State:** To adhere to **Data Sovereignty** and **Zero Trust** principles, this project decouples state from the local machine.
+  * **Terraform Backend:** State is stored in a self-hosted S3-compatible bucket (MinIO) running on the Management Node.
+  * **Secret Management:**
+      * Infrastructure secrets (API Tokens) are passed via `terraform.tfvars` (git-ignored).
+      * Configuration secrets (Passwords) are encrypted using **Ansible Vault**.
+  * **Access Control:** All nodes are accessed via SSH Key-based authentication only.
 
 ## Engineering Journal
 This repository documents the entire lifecycle of the lab:
@@ -30,13 +36,13 @@ This repository documents the entire lifecycle of the lab:
 
 | Layer | Tool | Purpose |
 | :--- | :--- | :--- |
-| Hypervisor | Proxmox VE | Host virtualization and VM lifecycle management |
-| Provisioning | Terraform | Declarative infrastructure provisioning and drift control |
-| Orchestration | Kubernetes | Container orchestration and workload management |
-| Configuration Management | Ansible | System configuration and consistent state enforcement |
-| VM Bootstrapping | Cloud‑Init | Automated VM templating and first-boot provisioning |
-| Backup & Recovery | Rclone + systemd | Encrypted offsite sync and scheduled backup orchestration |
-| Container Runtime | Docker | Local container image management and runtime |
+| **Hypervisor** | Proxmox VE | Host virtualization and VM lifecycle management |
+| **Provisioning** | Terraform | Declarative infrastructure provisioning and drift control |
+| **Orchestration** | Kubernetes | Container orchestration and workload management |
+| **Configuration Management** | Ansible | System configuration and consistent state enforcement |
+| **VM Bootstrapping** | Cloud‑Init | Automated VM templating and first-boot provisioning |
+| **Backup & Recovery** | Rclone + systemd | Encrypted offsite sync and scheduled backup orchestration |
+| **Container Runtime** | Docker | Local container image management and runtime |
 | **Scripting** | Bash / Systemd | Automation of client-side sync tasks |
 | **Networking** | SMTP Relay | Centralized Notification System (Gmail) |
 | **Security** | Rclone (SFTP) | Encrypted transport of backups |
