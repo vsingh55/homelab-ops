@@ -1,0 +1,53 @@
+---
+# USAGE: 
+# Start Lab: ansible-playbook playbooks/manage_lab.yml --tags start_lab
+# Stop Lab:  ansible-playbook playbooks/manage_lab.yml --tags stop_lab
+
+- name: Manage Lab Infrastructure Power State
+  hosts: hypervisor  # Targets Proxmox Host
+  gather_facts: false
+  become: true       # Requires root on Proxmox to run qm/pct commands
+
+  tasks:
+    # ==========================================
+    # START LOGIC (Tags: start_lab)
+    # ==========================================
+    - name: Start Gateway Container (LXC 100)
+      ansible.builtin.command: "pct start 100"
+      register: gateway_start
+      changed_when: "'VM 100 already running' not in gateway_start.stderr"
+      failed_when: 
+        - gateway_start.rc != 0 
+        - "'VM 100 already running' not in gateway_start.stderr"
+      tags: start_lab
+
+    - name: Start Kubernetes VMs (200, 210, 220)
+      ansible.builtin.command: "qm start {{ item }}"
+      loop:
+        - 200  # server
+        - 210  # node-0
+        - 220  # node-1
+      register: vm_start
+      changed_when: "'VM {{ item }} already running' not in vm_start.stderr"
+      failed_when:
+        - vm_start.rc != 0
+        - "'VM {{ item }} already running' not in vm_start.stderr"
+      ignore_errors: true # Continue even if one fails
+      tags: start_lab
+
+    # ==========================================
+    # STOP LOGIC (Tags: stop_lab)
+    # ==========================================
+    - name: Gracefully Shutdown Kubernetes VMs
+      ansible.builtin.command: "qm shutdown {{ item }} --timeout 60"
+      loop:
+        - 200
+        - 210
+        - 220
+      ignore_errors: true
+      tags: stop_lab
+
+    - name: Gracefully Shutdown Gateway Container
+      ansible.builtin.command: "pct shutdown 100"
+      ignore_errors: true
+      tags: stop_lab

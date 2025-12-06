@@ -1,0 +1,21 @@
+---
+- name: Deploy K3s Production Cluster
+  hosts: production
+  become: true
+  tasks:
+    - name: Install K3s (Single Node)
+      ansible.builtin.shell: |
+        curl -sfL https://get.k3s.io | sh -
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Wait for K3s to start
+      ansible.builtin.wait_for:
+        port: 6443
+        delay: 5
+
+    - name: Extract Kubeconfig
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ~/.kube/config-k3s-prod
+        flat: yes
