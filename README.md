@@ -25,12 +25,12 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
 This repository documents the entire lifecycle of the lab:
 ### Documentation Overview
 
-1. [Architecture & Storage Design](docs/01-architecture.md) — Resource-optimised architecture and tiered storage strategy tailored for constrained hardware, including capacity planning and performance tuning.
-2. [Proxmox Foundation](docs/02-proxmox-setup.md) — Proxmox VE installation and hardening, Cloud‑Init VM templates, and network design/segmentation best practices.
-3. [Disaster Recovery Pipeline](docs/03-backup-dr.md) — End-to-end automated backup and recovery workflows: snapshot policies, offsite encrypted sync with rclone, and systemd-based orchestration for zero-touch recovery.
-4. [Infrastructure Provisioning (Terraform)](docs/04-infrastructure-provisioning.md) — Infrastructure-as-Code workflows, module development, state management, and troubleshooting strategies for provisioning and resource allocation.
-5.  [**Deep Dive: Engineering Challenges**](docs/05-infrastructure-challenges.md)
-6.  
+1. [Architecture & Storage Design](docs/01-architecture.md) — Resource-optimised architecture and tiered storage strategy.
+2. [Proxmox Foundation](docs/02-proxmox-setup.md) — Proxmox VE installation and hardening.
+3. [Disaster Recovery Pipeline](docs/03-backup-dr.md) — Automated backups and offsite sync.
+4. [Infrastructure Provisioning (Terraform)](docs/04-infrastructure-provisioning.md) — IaC workflows and state management.
+5. [Deep Dive: Engineering Challenges](docs/05-infrastructure-challenges.md) — Post-mortem of technical blockers.
+6. [**Remote Operations Transformation**](docs/06-remote-ops-transformation.md) — Migration to S3 Remote State, Air-Gapped Networking (Tailscale), and Multi-Zone Architecture.
 
 ## Key Technologies
 

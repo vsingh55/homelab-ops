@@ -28,6 +28,5 @@ Exposing the Proxmox host port 8006 or SSH port 22 directly to the internet via 
 * **Outcome:** I can now `ping Internal-servers ` from a coffee shop without exposing any ports on the home router.
 
 ## 4. Next Steps
-* **Configuration Management:** Move away from "Shell Scripting" to "State-Based Configuration."
 * **Production Cluster:** Deploy K3s for hosting persistent tools (Traefik, Grafana).
 * **Observability:** Implement Prometheus for metrics collection.
