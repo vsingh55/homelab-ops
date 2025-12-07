@@ -40,6 +40,7 @@ This repository documents the entire lifecycle of the lab:
 6. [**Remote Operations Transformation**](docs/06-remote-ops-transformation.md) — Migration to S3 Remote State, Air-Gapped Networking (Tailscale), and Multi-Zone Architecture.
 7. [**The Automation Journey**](docs/07-ansible-automation-journey.md) — Evolution from Shell scripts to Ansible Roles, Vault, and Dynamic Inventory.
 8. [**Debugging Wan Connectivity**](docs/08-debugging-wan-connectivity.md) — A debugging journey on troubleshooting Split-Horizon SSH and Tailscale Routing.
+9. [**Application Layer & Observability**](docs/09-application-layer-observability.md) — Deploying Traefik, Prometheus, and Grafana with Ansible Vault security.
 
 ## Key Technologies
 

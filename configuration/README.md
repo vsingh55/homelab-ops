@@ -15,15 +15,17 @@ This directory contains the "Day 2" operational logic for the Homelab. It handle
 │   ├── hosts.yml           # Defines hosts and groups (Management, Production, Lab/Kubernetes)
 │   └── group_vars/         # Variables applied to specific groups
 │       ├── all.yml         # Global settings (Python interpreters, SSH users)
-│       ├── production.yml         # Variables for the k3s-prod persistent cluster
-│       ├── lab.yml  # K8s-specific settings (Jump Host tunneling args)
+│       ├── production.yml  # Variables for the k3s-prod persistent cluster
+│       ├── lab.yml         # K8s-specific settings (Jump Host tunneling args)
 │       └── management/     # Management node settings (includes Vaulted secrets)
 ├── playbooks/              # Entry points for automation tasks
 │   ├── bootstrap.yml       # Initial OS setup (Updates, Dependencies, Docker)
 │   └── deploy_minio.yml    # Deploys the MinIO Object Storage container
-│   └── manage_lab.yml    # Automates the Power On/Off of the "Lab Zone" to save RAM.
+│   └── manage_lab.yml      # Automates the Power On/Off of the "Lab Zone" to save RAM.
 └── roles/                  # Reusable logic units
-    └── minio/              # Role to install and configure MinIO S3
+    ├── minio/              # Role to install and configure MinIO S3
+    ├── traefik/            # Deploys Traefik Ingress Controller (Helm)
+    └── monitoring/         # Deploys Prometheus/Grafana Stack
 ```
 
 ## Security Model
