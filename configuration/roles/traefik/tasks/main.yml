@@ -1,0 +1,47 @@
+---
+- name: Install Helm (Required for Charts)
+  ansible.builtin.shell: |
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  args:
+    creates: /usr/local/bin/helm
+
+- name: Add Traefik Helm Repo
+  kubernetes.core.helm_repository:
+    name: traefik
+    repo_url: "https://traefik.github.io/charts"
+
+- name: Create Traefik Config (Values.yaml)
+  ansible.builtin.copy:
+    dest: /tmp/traefik-values.yaml
+    content: |
+      # Expose the Dashboard securely
+      ingressRoute:
+        dashboard:
+          enabled: false  # We will create a secure one later manually
+      
+      # Persistence for LetsEncrypt Certificates
+      persistence:
+        enabled: true
+        path: /data
+        size: 1Gi
+      
+      # Allow HTTP and HTTPS
+      ports:
+        web:
+          expose: 
+            default: true
+          nodePort: 30080  # Optional: Fix a port for testing
+        websecure:
+          expose: 
+            default: true
+          nodePort: 30443
+
+- name: Deploy Traefik via Helm
+  kubernetes.core.helm:
+    name: traefik
+    chart_ref: traefik/traefik
+    release_namespace: "{{ traefik_namespace }}"
+    create_namespace: true
+    values_files:
+      - /tmp/traefik-values.yaml
+    kubeconfig: /etc/rancher/k3s/k3s.yaml

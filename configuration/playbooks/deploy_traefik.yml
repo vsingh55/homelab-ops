@@ -1,0 +1,6 @@
+---
+- name: Deploy Traefik Ingress Controller
+  hosts: production
+  become: true
+  roles:
+    - traefik

@@ -1,0 +1,4 @@
+---
+monitoring_namespace: "monitoring"
+grafana_domain: "grafana.homelab"
+prometheus_domain: "prometheus.homelab"

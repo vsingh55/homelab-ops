@@ -1,0 +1,6 @@
+---
+- name: Deploy Observability Stack
+  hosts: production
+  become: true
+  roles:
+    - monitoring

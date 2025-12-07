@@ -1,0 +1,3 @@
+---
+traefik_chart_version: "26.0.0" 
+traefik_namespace: "kube-system" # Standard for K3s ingress

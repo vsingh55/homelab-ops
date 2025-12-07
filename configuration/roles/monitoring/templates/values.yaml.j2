@@ -1,0 +1,26 @@
+grafana:
+  # OLD: adminPassword: "admin"
+  # NEW: Use the variable from the Vault
+  adminPassword: "{{ grafana_admin_password }}"
+  
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - "{{ grafana_domain }}"
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - "{{ prometheus_domain }}"
+    paths:
+      - /
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+
+alertmanager:
+  enabled: false # Saving RAM (Optional: Enable if want alerts)
