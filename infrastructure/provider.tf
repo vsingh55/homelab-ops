@@ -10,12 +10,14 @@ terraform {
 provider "proxmox" {
   # URL of your Proxmox API
   pm_api_url = var.proxmox_api_url
-
   # Authentication (Using the Token you just created)
   pm_api_token_id             = var.proxmox_api_token_id
   pm_api_token_secret         = var.proxmox_api_token_secret
-  pm_minimum_permission_check = false
 
-  # Security (Ignore self-signed certs)
-  pm_tls_insecure = true
+  # Standard Performance Options
+  pm_minimum_permission_check = false
+  pm_tls_insecure             = true
+  pm_parallel                 = 1
+  pm_timeout                  = 600 
 }
+

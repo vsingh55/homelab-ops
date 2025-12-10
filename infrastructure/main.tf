@@ -1,242 +1,85 @@
-# ======================================================
-# Mode A (Production): Ops-Center + K3s-Prod are UP. 
-# Mode B (Academy/Lab): Ops-Center + Lab Cluster are UP. 
-# ======================================================
 # ==============================================
-# Zone A: Lab (Academy Plane)
-# consists of The KTHW Fleet and the Gateway VM
+# Zone A: Lab (Academy Plane) - Gateway
 # ==============================================
+module "gateway" {
+  source = "./modules/compute/lxc"
 
-resource "proxmox_lxc" "gateway" {
-  target_node     = var.target_node
-  hostname        = "gateway"
-  vmid            = 100
-  ostemplate      = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
-  password        = var.passwordGW
-  unprivileged    = true
-  ssh_public_keys = var.ssh_key
-
-  cores  = 1
-  memory = 512
-  swap   = 512
-
-  onboot  = true
-  start   = true
-  startup = "order=1,up=0,down=0"
-
-  network {
-    name   = "eth0"
-    bridge = "vmbr0"
-    ip     = "${var.gateway_ip}/24"
-    gw     = "192.168.0.1"
-  }
-
-  rootfs {
-    storage = "local-lvm"
-    size    = "8G"
-  }
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "Host gateway
-        HostName 192.168.0.10
-        User root
-        IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
-    EOT
-  }
+  target_node  = var.target_node
+  hostname     = "gateway"
+  vmid         = 100
+  ostemplate   = var.lxc_template
+  password     = var.passwordGW
+  ssh_key      = var.ssh_key
+  cores        = 1
+  memory       = 512
+  ip_address   = var.gateway_config.ip
+  gateway_ip   = "192.168.0.1" # Physical Router IP
+  onboot       = var.gateway_config.onboot
 }
 
-resource "proxmox_vm_qemu" "k8s_cluster" {
-  # Creates a VM for every entry in the 'vms' variable
+# K8s Cluster
+
+module "k8s_cluster" {
+  source   = "./modules/compute/vm"
   for_each = var.vms
 
-  target_node = var.target_node
-  name        = each.key
-  vmid        = each.value.vmid
-  clone       = "ubuntu-cloud-24.04"
-
-  # Hardware Config
-  cpu {
-    cores = each.value.cores
-  }
-  memory = each.value.memory
-  scsihw = "virtio-scsi-pci"
-
-  # Display
-  vga {
-    type = "std"
-  }
-
-  # Storage Configuration
-  disks {
-    scsi {
-      scsi0 {
-        disk {
-          storage = "local-lvm"
-          size    = "8G"
-        }
-      }
-    }
-    ide {
-      ide2 {
-        cloudinit {
-          storage = "local-lvm"
-        }
-      }
-    }
-  }
-
-  # Network Configuration
-  network {
-    id     = 0
-    model  = "virtio"
-    bridge = "vmbr0"
-  }
-
-  # Boot Order
-  boot    = "order=scsi0;net0"
-  onboot  = true
-  startup = each.value.startup_param
-
-  # Cloud-Init & Auth
-  ciuser    = var.ci_user
-  sshkeys   = var.ssh_key
-  ipconfig0 = "ip=${each.value.ip}/24,gw=192.168.0.1"
-
-  # SSH Config Injection (Dynamic)
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "Host ${each.key}
-        HostName ${each.value.ip}
-        User ${var.ci_user}
-        IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
-    EOT
-  }
-}
-
-# ==========================================
-# ZONE M: MANAGEMENT (The Ops-Center)
-# ==========================================
-
-resource "proxmox_vm_qemu" "ops_center" {
-  target_node = var.target_node
-  name        = "ops-center"
-  vmid        = var.ops_center_config.vmid
-  clone       = "ubuntu-cloud-24.04" 
-
- # Hardware Config
-  cpu {
-    cores = var.ops_center_config.cores
-  }
-  memory = var.ops_center_config.memory
-  scsihw = "virtio-scsi-pci"
-
-  # Display
-  vga {
-    type = "std"
-  }
-
-  # Network
-  network {
-    id     = 0
-    bridge = "vmbr0"
-    model  = "virtio"
-  }
-
-  # Boot & Disk
-  boot = "order=scsi0;net0"
-  disks {
-    scsi {
-      scsi0 {
-        disk {
-          storage = "local-lvm"
-          size    = var.ops_center_config.disk_size
-        }
-      }
-    }
-    ide {
-      ide2 {
-        cloudinit {
-          storage = "local-lvm"
-        }
-      }
-    }
-  }
-
-  # Cloud-Init & Auth
-  ciuser    = var.ci_user
-  sshkeys   = var.ssh_key
-  ipconfig0 = "ip=${var.ops_center_config.ip}/24,gw=192.168.0.1"
-
-  # SSH Config Injection (Dynamic)
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "Host ops-center
-        HostName ${var.ops_center_config.ip}
-        User ${var.ci_user}
-        IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
-    EOT
-  }
-}
-
-# ==============================================
-# Zone P: PROD (APPLICATION PLANE - K3s Cluster)  
-# ==============================================
-
-resource "proxmox_vm_qemu" "k3s_prod" {
-  target_node = var.target_node
-  name        = "k3s-prod"
-  vmid        = var.k3s_prod_config.vmid
-  clone       = "ubuntu-cloud-24.04"
-
-  # Resource Allocation (Efficient)
+  target_node   = var.target_node
+  vm_name       = each.key
+  vmid          = each.value.vmid
+  template_name = var.vm_template
   
-  cpu {
-    cores = var.k3s_prod_config.cores
-  }
-  memory  = var.k3s_prod_config.memory
-  agent   = 1
-  scsihw = "virtio-scsi-pci"
-  vga {
-    type = "std"
-  }
+  cores         = each.value.cores
+  memory        = each.value.memory
+  disk_size     = "8G" # Standard for lab nodes
+  startup_param = each.value.startup_param
+  onboot        = each.value.onboot
+  ci_user       = var.ci_user
+  ssh_key       = var.ssh_key
+  ip_address    = each.value.ip
+  gateway_ip    = var.gateway_config.ip # Gateway VM is the GW for Lab
+}
 
-  network {
-    id     = 0
-    bridge = "vmbr0"
-    model  = "virtio"
-  }
+# ==============================================
+# Zone M: Management (The Ops-Center)
+# ==============================================
+module "ops_center" {
+  source = "./modules/compute/vm"
 
-  boot = "order=scsi0;net0"
-  disks {
-    scsi {
-      scsi0 {
-        disk {
-          storage = "local-lvm"
-          size    = var.k3s_prod_config.disk_size
-        }
-      }
-    }
-    ide {
-      ide2 {
-        cloudinit {
-          storage = "local-lvm"
-        }
-      }
-    }
-  }
+  target_node   = var.target_node
+  vm_name       = "ops-center"
+  vmid          = var.ops_center_config.vmid
+  template_name = var.vm_template
 
-  # Cloud-Init
-  ciuser    = var.ci_user
-  sshkeys   = var.ssh_key
-  ipconfig0 = "ip=${var.k3s_prod_config.ip}/24,gw=192.168.0.1"
+  cores         = var.ops_center_config.cores
+  memory        = var.ops_center_config.memory
+  disk_size     = var.ops_center_config.disk_size
+  onboot        = var.ops_center_config.onboot
+  
+  ci_user       = var.ci_user
+  ssh_key       = var.ssh_key
+  ip_address    = var.ops_center_config.ip
+  gateway_ip    = "192.168.0.1" # Direct access to physical router
+}
 
-  # SSH Config Injection
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "Host k3s-prod
-        HostName ${var.k3s_prod_config.ip}
-        User ${var.ci_user}
-        IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
-    EOT
-  }
+# ==============================================
+# Zone P: PROD (Application Plane - K3s)
+# ==============================================
+module "k3s_prod" {
+  source = "./modules/compute/vm"
+
+  target_node   = var.target_node
+  vm_name       = "k3s-prod"
+  vmid          = var.k3s_prod_config.vmid
+  template_name = var.vm_template
+
+  cores         = var.k3s_prod_config.cores
+  memory        = var.k3s_prod_config.memory
+  disk_size     = var.k3s_prod_config.disk_size
+  agent_enabled = 1
+  onboot        = var.k3s_prod_config.onboot
+
+  ci_user       = var.ci_user
+  ssh_key       = var.ssh_key
+  ip_address    = var.k3s_prod_config.ip
+  gateway_ip    = "192.168.0.1" 
 }
