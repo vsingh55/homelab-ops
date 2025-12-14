@@ -1,0 +1,8 @@
+---
+- name: Setup Application Backups (Velero)
+  hosts: management
+  become: false # Run as devops user to access ~/.kube/config
+  vars_files:
+    - ../inventory/group_vars/management/vault.yml
+  roles:
+    - backup-velero

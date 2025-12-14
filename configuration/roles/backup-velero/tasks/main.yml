@@ -1,0 +1,60 @@
+---
+- name: Install Python dependencies for Kubernetes modules
+  ansible.builtin.apt:
+    name: python3-kubernetes
+    state: present
+    update_cache: yes
+  become: true
+  
+- name: Check if Velero is already installed
+  kubernetes.core.k8s_info:
+    kind: Deployment
+    namespace: velero
+    name: velero
+    kubeconfig: ~/.kube/config-k3s-prod
+  register: velero_deployment
+
+- name: Download Velero CLI
+  ansible.builtin.get_url:
+    url: "https://github.com/vmware-tanzu/velero/releases/download/v1.12.0/velero-v1.12.0-linux-amd64.tar.gz"
+    dest: "/tmp/velero.tar.gz"
+
+- name: Install Velero CLI
+  ansible.builtin.unarchive:
+    src: "/tmp/velero.tar.gz"
+    dest: "/usr/local/bin"
+    extra_opts: ["--strip-components=1"]
+    remote_src: yes
+    include: ["velero-v1.12.0-linux-amd64/velero"]
+  become: true
+
+- name: Create temporary credentials file
+  ansible.builtin.copy:
+    dest: "/tmp/velero-creds"
+    content: |
+      [default]
+      aws_access_key_id = {{ vault_minio_root_user }}
+      aws_secret_access_key = {{ vault_minio_root_password }}
+    mode: '0600'
+  when: velero_deployment.resources | length == 0
+
+- name: Install Velero Server (Connect to MinIO)
+  ansible.builtin.command: >
+    velero install
+    --provider aws
+    --plugins velero/velero-plugin-for-aws:v1.8.0
+    --bucket k3s-backups
+    --secret-file /tmp/velero-creds
+    --use-node-agent
+    --use-volume-snapshots=false
+    --backup-location-config region=minio,s3ForcePathStyle="true",s3Url=http://192.168.0.5:9000
+    --kubeconfig ~/.kube/config-k3s-prod
+  environment:
+    VELERO_NAMESPACE: velero
+  when: velero_deployment.resources | length == 0
+
+- name: Remove temporary credentials file
+  ansible.builtin.file:
+    path: "/tmp/velero-creds"
+    state: absent
+  when: velero_deployment.resources | length == 0
