@@ -15,7 +15,7 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
 * **Logical Zones:**
     * **Zone Management (Always On):** `ops-center` node for Ansible Control, S3 State, and Monitoring.
     * **Zone Production (Always On):** `k3s-prod` node for persistent applications (Traefik, Grafana etc).
-    * **Zone Lab (On-Demand):** Ephemeral Kubernetes Cluster (`gateway`, `server`, `nodes`) for CKA study, managed by Ansible Power Automation to save RAM.
+    * **Zone Lab (On-Demand):** Ephemeral Kubernetes Cluster (`gateway`, `jumpbox`. `server`, `nodes`) for CKA study, managed by Ansible Power Automation to save RAM.
 * **Network Strategy:**
     * **WAN Access:** Zero-Trust via Tailscale Mesh (No open ports on router).
     * **Internal Routing:** Ansible tunnels traffic through the Management Node (Jump Host).
@@ -27,6 +27,17 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
       * Infrastructure secrets (API Tokens) are passed via `terraform.tfvars` (git-ignored).
       * Configuration secrets (Passwords) are encrypted using **Ansible Vault**.
   * **Access Control:** All nodes are accessed via SSH Key-based authentication only.
+
+## 🏗 Architecture Status
+
+| Component | Technology | Status | Details |
+| :--- | :--- | :--- | :--- |
+| **Infrastructure** | Terraform | ✅ Active | **Modular Design** with remote S3 State Backend (MinIO). |
+| **Configuration** | Ansible | ✅ Active | Automated bootstrapping, security hardening, and Zsh dotfiles. |
+| **Orchestration** | K3s (Kubernetes) | ✅ Active | 3-Node HA Cluster (Prod) + 1 Node (Lab). |
+| **Storage** | MinIO | ✅ Active | S3 Compatible Object Storage (1TB Capacity on `ops-center`). |
+| **Backups** | Velero + Restic | ✅ Active | **Dual-Layer Defense:** K8s Objects (Velero) + Host Data (Restic). |
+| **Observability** | Prometheus/Grafana | 🚧 Planned | Upcoming implementation. |
 
 ## Engineering Journal
 This repository documents the entire lifecycle of the lab:
@@ -41,6 +52,8 @@ This repository documents the entire lifecycle of the lab:
 7. [**The Automation Journey**](docs/07-ansible-automation-journey.md) — Evolution from Shell scripts to Ansible Roles, Vault, and Dynamic Inventory.
 8. [**Debugging Wan Connectivity**](docs/08-debugging-wan-connectivity.md) — A debugging journey on troubleshooting Split-Horizon SSH and Tailscale Routing.
 9. [**Application Layer & Observability**](docs/09-application-layer-observability.md) — Deploying Traefik, Prometheus, and Grafana with Ansible Vault security.
+10. [**Refactoring to Modular Terraform**](./docs/10-terraform-modularization) 
+11. [**Implementing Comprehensive Backups**](./docs/11-comprehensive-backups.md) 
 
 ## Key Technologies
 
