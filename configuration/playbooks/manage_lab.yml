@@ -21,17 +21,19 @@
         - "'VM 100 already running' not in gateway_start.stderr"
       tags: start_lab
 
-    - name: Start Kubernetes VMs (200, 210, 220)
+    - name: Start Kubernetes VMs (200, 210, 220, 221)
       ansible.builtin.command: "qm start {{ item }}"
       loop:
-        - 200  # server
-        - 210  # node-0
-        - 220  # node-1
+        - 200  # jumpbox
+        - 210  # server
+        - 220  # node-0
+        - 221  # node-1
+
       register: vm_start
-      changed_when: "'VM {{ item }} already running' not in vm_start.stderr"
+      changed_when: "('VM ' ~ item ~ ' already running') not in vm_start.stderr"
       failed_when:
         - vm_start.rc != 0
-        - "'VM {{ item }} already running' not in vm_start.stderr"
+        - "('VM ' ~ item ~ ' already running') not in vm_start.stderr"
       ignore_errors: true # Continue even if one fails
       tags: start_lab
 
@@ -41,9 +43,10 @@
     - name: Gracefully Shutdown Kubernetes VMs
       ansible.builtin.command: "qm shutdown {{ item }} --timeout 60"
       loop:
-        - 200
-        - 210
-        - 220
+        - 200  # jumpbox
+        - 210  # server
+        - 220  # node-0
+        - 221  # node-1
       ignore_errors: true
       tags: stop_lab
 
