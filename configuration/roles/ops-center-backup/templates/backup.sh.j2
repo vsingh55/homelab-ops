@@ -1,0 +1,26 @@
+#!/bin/bash
+export RESTIC_REPOSITORY="{{ backup_repo_path }}"
+export RESTIC_PASSWORD="{{ vault_restic_password }}"
+
+# Log Start
+echo "---------------------------------"
+echo "Starting Ops-Center Backup at $(date)"
+
+# 1. Backup Critical Data
+# - MinIO Data (Terraform State & K8s Backups)
+# - Homelab Ops Repo (Code)
+# - Zsh Configuration (Shell Setup)
+restic backup \
+  /mnt/storage/minio-data \
+  /home/devops/homelab-ops \
+  /home/devops/.zshrc \
+  /home/devops/.zsh_secrets \
+  --tag scheduled
+
+# 2. Prune Old Backups
+# Keep last 7 days and last 4 weeks
+restic forget --keep-daily 7 --keep-weekly 4 --prune
+
+# Log End
+echo "Backup Complete at $(date)"
+echo "---------------------------------"

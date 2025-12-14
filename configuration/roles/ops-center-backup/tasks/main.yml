@@ -1,0 +1,46 @@
+---
+- name: Install Restic
+  ansible.builtin.apt:
+    name: restic
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Create Backup Repository Directory
+  ansible.builtin.file:
+    path: "{{ backup_repo_path }}"
+    state: directory
+    mode: '0700'
+    owner: root
+    group: root
+  become: true
+
+- name: Initialize Restic Repository
+  ansible.builtin.command:
+    cmd: "restic init --repo {{ backup_repo_path }}"
+  environment:
+    RESTIC_PASSWORD: "{{ vault_restic_password }}"
+  register: init_result
+  failed_when: 
+    - init_result.rc != 0 
+    - "'already initialized' not in init_result.stderr"
+  changed_when: "'created restic repository' in init_result.stdout"
+  become: true
+
+- name: Create Backup Script
+  ansible.builtin.template:
+    src: backup.sh.j2
+    dest: /usr/local/bin/run-ops-center-backup
+    mode: '0700'
+    owner: root
+    group: root
+  become: true
+
+- name: Schedule Daily Backup (Cron)
+  ansible.builtin.cron:
+    name: "Daily Ops-Center Backup"
+    minute: "0"
+    hour: "3" # Runs automatically at 03:00 AM
+    job: "/usr/local/bin/run-ops-center-backup >> {{ backup_log_path }} 2>&1"
+    user: root
+  become: true

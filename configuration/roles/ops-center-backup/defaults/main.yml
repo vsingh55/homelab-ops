@@ -1,0 +1,3 @@
+---
+backup_repo_path: "/var/backups/ops-center-repo"
+backup_log_path: "/var/log/ops-center-backup.log"

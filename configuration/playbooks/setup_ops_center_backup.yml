@@ -1,0 +1,7 @@
+---
+- name: Setup Ops-Center Auto-Backup
+  hosts: management
+  vars_files:
+    - ../inventory/group_vars/management/vault.yml
+  roles:
+    - ops-center-backup
