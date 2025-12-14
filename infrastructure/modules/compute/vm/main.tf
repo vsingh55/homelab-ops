@@ -34,6 +34,7 @@ resource "proxmox_vm_qemu" "vm" {
   # Boot & Disk Configuration
   boot    = "order=scsi0;net0"
   onboot  = var.onboot
+  vm_state = var.onboot ? "running" : "stopped"
   startup = var.startup_param
 
   disks {
@@ -44,7 +45,19 @@ resource "proxmox_vm_qemu" "vm" {
           size    = var.disk_size
         }
       }
+      
+      # block to only create scsi1 if size is not "0G"
+      dynamic "scsi1" {
+        for_each = var.data_disk_size != "0G" ? [1] : []
+        content {
+          disk {
+            storage = var.data_disk_storage
+            size    = var.data_disk_size
+          }
+        }
+      }
     }
+
     ide {
       ide2 {
         cloudinit {

@@ -53,6 +53,9 @@ module "ops_center" {
   cores         = var.ops_center_config.cores
   memory        = var.ops_center_config.memory
   disk_size     = var.ops_center_config.disk_size
+  # Add the 1TB HDD Config
+  data_disk_size    = "250G"        # Allocating 250GB for data recovery tasks
+  data_disk_storage = "backup-hdd"  # Must match the ID of directory created in Proxmox for the HDD
   onboot        = var.ops_center_config.onboot
   
   ci_user       = var.ci_user
