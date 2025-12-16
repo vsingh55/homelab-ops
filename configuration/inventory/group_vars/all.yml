@@ -8,3 +8,5 @@ ansible_python_interpreter: /usr/bin/python3
 # Fix for "Remote Tmp" Warning
 # We define a standard path that the user definitely has write access to
 ansible_remote_tmp: /tmp/.ansible-${USER}/tmp
+
+timezone: "Asia/Kolkata"

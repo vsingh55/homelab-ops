@@ -12,6 +12,10 @@
         update_cache: yes
         upgrade: "yes"
 
+    - name: Set system timezone to {{ timezone }}
+      community.general.timezone:
+        name: "{{ timezone }}"
+
     - name: Install required system dependencies
       ansible.builtin.apt:
         pkg:
@@ -65,3 +69,16 @@
         groups: docker
         append: yes
       loop: "{{ docker_users }}"
+
+    # 4. QEMU Guest Agent Installation
+    - name: Install QEMU Guest Agent
+      ansible.builtin.apt:
+        name: qemu-guest-agent
+        state: present
+        update_cache: yes
+
+    - name: Start and Enable QEMU Guest Agent
+      ansible.builtin.service:
+        name: qemu-guest-agent
+        state: started
+        enabled: yes

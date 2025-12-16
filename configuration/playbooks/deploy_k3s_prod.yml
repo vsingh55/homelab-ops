@@ -3,6 +3,22 @@
   hosts: production
   become: true
   tasks:
+    - name: Install QEMU Guest Agent
+      ansible.builtin.apt:
+        name: qemu-guest-agent
+        state: present
+        update_cache: yes
+
+    - name: Start and Enable QEMU Guest Agent
+      ansible.builtin.service:
+        name: qemu-guest-agent
+        state: started
+        enabled: yes
+
+    - name: Set system timezone to {{ timezone }}
+      community.general.timezone:
+        name: "{{ timezone }}"
+
     - name: Install K3s (Single Node)
       ansible.builtin.shell: |
         curl -sfL https://get.k3s.io | sh -
