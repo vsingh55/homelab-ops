@@ -74,7 +74,16 @@ resource "proxmox_vm_qemu" "vm" {
   sshkeys   = var.ssh_key
   ipconfig0 = "ip=${var.ip_address}/24,gw=${var.gateway_ip}"
 
-
+  # This allows Proxmox to reclaim "Cache" memory from the VM
+  balloon = 1
+  
+  # To fix tag drift issues with Proxmox UI and API 
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
+  
   # SSH Config Injection (Local Convenience)
 
   provisioner "local-exec" {

@@ -31,6 +31,7 @@ module "k8s_cluster" {
   cores         = each.value.cores
   memory        = each.value.memory
   disk_size     = "8G" # Standard for lab nodes
+  agent_enabled = 1
   startup_param = each.value.startup_param
   onboot        = each.value.onboot
   ci_user       = var.ci_user
@@ -56,6 +57,7 @@ module "ops_center" {
   # Add the 1TB HDD Config
   data_disk_size    = "250G"        # Allocating 250GB for data recovery tasks
   data_disk_storage = "backup-hdd"  # Must match the ID of directory created in Proxmox for the HDD
+  agent_enabled = 1
   onboot        = var.ops_center_config.onboot
   
   ci_user       = var.ci_user
