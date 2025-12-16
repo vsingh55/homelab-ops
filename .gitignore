@@ -8,3 +8,4 @@ pack_homelab.py
 homelab_context.md
 .vscode/
 notes.md
+.ansible_vault_pass
