@@ -10,7 +10,7 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
 
 ## Architecture
 * **Hardware:** Mini PC (Intel i5 7th Gen, 16GB RAM, 256GB NVMe, 1TB HDD).
-  ![alt text](/images/server.jpeg)
+  ![alt text](/images/v.1.0.0/HomeLab-Ops%20V1.0.0.svg)
 * **Hypervisor:** Proxmox VE 9.1 (Debian-based).
 * **Logical Zones:**
     * **Zone Management (Always On):** `ops-center` node for Ansible Control, S3 State, and Monitoring.
