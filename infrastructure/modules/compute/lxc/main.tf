@@ -43,4 +43,11 @@ resource "proxmox_lxc" "lxc" {
         IdentityFile ~/.ssh/id_ed25519" >> ~/.ssh/config
     EOT
   }
+
+  # To fix tag drift issues with Proxmox UI and API 
+  lifecycle {
+    ignore_changes = [
+      tags,
+    ]
+  }
 }
