@@ -72,7 +72,7 @@ resource "google_compute_instance" "vpn_gateway" {
   # (We will use Ansible instead of startup scripts for better control)
 
   metadata = {
-    # This allows us to SSH using OS Login if needed, 
+    # This allows to SSH using OS Login if needed, 
     # but we'll stick to SSH keys for Ansible.
     enable-oslogin = "TRUE" 
   }
