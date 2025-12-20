@@ -28,7 +28,7 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
       * Configuration secrets (Passwords) are encrypted using **Ansible Vault**.
   * **Access Control:** All nodes are accessed via SSH Key-based authentication only.
 
-## 🏗 Architecture Status
+## Architecture Status
 
 | Component | Technology | Status | Details |
 | :--- | :--- | :--- | :--- |
@@ -37,7 +37,20 @@ To engineer a production-grade, self-hosted infrastructure that simulates a real
 | **Orchestration** | K3s (Kubernetes) | ✅ Active | 3-Node HA Cluster (Prod) + 1 Node (Lab). |
 | **Storage** | MinIO | ✅ Active | S3 Compatible Object Storage (1TB Capacity on `ops-center`). |
 | **Backups** | Velero + Restic | ✅ Active | **Dual-Layer Defense:** K8s Objects (Velero) + Host Data (Restic). |
-| **Observability** | Prometheus/Grafana | 🚧 Planned | Upcoming implementation. |
+| **Observability** | Prometheus/Grafana | ✅ Active | Observing my resources & k8s stats on Grafana |
+
+## The "Sovereign Cloud" Roadmap
+
+I am currently evolving this homelab into a Hybrid Cloud Platform spanning On-Premises (India) and Google Cloud (Mumbai).
+
+| Status | Project | Module | Tech Stack |
+| :--- | :--- | :--- | :--- |
+| 🚧 | **1. Hybrid Cloud Network Interconnect** | `infrastructure/gcp` | Terraform, WireGuard, Cloud NAT |
+| ⏳ | **2. Secure CI/CD & Container Registry** | `.github/workflows` | GitHub Actions, Trivy, Cosign |
+| ⏳ | **3. Stateful Kubernetes & DB Operators** | `kubernetes/platform` | K8s, CloudNativePG, LocalPath |
+| ⏳ | **4. Event-Driven Serverless OCR Worker** | `apps/ocr-worker` | Cloud Run, Eventarc, Python |
+| ⏳ | **5. End-to-End Observability Stack** | `kubernetes/platform` | Prometheus, Grafana, OpenTelemetry |
+| ⏳ | **6. GitOps Platform & Disaster Recovery** | `kubernetes/apps` | ArgoCD, Kyverno, DR Scripts |
 
 ## Engineering Journal
 This repository documents the entire lifecycle of the lab:
