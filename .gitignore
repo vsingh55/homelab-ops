@@ -9,3 +9,4 @@ homelab_context.md
 .vscode/
 notes.md
 .ansible_vault_pass
+PRIVATE.txt
