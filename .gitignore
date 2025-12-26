@@ -1,12 +1,27 @@
-.env
-terraform.tfstate
-terraform.tfvars
-.terraform.lock.hcl
-terraform.tfstate.backup
+# --- Terraform ---
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.lock.hcl  
 backend.conf
+
+# --- Ansible ---
+*.retry
+.ansible_vault_pass
+# --- Secrets & Local Configs ---
+configuration/inventory/hosts.yml
+scripts/watchdog.conf
+c
+
+# --- OS/Misc ---
+.DS_Store
+**/.idea/
+**/.vscode/
+**/__pycache__/
+.env
 pack_homelab.py
 homelab_context.md
-.vscode/
 notes.md
-.ansible_vault_pass
 PRIVATE.txt
+scripts/watchdog.conf
