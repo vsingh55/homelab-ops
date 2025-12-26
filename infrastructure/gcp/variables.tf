@@ -3,10 +3,22 @@ variable "gcp_project_id" {
   type        = string
 }
 
+variable "project_name" {
+  description = "Base name for the project (e.g., homelab)"
+  type        = string
+  default     = "homelab"
+}
+
+variable "environment" {
+  description = "Environment (e.g., prod, dev)"
+  type        = string
+  default     = "prod"
+}
+
 variable "gcp_region" {
   description = "Region for GCP resources"
   type        = string
-  default     = "asia-south1" # Mumbai (Lowest Latency for you)
+  default     = "asia-south1" # Mumbai
 }
 
 variable "gcp_zone" {
