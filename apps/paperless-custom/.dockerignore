@@ -1,0 +1,13 @@
+.git
+.github
+infrastructure
+configuration
+kubernetes
+docs
+README.md
+images
+.ansible_vault_pass
+*.log
+*.env
+.vscode
+LICENSE

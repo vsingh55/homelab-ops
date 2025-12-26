@@ -12,7 +12,7 @@ backend.conf
 # --- Secrets & Local Configs ---
 configuration/inventory/hosts.yml
 scripts/watchdog.conf
-c
+
 
 # --- OS/Misc ---
 .DS_Store

@@ -1,0 +1,55 @@
+name: Build and Scan Secure Image
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'apps/paperless-custom/**'
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: paperless-custom
+  # PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }} # Uncomment later
+
+jobs:
+  build-secure:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # Required for uploading Trivy results
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 1. Build the Image (Local Cache)
+      - name: Build Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/paperless-custom
+          push: false # enable this when GCP is ready
+          tags: ${{ env.IMAGE_NAME }}:latest
+          load: true # Load it into the runner so Trivy can scan it
+
+      # 2. Security Scan (Trivy) - Fails pipeline if Critical Vulns found
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.IMAGE_NAME }}:latest'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      # 3. (Future) Login to GCP Artifact Registry
+      # - name: Google Auth
+      #   uses: google-github-actions/auth@v2
+      #   with:
+      #     credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # 4. (Future) Push to GAR
+      # ...

@@ -1,0 +1,23 @@
+---
+- name: Hydrate Infrastructure Configuration
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - ../inventory/group_vars/all.yml
+    - ../inventory/group_vars/production/vault.yml
+
+  tasks:
+    - name: Generate GCP terraform.tfvars
+      template:
+        src: ../../infrastructure/gcp/terraform.tfvars.j2
+        dest: ../../infrastructure/gcp/terraform.tfvars
+        mode: '0600'
+
+    - name: Generate On-Prem terraform.tfvars
+      template:
+        src: ../../infrastructure/on-prem/terraform.tfvars.j2
+        dest: ../../infrastructure/on-prem/terraform.tfvars
+        mode: '0600'
+      # This task takes the .j2 file, fills in the {{ }} placeholders,
+      # and saves it as the real .tfvars file that Terraform expects.
