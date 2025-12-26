@@ -1,0 +1,80 @@
+---
+- name: Install WireGuard and Tools
+  apt:
+    name:
+      - wireguard
+      - wireguard-tools
+      - qrencode
+    state: present
+    update_cache: yes
+
+# --- Security: Fail2Ban Integration ---
+- name: Install Fail2Ban for SSH Protection
+  apt:
+    name: fail2ban
+    state: present
+
+- name: Ensure Fail2Ban is running
+  service:
+    name: fail2ban
+    state: started
+    enabled: yes
+# --------------------------------------
+
+# --- Robust Key Management (Fixes your error) ---
+- name: Check if private key exists
+  stat:
+    path: /etc/wireguard/private.key
+  register: wg_private_key_file
+
+- name: Generate Private Key
+  shell: "wg genkey > /etc/wireguard/private.key"
+  when: not wg_private_key_file.stat.exists
+
+- name: Ensure Private Key Permissions
+  file:
+    path: /etc/wireguard/private.key
+    mode: '0600'
+
+- name: Read Private Key (Securely from Remote)
+  slurp:
+    src: /etc/wireguard/private.key
+  register: wg_private_key_content
+
+- name: Derive Public Key
+  shell: "cat /etc/wireguard/private.key | wg pubkey"
+  register: wg_public_key_result
+  changed_when: false
+
+- name: Set Key Facts
+  set_fact:
+    wireguard_public_key: "{{ wg_public_key_result.stdout }}"
+    # Decodes the base64 content returned by 'slurp'
+    wireguard_private_key: "{{ wg_private_key_content['content'] | b64decode | trim }}"
+# ------------------------------------------------
+
+- name: Enable IP Forwarding (Gateway Only)
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  when: "'gcp' in group_names"
+
+- name: Configure WireGuard Interface (wg0)
+  template:
+    src: wg0.conf.j2
+    dest: /etc/wireguard/wg0.conf
+    mode: '0600'
+  notify: Restart WireGuard
+
+- name: Ensure WireGuard is enabled and running
+  service:
+    name: wg-quick@wg0
+    state: started
+    enabled: yes
+
+- name: Display Public Key (For Debugging)
+  debug:
+    msg: "Public Key for {{ inventory_hostname }} is: {{ wireguard_public_key }}"

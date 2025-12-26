@@ -1,0 +1,64 @@
+all:
+  children:
+    # -----------------------------------
+    # INFRASTRUCTURE (The Hypervisor)
+    # -----------------------------------
+    hypervisor:
+      hosts:
+        pve:
+          ansible_host: 192.168.x.x
+          ansible_user: root
+    
+    # -----------------------------------
+    # ZONE MGMT
+    # -----------------------------------
+    management:
+      hosts:
+        ops-center:
+          ansible_host: ops-center
+          vpn_ip: 10.100.x.x        # The IP this node will get inside the VPN
+          vpn_peer_ip: 10.100.x.x    # The IP of the GCP Gateway
+
+    # -----------------------------------
+    # ZONE PROD
+    # -----------------------------------
+    production:
+      hosts:
+        k3s-prod:
+          ansible_host: 192.168.x.x
+
+    # -----------------------------------
+    # ZONE LAB (K8s The Hard Way)
+    # -----------------------------------
+    lab:
+      children:
+        load_balancers:
+          hosts:
+            gateway:
+              ansible_host: 192.168.x.x
+              ansible_user: root
+        bastion:
+          hosts:
+            jumpbox:
+              ansible_host: 192.168.x.x
+              
+        k8s_cluster:
+          hosts:
+            server:
+              ansible_host: 192.168.x.x
+            node-0:
+              ansible_host: 192.168.x.x
+            node-1:
+              ansible_host: 192.168.x.x
+
+    gcp:
+      hosts:
+        vpn-gateway-mumbai:
+          ansible_host: 34.180.xx.xx
+          ansible_user: gcp-username
+          ansible_ssh_private_key_file: ~/.ssh/google_compute_engine
+          vpn_ip: 10.100.x.x          # The IP this node will get inside the VPN
+          vpn_peer_ip: 10.100.x.x      # The IP of the Home Lab Gateway
+          # The "Public" endpoint the Home Lab connects to
+          vpn_endpoint: "{{ ansible_host }}"
+    

@@ -1,0 +1,23 @@
+---
+- name: Install & Generate Keys
+  hosts: gcp:ops-center
+  become: yes
+  roles:
+    - wireguard
+
+- name: Exchange Keys & Configure Tunnel
+  hosts: gcp:ops-center
+  become: yes
+  tasks:
+    - name: Force Template Refresh (To pick up Peer Keys)
+      template:
+        src: "../roles/wireguard/templates/wg0.conf.j2"
+        dest: /etc/wireguard/wg0.conf
+        mode: '0600'
+      notify: Restart WireGuard
+
+  handlers:
+    - name: Restart WireGuard
+      service:
+        name: wg-quick@wg0
+        state: restarted

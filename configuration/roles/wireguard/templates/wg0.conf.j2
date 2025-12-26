@@ -1,0 +1,20 @@
+[Interface]
+Address = {{ vpn_ip }}/24
+PrivateKey = {{ wireguard_private_key }}
+ListenPort = 51820
+{% if 'gcp' in group_names %}
+# GCP Needs to masquerade traffic leaving the VPN
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens4 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ens4 -j MASQUERADE
+{% endif %}
+
+[Peer]
+# FIX: Changed 'homelab' to 'management' to match your inventory
+PublicKey = {{ hostvars[groups['management'][0] if 'gcp' in group_names else groups['gcp'][0]]['wireguard_public_key'] }}
+AllowedIPs = {{ vpn_peer_ip }}/32{% if 'gcp' in group_names %}, 192.168.0.0/24{% endif %}
+
+{% if 'management' in group_names %}
+# Home connects TO Cloud
+Endpoint = {{ hostvars[groups['gcp'][0]]['vpn_endpoint'] }}:51820
+PersistentKeepalive = 25
+{% endif %}
