@@ -9,7 +9,6 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING 
 {% endif %}
 
 [Peer]
-# FIX: Changed 'homelab' to 'management' to match your inventory
 PublicKey = {{ hostvars[groups['management'][0] if 'gcp' in group_names else groups['gcp'][0]]['wireguard_public_key'] }}
 AllowedIPs = {{ vpn_peer_ip }}/32{% if 'gcp' in group_names %}, 192.168.0.0/24{% endif %}
 

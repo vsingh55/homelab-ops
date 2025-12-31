@@ -21,7 +21,7 @@
     enabled: yes
 # --------------------------------------
 
-# --- Robust Key Management (Fixes your error) ---
+# --- Robust Key Management ---
 - name: Check if private key exists
   stat:
     path: /etc/wireguard/private.key
