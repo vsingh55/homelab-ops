@@ -1,7 +1,8 @@
 # Secret Management: The Vault Hydration Pattern
 
 **Scope:** Security & Automation Integration
-
+## Workfow Automation
+![Architecture Diagram](../images/v.2.0.0/P1.hybrid-network/secret-hydration-flow.png)
 ## 1. The Problem: "Terraform vs. Git"
 As I scaled the infrastructure, I encountered a classic DevOps conflict:
 1.  **Terraform** requires variables (API keys, passwords) in plain text files (`terraform.tfvars`) to execute.

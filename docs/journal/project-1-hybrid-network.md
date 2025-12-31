@@ -1,7 +1,5 @@
 # Project 1 - Hybrid Cloud Network Interconnect
 
-**Date:** December 2025  
-**Role:** Platform Engineer  
 **Status:** Production Ready ✅
 
 ---
@@ -10,6 +8,10 @@
 The goal was to extend my on-premises Proxmox laboratory (India) into the Public Cloud (GCP Mumbai) to create a "Sovereign Cloud" platform. Instead of using expensive Managed Services (Cloud VPN, Dedicated Interconnect), I engineered a cost-optimized, RFC-compliant Site-to-Site VPN using open-source tools.
 
 ## 2. Architecture Decisions
+> Architecture Diagrams:
+![Architecture Diagram](../../images/v.2.0.0/P1.hybrid-network/automation-pipeline.png)
+![Architecture Diagram](../../images/v.2.0.0/P1.hybrid-network/architecture-topology.png)
+![Architecture Diagram](../../images/v.2.0.0/P1.hybrid-network/automation-workflow.png)
 
 ### 2.1 The Connectivity Layer: WireGuard vs. OpenVPN vs. IPsec
 I evaluated three protocols for the tunnel:
