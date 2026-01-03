@@ -1,5 +1,9 @@
 # Project 1 - Hybrid Cloud Network Interconnect
 
+**Severity:** P2 (High - Network Interconnect Down)  
+**Affected System:** WireGuard VPN Tunnel (Site-to-Site)  
+**Severity:** P3 (Medium - Automation Failure)  
+**Affected System:** `watchdog-vpn.sh` (GCloud CLI Authentication)  
 **Status:** Production Ready ✅
 
 ---

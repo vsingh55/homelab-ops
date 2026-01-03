@@ -1,5 +1,8 @@
 # Architecture & Resource Strategy
 
+**Severity:** P3 (Medium - Operational Risk)  
+**Affected System:** Proxmox Host (Local Storage)
+
 ## 1. The Constraint Challenge
 **Scenario:** I had a single Mini PC with 16GB RAM. Running a full Kubernetes cluster + Production services requires careful resource budgeting.
 **Solution:** Implemented a **"Two-Layer Architecture"**.

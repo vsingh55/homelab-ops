@@ -1,5 +1,10 @@
 # Deep Dive: Engineering Challenges in Bare-Metal Provisioning
 
+**Severity:** P3 (Medium - Provisioning Failure)  
+**Affected System:** `terraform-provider-proxmox` (VM Storage)
+**Severity:** P3 (Medium - Provisioning Failure)  
+**Affected System:** `proxmox_vm_qemu` (Network Interface), Terraform Provider (v3.0.2-rc04)
+
 **Context:** During the Terraform provisioning phase, several critical integration issues emerged between the Orchestrator (Terraform) and the Hypervisor (Proxmox). These required debugging at the VM hardware definition level.
 
 ## 1. The "Ghost Disk" Phenomenon (State Drift)

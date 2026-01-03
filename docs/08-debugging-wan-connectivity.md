@@ -1,5 +1,8 @@
 # 08. Debugging WAN Connectivity Barrier
 
+**Severity:** P2 (High - Major Functionality Degraded)  
+**Affected System:** `ops-center` (Ansible Control Node)
+
 **Incident:** Ansible Automation failing from external networks (WAN) while operational on LAN.
 
 **Skills Deployed:** Network Tracing, SSH Tunneling, Split-Horizon DNS, Log Analysis.
