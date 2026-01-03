@@ -28,6 +28,23 @@
           - jq
         state: present
 
+    - name: "System | Enable Auto-FSCK Self-Healing"
+      become: true
+      # This ensures I don't conflict with Cloud-Init's default config
+      copy:
+        dest: /etc/default/grub.d/99-self-healing.cfg
+        content: |
+          # HOMELAB-OPS MANAGED FILE
+          # Purpose: Force disk repair on boot to recover from power cuts automatically.
+          GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS0 fsck.mode=force fsck.repair=yes"
+        mode: '0644'
+      notify: update_grub
+
+  handlers:
+    - name: update_grub
+      become: true
+      command: update-grub
+
     # 2. Docker Installation 
     - name: Create directory for Docker GPG key
       ansible.builtin.file:
