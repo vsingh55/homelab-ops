@@ -9,6 +9,7 @@ backend.conf
 # --- Ansible ---
 *.retry
 .ansible_vault_pass
+
 # --- Secrets & Local Configs ---
 configuration/inventory/hosts.yml
 scripts/watchdog.conf

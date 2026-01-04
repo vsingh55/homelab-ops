@@ -49,7 +49,7 @@ NEW_IP=$(gcloud compute instances describe "$GCP_VM_NAME" --zone="$GCP_ZONE" --f
 log "New Public IP: $NEW_IP"
 
 # 5. Update Inventory (Using the path from config)
-sed -i "s/ansible_host: [0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/ansible_host: $NEW_IP/" "$INVENTORY_FILE"
+sed -i "s/ansible_host: .* # DYNAMIC_IP/ansible_host: $NEW_IP # DYNAMIC_IP/" "$INVENTORY_FILE"
 
 # 6. Re-run Ansible
 log "🔄 Re-running Ansible configuration..."

@@ -54,7 +54,8 @@ all:
     gcp:
       hosts:
         vpn-gateway-mumbai:
-          ansible_host: 34.180.xx.xx
+        # watchdog-vpn.sh will update the ansible_host line below with the current external IP
+          ansible_host: 34.180.xx.xx # DYNAMIC_IP
           ansible_user: gcp-username
           ansible_ssh_private_key_file: ~/.ssh/google_compute_engine
           vpn_ip: 10.100.x.x          # The IP this node will get inside the VPN
