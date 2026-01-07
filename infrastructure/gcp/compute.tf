@@ -30,4 +30,5 @@ resource "google_compute_instance" "vpn_gateway" {
   }
   
   tags = ["vpn-gateway"]
+  
 }
