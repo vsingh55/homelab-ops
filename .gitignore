@@ -13,6 +13,7 @@ backend.conf
 # --- Secrets & Local Configs ---
 configuration/inventory/hosts.yml
 scripts/watchdog.conf
+secrets.yaml
 
 
 # --- OS/Misc ---
@@ -30,3 +31,5 @@ scripts/watchdog.conf
 
 
 
+test-ingress.yaml
+oldREADME.md
