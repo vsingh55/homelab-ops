@@ -1,87 +1,65 @@
-# Homelab-Ops: From Bare Metal to Cloud Native
+# 🚀 Homelab-Ops: Hybrid Cloud Platform
 
-**Role:** DevOps Engineer | Cloud Engineer | System Admin
+![Status](https://img.shields.io/badge/Status-Active-success)
+![Version](https://img.shields.io/badge/Version-v2.0.0-blue)
+![Architecture](https://img.shields.io/badge/Architecture-Hybrid%20Cloud-orange)
 
-**Stack:** Proxmox, Terraform, Ansible, Kubernetes, Docker
+> **A production-grade DevOps portfolio demonstrating "Infrastructure as Code" principles in a Hybrid Cloud environment (Proxmox + GCP).**
 
-## Project Goal
-To engineer a production-grade, self-hosted infrastructure that simulates a real-world enterprise environment. 
-<!-- The focus is on **Data Sovereignty**, **Infrastructure as Code (IaC)**, and **Disaster Recovery**. -->
+## 📖 Overview
+**Homelab-Ops** is an engineering initiative to build a resilient, secure, and automated platform for hosting internal tools (Observability, Documents, Automation). It solves the "CGNAT Barrier" by establishing a **Site-to-Site WireGuard Mesh** between an on-premise Proxmox cluster and a Google Cloud Edge Gateway.
 
-## Architecture
-* **Hardware:** Mini PC (Intel i5 7th Gen, 16GB RAM, 256GB NVMe, 1TB HDD).
-  ![alt text](/images/v.1.0.0/HomeLab-Ops%20V1.0.0.svg)
-* **Hypervisor:** Proxmox VE 9.1 (Debian-based).
-* **Logical Zones:**
-    * **Zone Management (Always On):** `ops-center` node for Ansible Control, S3 State, and Monitoring.
-    * **Zone Production (Always On):** `k3s-prod` node for persistent applications (Traefik, Grafana etc).
-    * **Zone Lab (On-Demand):** Ephemeral Kubernetes Cluster (`gateway`, `jumpbox`. `server`, `nodes`) for CKA study, managed by Ansible Power Automation to save RAM.
-* **Network Strategy:**
-    * **WAN Access:** Zero-Trust via Tailscale Mesh (No open ports on router).
-    * **Internal Routing:** Ansible tunnels traffic through the Management Node (Jump Host).
-* **Storage Strategy:** Tiered architecture (NVMe for Hot Data/VMs, HDD for Cold Storage/Backups).
-* **Backup Strategy:** 3-2-1 Rule implemented via Proxmox Snapshots + Offsite Rclone Sync.
-* **Security & Remote State:** To adhere to **Data Sovereignty** and **Zero Trust** principles, this project decouples state from the local machine.
-  * **Terraform Backend:** State is stored in a self-hosted S3-compatible bucket (MinIO) running on the Management Node.
-  * **Secret Management:**
-      * Infrastructure secrets (API Tokens) are passed via `terraform.tfvars` (git-ignored).
-      * Configuration secrets (Passwords) are encrypted using **Ansible Vault**.
-  * **Access Control:** All nodes are accessed via SSH Key-based authentication only.
+### 🏗 Architecture
+![Architecture Diagram](images/v.1.0.0/architecture.png)
 
-## Architecture Status
+* **Zone A (Cloud Edge):** GCP Spot Instances acting as the public ingress and VPN anchor.
+* **Zone B (On-Prem Core):** Proxmox VE running K3s (Kubernetes) for workloads and LXC for routing.
+* **Connectivity:** WireGuard mesh with automated self-healing (Watchdog).
 
-| Component | Technology | Status | Details |
-| :--- | :--- | :--- | :--- |
-| **Infrastructure** | Terraform | ✅ Active | **Modular Design** with remote S3 State Backend (MinIO). |
-| **Configuration** | Ansible | ✅ Active | Automated bootstrapping, security hardening, and Zsh dotfiles. |
-| **Orchestration** | K3s (Kubernetes) | ✅ Active | 3-Node HA Cluster (Prod) + 1 Node (Lab). |
-| **Storage** | MinIO | ✅ Active | S3 Compatible Object Storage (1TB Capacity on `ops-center`). |
-| **Backups** | Velero + Restic | ✅ Active | **Dual-Layer Defense:** K8s Objects (Velero) + Host Data (Restic). |
-| **Observability** | Prometheus/Grafana | ✅ Active | Observing my resources & k8s stats on Grafana |
+## Technology Stack
+| Layer | Technologies |
+| :--- | :--- |
+| **Infrastructure** | Terraform (GCP), Proxmox VE, Docker, LXC |
+| **Configuration** | Ansible, Jinja2, Cloud-Init |
+| **Security** | Ansible Vault (AES-256), WireGuard, SSH Keys |
+| **Orchestration** | K3s (Kubernetes), Docker Compose |
+| **Observability** | Prometheus, Grafana, Node Exporter |
 
-## The "Sovereign Cloud" Roadmap
+## Key Features (v2.0.0)
+* **Vault Hydration Pattern:** Automated injection of secrets from Ansible Vault into Terraform variables.
+* **Self-Healing Network:** `watchdog-vpn.sh` detects cloud preemption and repairs the VPN tunnel automatically.
+* **FinOps Optimized:** Uses GCP Spot instances to keep cloud costs <$5/month.
+* **Zero-Trust Access:** No public ports exposed on the home router; all access is via the encrypted tunnel.
 
-I am currently evolving this homelab into a Hybrid Cloud Platform spanning On-Premises (India) and Google Cloud (Mumbai).
+## Project Structure
+```text
+├── configuration/       # Ansible Playbooks, Roles, and Vault
+├── infrastructure/      # Terraform Code (GCP & On-Prem Modules)
+├── apps/               # Docker/K8s Manifests (Paperless, Traefik)
+├── docs/               # Architecture Decision Records (ADRs)
+└── scripts/            # Automation utilities (Watchdog, Sync)
+```
+## Quick Start
+### 1. Hydrate Secrets
 
-| Status | Project | Module | Tech Stack |
-| :--- | :--- | :--- | :--- |
-| 🚧 | **1. Hybrid Cloud Network Interconnect** | `infrastructure/gcp` | Terraform, WireGuard, Cloud NAT |
-| ⏳ | **2. Secure CI/CD & Container Registry** | `.github/workflows` | GitHub Actions, Trivy, Cosign |
-| ⏳ | **3. Stateful Kubernetes & DB Operators** | `kubernetes/platform` | K8s, CloudNativePG, LocalPath |
-| ⏳ | **4. Event-Driven Serverless OCR Worker** | `apps/ocr-worker` | Cloud Run, Eventarc, Python |
-| ⏳ | **5. End-to-End Observability Stack** | `kubernetes/platform` | Prometheus, Grafana, OpenTelemetry |
-| ⏳ | **6. GitOps Platform & Disaster Recovery** | `kubernetes/apps` | ArgoCD, Kyverno, DR Scripts |
+```Bash
 
-## Engineering Journal
-This repository documents the entire lifecycle of the lab:
-### Documentation Overview
+# Generates terraform.tfvars from encrypted Vault
+cd configuration
+ansible-playbook playbooks/hydrate_infra.yml 
+```
 
-1. [Architecture & Storage Design](docs/01-architecture.md) — Resource-optimised architecture and tiered storage strategy.
-2. [Proxmox Foundation](docs/02-proxmox-setup.md) — Proxmox VE installation and hardening.
-3. [Disaster Recovery Pipeline](docs/03-backup-dr.md) — Automated backups and offsite sync.
-4. [Infrastructure Provisioning (Terraform)](docs/04-infrastructure-provisioning.md) — IaC workflows and state management.
-5. [Deep Dive: Engineering Challenges](docs/05-infrastructure-challenges.md) — Post-mortem of technical blockers.
-6. [**Remote Operations Transformation**](docs/06-remote-ops-transformation.md) — Migration to S3 Remote State, Air-Gapped Networking (Tailscale), and Multi-Zone Architecture.
-7. [**The Automation Journey**](docs/07-ansible-automation-journey.md) — Evolution from Shell scripts to Ansible Roles, Vault, and Dynamic Inventory.
-8. [**Debugging Wan Connectivity**](docs/08-debugging-wan-connectivity.md) — A debugging journey on troubleshooting Split-Horizon SSH and Tailscale Routing.
-9. [**Application Layer & Observability**](docs/09-application-layer-observability.md) — Deploying Traefik, Prometheus, and Grafana with Ansible Vault security.
-10. [**Refactoring to Modular Terraform**](./docs/10-terraform-modularization) 
-11. [**Implementing Comprehensive Backups**](./docs/11-comprehensive-backups.md) 
+### 2. Provision Infrastructure
 
-## Key Technologies
+```Bash
+cd infrastructure/gcp
+terraform init && terraform apply
+```
 
-| Layer | Tool | Purpose |
-| :--- | :--- | :--- |
-| **Hypervisor** | Proxmox VE | Host virtualization and VM lifecycle management |
-| **Provisioning** | Terraform | Declarative infrastructure provisioning and drift control |
-| **Orchestration** | Kubernetes | Container orchestration and workload management |
-| **Configuration Management** | Ansible | System configuration and consistent state enforcement |
-| **VM Bootstrapping** | Cloud‑Init | Automated VM templating and first-boot provisioning |
-| **Backup & Recovery** | Rclone + systemd | Encrypted offsite sync and scheduled backup orchestration |
-| **Container Runtime** | Docker | Local container image management and runtime |
-| **Scripting** | Bash / Systemd | Automation of client-side sync tasks |
-| **Networking** | SMTP Relay | Centralized Notification System (Gmail) |
-| **Security** | Rclone (SFTP) | Encrypted transport of backups |
+### 3. Configure Nodes
 
----
-*This project is actively maintained.*
+```Bash
+cd configuration
+ansible-playbook playbooks/setup_hybrid_vpn.yml
+```
+Author: Vijay Singh
