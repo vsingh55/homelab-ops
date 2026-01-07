@@ -1,0 +1,42 @@
+---
+- name: Install Certbot and Nginx Plugin
+  apt:
+    name:
+      - certbot
+      - python3-certbot-nginx
+    state: present
+    update_cache: yes
+
+- name: Check if Certificate already exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+  register: cert_files
+
+- name: Request Initial Certificate (Dry Run First)
+  command: >
+    certbot certonly --nginx 
+    -d {{ domain_name }} 
+    --email {{ cert_email }} 
+    --agree-tos 
+    --no-eff-email 
+    --non-interactive 
+    --dry-run
+  when: not cert_files.stat.exists
+  register: dry_run_result
+  changed_when: false
+
+- name: Request Initial Certificate (Real)
+  command: >
+    certbot certonly --nginx 
+    -d {{ domain_name }} 
+    --email {{ cert_email }} 
+    --agree-tos 
+    --no-eff-email 
+    --non-interactive
+  when: not cert_files.stat.exists and dry_run_result.rc == 0
+
+- name: Ensure Auto-Renewal Timer is Active
+  service:
+    name: certbot.timer
+    state: started
+    enabled: yes

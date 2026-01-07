@@ -68,12 +68,14 @@
     dest: /etc/wireguard/wg0.conf
     mode: '0600'
   notify: Restart WireGuard
+  when: finalize_setup | default(false)
 
 - name: Ensure WireGuard is enabled and running
   service:
     name: wg-quick@wg0
     state: started
     enabled: yes
+  when: finalize_setup | default(false)
 
 - name: Display Public Key (For Debugging)
   debug:

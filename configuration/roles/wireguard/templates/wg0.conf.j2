@@ -1,19 +1,28 @@
 [Interface]
-Address = {{ vpn_ip }}/24
+Address = {{ vpn_ip }}/32
 PrivateKey = {{ wireguard_private_key }}
 ListenPort = 51820
+
 {% if 'gcp' in group_names %}
-# GCP Needs to masquerade traffic leaving the VPN
+# --- GCP GATEWAY CONFIGURATION ---
+# Masquerade traffic (NAT) so packets can return
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o ens4 -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o ens4 -j MASQUERADE
-{% endif %}
 
+# Loop through ALL VPN Clients (Ops-Center, K3s-Prod, etc.)
+{% for host in groups['vpn_clients'] %}
 [Peer]
-PublicKey = {{ hostvars[groups['management'][0] if 'gcp' in group_names else groups['gcp'][0]]['wireguard_public_key'] }}
-AllowedIPs = {{ vpn_peer_ip }}/32{% if 'gcp' in group_names %}, 192.168.0.0/24{% endif %}
+# Client: {{ host }}
+PublicKey = {{ hostvars[host]['wireguard_public_key'] }}
+AllowedIPs = {{ hostvars[host]['vpn_ip'] }}/32
+{% endfor %}
 
-{% if 'management' in group_names %}
-# Home connects TO Cloud
+{% else %}
+# --- CLIENT CONFIGURATION (Ops-Center / K3s) ---
+[Peer]
+# Connect to GCP Gateway
+PublicKey = {{ hostvars[groups['gcp'][0]]['wireguard_public_key'] }}
 Endpoint = {{ hostvars[groups['gcp'][0]]['vpn_endpoint'] }}:51820
+AllowedIPs = 10.100.0.0/24
 PersistentKeepalive = 25
 {% endif %}

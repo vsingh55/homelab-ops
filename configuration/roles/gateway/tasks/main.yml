@@ -1,0 +1,33 @@
+- name: Install Nginx
+  apt:
+    name: 
+      - nginx
+      - ssl-cert # Ensures snakeoil certs exist for testing
+    state: present
+    update_cache: yes
+
+- name: Deploy Nginx Reverse Proxy Config
+  template:
+    src: nginx_proxy.j2
+    dest: /etc/nginx/sites-available/{{ domain_name }}
+  notify: Reload Nginx
+
+- name: Enable the Nginx Site
+  file:
+    src: /etc/nginx/sites-available/{{ domain_name }}
+    dest: /etc/nginx/sites-enabled/{{ domain_name }}
+    state: link
+  notify: Reload Nginx
+
+- name: Remove Default Nginx Site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Reload Nginx
+
+# Handlers usually go in handlers/main.yml, but if you don't have one:
+- name: Ensure Nginx is started
+  service:
+    name: nginx
+    state: started
+    enabled: yes

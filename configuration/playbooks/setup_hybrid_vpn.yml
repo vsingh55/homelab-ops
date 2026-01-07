@@ -1,15 +1,24 @@
 ---
-- name: Install & Generate Keys
-  hosts: gcp:ops-center
+# 1. Gather Facts & Generate Keys for CLIENTS (Ops-Center & K3s)
+- name: Prepare VPN Clients
+  hosts: vpn_clients
+  become: yes
+  roles:
+    - wireguard 
+# 2. Gather Facts & Generate Keys for GATEWAY (GCP)
+- name: Prepare GCP Gateway
+  hosts: vpn-gateway-mumbai
   become: yes
   roles:
     - wireguard
 
-- name: Exchange Keys & Configure Tunnel
-  hosts: gcp:ops-center
+# 3. Write Configuration & Reload
+# We run this again because now Ansible memory has facts from BOTH sides
+- name: Configure Tunnel Mesh
+  hosts: gcp:vpn_clients
   become: yes
   tasks:
-    - name: Force Template Refresh (To pick up Peer Keys)
+    - name: Deploy WireGuard Config (Mesh)
       template:
         src: "../roles/wireguard/templates/wg0.conf.j2"
         dest: /etc/wireguard/wg0.conf
@@ -21,3 +30,38 @@
       service:
         name: wg-quick@wg0
         state: restarted
+
+
+# ------------------------------------------------------------------
+# GCP Gateway Proxy Configuration (Nginx) for n8n Webhooks
+# ------------------------------------------------------------------
+
+- name: Configure GCP Gateway (VPN + Nginx Proxy + SSL)
+  hosts: vpn-gateway-mumbai
+  become: yes
+  
+  vars:
+    homelab_wireguard_ip: "10.100.0.3"  # Points to K3s
+    domain_name: "hooks.vijaysingh.cloud"
+    cert_email: "vscit23@gmail.com"
+
+  tasks:
+    # 1. Ensure Nginx is installed and running (with default snakeoil if needed)
+    - import_role:
+        name: gateway
+      vars:
+        # Force snakeoil on first run so Nginx can start
+        ssl_cert_path: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+        ssl_key_path: "/etc/ssl/private/ssl-cert-snakeoil.key"
+
+    # 2. Get the Real Certificates
+    - import_role:
+        name: certbot
+
+    # 3. Re-configure Nginx with the Real Certificates
+    - import_role:
+        name: gateway
+      vars:
+        # Now point to the live certs
+        ssl_cert_path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+        ssl_key_path: "/etc/letsencrypt/live/{{ domain_name }}/privkey.pem"

@@ -1,28 +1,59 @@
 #!/bin/bash
 # ------------------------------------------------------------------
-# Watchdog: Hybrid Cloud VPN Healer
+# Watchdog: Hybrid Cloud VPN Healer (Cloudflare Edition)
 # ------------------------------------------------------------------
 
 # 1. Securely Load Configuration
-# Look for the config file in the same directory as this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_FILE="$SCRIPT_DIR/watchdog.conf"
 
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "❌ Critical Error: Config file not found at $CONFIG_FILE"
-    echo "   Please copy watchdog.conf.example to watchdog.conf and configure it."
     exit 1
 fi
 
 source "$CONFIG_FILE"
 
-# ------------------------------------------------------------------
-# Logic (No Secrets Below This Line)
-# ------------------------------------------------------------------
+# --- HELPER FUNCTIONS ---
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$LOG_FILE"
 }
+
+update_cloudflare_dns() {
+    local ip=$1
+    local record_name="hooks.vijaysingh.cloud"
+    
+    # Ensure these are in your watchdog.conf
+    # CF_ZONE_ID="your_zone_id_here"
+    # CF_API_TOKEN="your_api_token_here"
+
+    log "☁️ Checking Cloudflare DNS for $record_name..."
+
+    # Check if record exists and get its ID
+    RECORD_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records?name=$record_name" \
+         -H "Authorization: Bearer $CF_API_TOKEN" \
+         -H "Content-Type: application/json" | grep -Po '(?<="id":")[^"]*' | head -1)
+
+    if [ -z "$RECORD_ID" ]; then
+        log "⚠️ Record not found. Creating new record..."
+        curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records" \
+             -H "Authorization: Bearer $CF_API_TOKEN" \
+             -H "Content-Type: application/json" \
+             --data '{"type":"A","name":"'"$record_name"'","content":"'"$ip"'","ttl":120,"proxied":false}' > /dev/null
+    else
+        log "🔄 Updating existing Record ID: $RECORD_ID to $ip"
+        curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/dns_records/$RECORD_ID" \
+             -H "Authorization: Bearer $CF_API_TOKEN" \
+             -H "Content-Type: application/json" \
+             --data '{"type":"A","name":"'"$record_name"'","content":"'"$ip"'","ttl":120,"proxied":false}' > /dev/null
+    fi
+    log "✅ Cloudflare DNS Updated."
+}
+
+# ------------------------------------------------------------------
+# MAIN LOGIC
+# ------------------------------------------------------------------
 
 # 2. Check Connectivity
 ping -c 3 -W 5 "$VPN_IP" > /dev/null 2>&1
@@ -48,13 +79,14 @@ fi
 NEW_IP=$(gcloud compute instances describe "$GCP_VM_NAME" --zone="$GCP_ZONE" --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
 log "New Public IP: $NEW_IP"
 
-# 5. Update Inventory (Using the path from config)
+# 5. Update Inventory
 sed -i "s/ansible_host: .* # DYNAMIC_IP/ansible_host: $NEW_IP # DYNAMIC_IP/" "$INVENTORY_FILE"
 
-# 6. Re-run Ansible
+# 6. Update DNS (The New Step)
+update_cloudflare_dns "$NEW_IP"
+
+# 7. Re-run Ansible
 log "🔄 Re-running Ansible configuration..."
-# We assume the playbook path relative to the inventory location defined in config
-# Or you can add PLAYBOOK_DIR to the config file for extra safety.
 cd "$(dirname "$INVENTORY_FILE")/../" || exit 1
 ansible-playbook playbooks/setup_hybrid_vpn.yml -i inventory/hosts.yml >> "$LOG_FILE" 2>&1
 
