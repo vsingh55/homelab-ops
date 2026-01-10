@@ -1,4 +1,40 @@
+# ----------------------------------------------------------------
+# Ansible / Python Artifacts
+# ----------------------------------------------------------------
+*.retry
+*.pyc
+__pycache__/
+.ansible/
+.ansible_vault_pass
+# --- Secrets & Local Configs ---
+configuration/inventory/hosts.yml
+scripts/watchdog.conf
+secrets.yaml
+test-ingress.yaml
+
+# ----------------------------------------------------------------
+# Security & Secrets
+# ----------------------------------------------------------------
+# Ignore decrypted vault files 
+*.unencrypted
+.env
+
+# ----------------------------------------------------------------
+# IDE Settings 
+# ----------------------------------------------------------------
+*.swp
+**/.idea/
+**/.vscode/
+
+# ----------------------------------------------------------------
+# OS Generated Files
+# ----------------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------------------------------------------------
 # --- Terraform ---
+# ----------------------------------------------------------------
 **/.terraform/
 *.tfstate
 *.tfstate.backup
@@ -6,30 +42,9 @@
 .terraform.lock.hcl  
 backend.conf
 
-# --- Ansible ---
-*.retry
-.ansible_vault_pass
-
-# --- Secrets & Local Configs ---
-configuration/inventory/hosts.yml
-scripts/watchdog.conf
-secrets.yaml
-
-
-# --- OS/Misc ---
-.DS_Store
-**/.idea/
-**/.vscode/
-**/__pycache__/
-.env
+# --- Misc ---
 pack_homelab.py
 homelab_context.md
 notes.md
 PRIVATE.txt
-scripts/watchdog.conf
-
-
-
-
-test-ingress.yaml
 oldREADME.md
