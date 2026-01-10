@@ -1,3 +1,8 @@
 ---
+# Connection settings for Proxmox Node
+
 # Tunnel PVE connection through Ops-Center
 ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q devops@ops-center"'
+
+# Other hypervisor configs
+pve_cluster_name: home-cluster

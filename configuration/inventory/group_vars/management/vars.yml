@@ -1,0 +1,3 @@
+minio_root_user: "{{ vault_minio_root_user }}"
+minio_root_password: "{{ vault_minio_root_password }}"
+restic_password: "{{ vault_restic_password }}"

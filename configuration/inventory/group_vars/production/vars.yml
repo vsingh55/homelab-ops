@@ -1,3 +1,15 @@
 ---
-# Tunnel connection through Ops-Center (Jump Host)
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q devops@ops-center"'
+# ----------------------------------------------------------------
+# CONFIGURATION - PLAIN TEXT
+# ----------------------------------------------------------------
+# Map the vault variables to usable names here
+grafana_admin_password: "{{ vault_grafana_admin_password }}"
+discord_webhook_url: "{{ vault_discord_webhook_url }}"
+
+proxmox_api_token_secret: "{{ vault_proxmox_api_token_secret }}"
+proxmox_gateway_password: "{{ vault_proxmox_gateway_password }}"
+
+
+# Other config
+grafana_domain: "monitor.homelab.local"
+prometheus_domain: "prom.homelab.local"

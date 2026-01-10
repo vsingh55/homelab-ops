@@ -4,8 +4,14 @@
   connection: local
   gather_facts: no
   vars_files:
-    - ../inventory/group_vars/all.yml
+    # 1. Load the Infrastructure Blueprint (IPs, Regions)
+    - ../inventory/group_vars/all/vars.yml
+    
+    # 2. Load the Production Secrets (Passwords)
     - ../inventory/group_vars/production/vault.yml
+    
+    # 3. Load Production Configs (Domain names, mapped variables)
+    - ../inventory/group_vars/production/vars.yml
 
   tasks:
     - name: Generate GCP terraform.tfvars
