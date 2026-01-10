@@ -5,15 +5,17 @@ resource "google_compute_instance" "vpn_gateway" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-12"
-      size  = 10
+      image = "ubuntu-os-cloud/ubuntu-2204-lts"
+      size  = 20
     }
   }
 
   network_interface {
-    subnetwork = google_compute_subnetwork.subnet.id
+    network    = google_compute_network.vpc.name
+    subnetwork = google_compute_subnetwork.subnet.name
+    
     access_config {
-      # Ephemeral Public IP
+      nat_ip = google_compute_address.vpn_gateway_ip.address
     }
   }
 
@@ -21,14 +23,13 @@ resource "google_compute_instance" "vpn_gateway" {
     enable-oslogin = "TRUE" 
   }
 
-  # FinOps Strategy: Spot Provisioning
+  
   scheduling {
-    preemptible                 = true
+    preemptible                 = false
     automatic_restart           = false
-    provisioning_model          = "SPOT"
-    instance_termination_action = "STOP"
+    provisioning_model          = "STANDARD"
   }
   
-  tags = ["vpn-gateway"]
+  tags = ["vpn-gateway", "http-server", "https-server"]
   
 }

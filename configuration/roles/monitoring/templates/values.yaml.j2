@@ -1,5 +1,4 @@
 grafana:
-  # OLD: adminPassword: "admin"
   # NEW: Use the variable from the Vault
   adminPassword: "{{ grafana_admin_password }}"
   persistence:
@@ -28,5 +27,74 @@ prometheus:
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web
 
+# ----------------------------------------------------------------
+  # Create custom alerts
+  prometheusSpec:
+    additionalPrometheusRulesMap:
+      custom-ops-rules:
+        groups:
+        - name: homelab-ops
+          rules:
+          # WRAP PROMETHEUS TEMPLATING IN RAW BLOCK
+          {% raw %}
+          # 1. INSTANCE DOWN (Critical)
+          - alert: InstanceDown
+            expr: up == 0
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Instance {{ $labels.instance }} is down"
+              description: "Getting no metrics from {{ $labels.instance }} for more than 5 minute."
+
+          # 2. CPU SATURATION (Warning)
+          - alert: HighNodeLoad
+            expr: node_load1 > 3
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High Load on {{ $labels.instance }}"
+              description: "System load is {{ $value }}, which exceeds core count."
+
+          # 3. HIGH NETWORK UPLOAD (Security)
+          - alert: HighNetworkUpload
+            expr: rate(node_network_transmit_bytes_total[1m]) > 10000000
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High Network Upload Detected"
+              description: "Outbound traffic is {{ $value | humanize1024 }}B/s. Check for data exfiltration."
+          {% endraw %}
+
+# ----------------------------------------------------------------
+
 alertmanager:
-  enabled: false # Saving RAM (Optional: Enable if want alerts)
+  enabled: true  
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['alertname', 'job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 3h
+      receiver: 'discord-notifications'
+      routes:
+        - match:
+            alertname: Watchdog
+          receiver: 'null' 
+    receivers:
+    - name: 'null'
+    - name: 'discord-notifications'
+      discord_configs:
+      - webhook_url: '{{ discord_webhook_url }}' 
+        send_resolved: true
+        # WRAP ALERTMANAGER TEMPLATES IN RAW BLOCK
+        {% raw %}
+        title: '{{ template "discord.title" . }}'
+        message: '{{ template "discord.message" . }}'
+        {% endraw %}
+    templates:
+    - '/etc/alertmanager/config/*.tmpl'
