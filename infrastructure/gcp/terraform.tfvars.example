@@ -1,6 +1,1 @@
-gcp_project_id = "homelab-xxxxxx"
-gcp_region     = "xxxxxx"    
-gcp_zone       = "xxxxxx"
-project_name   = "xxxxxx"
-environment    = "xxxxxx"  # define environment e.g, test, dev, prod
-subnet_cidr    = "10.0.1.0/24"
+# Example Terraform Variables
