@@ -1,7 +1,0 @@
-# scripts/watchdog.conf.example
-# Copy this to 'watchdog.conf' and fill in your values.
-GCP_ZONE="xxxxxxx"
-GCP_VM_NAME="xxxxxxx"
-VPN_IP="10.100.x.x"
-INVENTORY_FILE="/path/to/inventory/hosts.yml"
-LOG_FILE="/var/log/vpn-watchdog.log"
