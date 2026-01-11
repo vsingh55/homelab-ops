@@ -6,6 +6,7 @@
 
 > **A production-grade DevOps portfolio demonstrating "Infrastructure as Code" principles in a Hybrid Cloud environment (Proxmox + GCP).**
 
+
 ## 📖 Overview
 **Homelab-Ops** is an engineering initiative to build a resilient, secure, and automated platform for hosting internal tools (Observability, Documents, Automation). It solves the "CGNAT Barrier" by establishing a **Site-to-Site WireGuard Mesh** between an on-premise Proxmox cluster and a Google Cloud Edge Gateway.
 
