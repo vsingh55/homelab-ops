@@ -1,5 +1,4 @@
 grafana:
-  # NEW: Use the variable from the Vault
   adminPassword: "{{ grafana_admin_password }}"
   persistence:
     enabled: true
@@ -26,52 +25,19 @@ prometheus:
       - /
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web
-
-# ----------------------------------------------------------------
-  # Create custom alerts
   prometheusSpec:
-    additionalPrometheusRulesMap:
-      custom-ops-rules:
-        groups:
-        - name: homelab-ops
-          rules:
-          # WRAP PROMETHEUS TEMPLATING IN RAW BLOCK
-          {% raw %}
-          # 1. INSTANCE DOWN (Critical)
-          - alert: InstanceDown
-            expr: up == 0
-            for: 5m
-            labels:
-              severity: critical
-            annotations:
-              summary: "Instance {{ $labels.instance }} is down"
-              description: "Getting no metrics from {{ $labels.instance }} for more than 5 minute."
-
-          # 2. CPU SATURATION (Warning)
-          - alert: HighNodeLoad
-            expr: node_load1 > 3
-            for: 5m
-            labels:
-              severity: warning
-            annotations:
-              summary: "High Load on {{ $labels.instance }}"
-              description: "System load is {{ $value }}, which exceeds core count."
-
-          # 3. HIGH NETWORK UPLOAD (Security)
-          - alert: HighNetworkUpload
-            expr: rate(node_network_transmit_bytes_total[1m]) > 10000000
-            for: 2m
-            labels:
-              severity: warning
-            annotations:
-              summary: "High Network Upload Detected"
-              description: "Outbound traffic is {{ $value | humanize1024 }}B/s. Check for data exfiltration."
-          {% endraw %}
-
-# ----------------------------------------------------------------
+    retention: 10d
+    storageSpec: 
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
 
 alertmanager:
-  enabled: true  
+  enabled: true
   config:
     global:
       resolve_timeout: 5m
@@ -84,17 +50,55 @@ alertmanager:
       routes:
         - match:
             alertname: Watchdog
-          receiver: 'null' 
+          receiver: 'null'
     receivers:
     - name: 'null'
     - name: 'discord-notifications'
       discord_configs:
-      - webhook_url: '{{ discord_webhook_url }}' 
+      - webhook_url: '{{ discord_webhook_url }}'
         send_resolved: true
-        # WRAP ALERTMANAGER TEMPLATES IN RAW BLOCK
-        {% raw %}
-        title: '{{ template "discord.title" . }}'
-        message: '{{ template "discord.message" . }}'
-        {% endraw %}
+        # SAFER SYNTAX: Only wrapping the values in raw, keeping keys aligned
+        title: '{% raw %}{{ template "discord.title" . }}{% endraw %}'
+        message: '{% raw %}{{ template "discord.message" . }}{% endraw %}'
     templates:
     - '/etc/alertmanager/config/*.tmpl'
+
+# ---------------------------------------------------------------------
+# CUSTOM ALERTS
+# ---------------------------------------------------------------------
+additionalPrometheusRulesMap:
+  homelab-ops-alerts:
+    groups:
+    - name: homelab-ops
+      rules:
+      {% raw %}
+      # 1. INSTANCE DOWN (Critical)
+      - alert: InstanceDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} is down"
+          description: "Getting no metrics from {{ $labels.instance }} for more than 5 minutes."
+
+      # 2. CPU SATURATION (Warning)
+      - alert: HighNodeLoad
+        expr: node_load1 > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Load on {{ $labels.instance }}"
+          description: "System load is {{ $value }}, which exceeds core count."
+
+      # 3. HIGH NETWORK UPLOAD (Security)
+      - alert: HighNetworkUpload
+        expr: rate(node_network_transmit_bytes_total[1m]) > 10000000
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Network Upload Detected"
+          description: "Outbound traffic is {{ $value | humanize1024 }}B/s. Check for data exfiltration."
+      {% endraw %}

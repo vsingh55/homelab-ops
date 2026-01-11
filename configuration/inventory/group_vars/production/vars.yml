@@ -11,5 +11,3 @@ proxmox_gateway_password: "{{ vault_proxmox_gateway_password }}"
 
 
 # Other config
-grafana_domain: "monitor.homelab.local"
-prometheus_domain: "prom.homelab.local"

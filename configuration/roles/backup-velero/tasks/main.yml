@@ -58,3 +58,24 @@
     path: "/tmp/velero-creds"
     state: absent
   when: velero_deployment.resources | length == 0
+
+# ----------------------------------------------------------------
+# BACKUP SCHEDULING (Automated Protection)
+# ----------------------------------------------------------------
+- name: Check if Daily Schedule already exists
+  ansible.builtin.command: >
+    velero schedule get daily-full-backup
+    --kubeconfig ~/.kube/config-k3s-prod
+  register: schedule_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Create Daily Cluster Backup Schedule (Retention 7 Days)
+  ansible.builtin.command: >
+    velero schedule create daily-full-backup
+    --schedule="@daily"
+    --ttl 168h
+    --include-namespaces '*'
+    --exclude-namespaces kube-system,velero
+    --kubeconfig ~/.kube/config-k3s-prod
+  when: schedule_check.rc != 0

@@ -18,3 +18,5 @@
     values_files:
       - /tmp/monitoring-values.yaml
     kubeconfig: /etc/rancher/k3s/k3s.yaml
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
