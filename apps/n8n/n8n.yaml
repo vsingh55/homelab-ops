@@ -28,9 +28,42 @@ spec:
       labels:
         app: n8n
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      initContainers:
+        - name: volume-permissions
+          image: busybox:latest
+          command: ["sh", "-c", "chown -R 1000:1000 /home/node/.n8n"]
+          securityContext:
+            runAsUser: 0 # Runs as root just for this command
+          volumeMounts:
+            - name: n8n-storage
+              mountPath: /home/node/.n8n
       containers:
         - name: n8n
           image: n8nio/n8n:latest
+          # Restart if dead (Liveness), wait to receive traffic (Readiness)
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5678
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu:     500m
+            requests:
+              memory: "512Mi" 
+              cpu:     250m     
           ports:
             - containerPort: 5678
           env:

@@ -1,0 +1,79 @@
+# 1. The Firewall Rule: Block EVERYTHING in 'automation' namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: automation
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# 2. Ingress: Allow Traefik -> n8n (So you can access the UI)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-traefik-to-n8n
+  namespace: automation
+spec:
+  podSelector:
+    matchLabels:
+      app: n8n
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: TCP
+          port: 5678
+---
+# 3. Egress: Allow n8n -> Postgres AND n8n -> DNS
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-n8n-egress
+  namespace: automation
+spec:
+  podSelector:
+    matchLabels:
+      app: n8n
+  egress:
+    # Rule A: Allow connection to Postgres DB
+    - to:
+      - podSelector:
+          matchLabels:
+            app: postgres
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Rule B: Allow DNS Lookups (Essential for finding "postgres")
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# 4. Ingress: Allow Postgres <- n8n
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-postgres-ingress
+  namespace: automation
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres
+  ingress:
+    - from:
+      - podSelector:
+          matchLabels:
+            app: n8n
+      ports:
+        - protocol: TCP
+          port: 5432

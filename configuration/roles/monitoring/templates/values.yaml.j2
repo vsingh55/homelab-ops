@@ -14,6 +14,20 @@ grafana:
       - "{{ grafana_domain }}"
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web
+  # FIX: Optimized Sidecars to save RAM 
+  sidecar:
+    datasources:
+      resources:
+        limits:
+          memory: 100Mi
+        requests:
+          memory: 50Mi
+    dashboards:
+      resources:
+        limits:
+          memory: 100Mi
+        requests:
+          memory: 50Mi
 
 prometheus:
   ingress:
@@ -26,7 +40,13 @@ prometheus:
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web
   prometheusSpec:
-    retention: 10d
+    retention: 5d       # FIX: Reduced retention
+    resources:
+      requests:
+        memory: 400Mi
+      limits:
+        memory: 800Mi
+    walCompression: true # Compresses the Write-Ahead Log to save RAM/Disk
     storageSpec: 
       volumeClaimTemplate:
         spec:
@@ -57,9 +77,9 @@ alertmanager:
       discord_configs:
       - webhook_url: '{{ discord_webhook_url }}'
         send_resolved: true
-        # SAFER SYNTAX: Only wrapping the values in raw, keeping keys aligned
-        title: '{% raw %}{{ template "discord.title" . }}{% endraw %}'
-        message: '{% raw %}{{ template "discord.message" . }}{% endraw %}'
+        # FIX: Replaced broken templates with direct strings 
+        title: '{% raw %}{{ .Status | toUpper }}: {{ .CommonLabels.alertname }}{% endraw %}'
+        message: '{% raw %}{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}{% endraw %}'
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 
@@ -102,3 +122,11 @@ additionalPrometheusRulesMap:
           summary: "High Network Upload Detected"
           description: "Outbound traffic is {{ $value | humanize1024 }}B/s. Check for data exfiltration."
       {% endraw %}
+
+# Disable Control Plane Monitors (False Positives in K3s)
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
