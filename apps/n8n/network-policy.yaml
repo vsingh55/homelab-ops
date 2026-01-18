@@ -58,6 +58,18 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+    # Rule C: Allow Internet Access (HTTPS/HTTP)
+    # Required for: Gemini, PostHog, GitHub, APIs
+    - to:
+      - ipBlock:
+          cidr: 0.0.0.0/0
+          except:
+            - 192.168.0.0/16  
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
 ---
 # 4. Ingress: Allow Postgres <- n8n
 apiVersion: networking.k8s.io/v1
