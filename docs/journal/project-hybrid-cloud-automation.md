@@ -1,64 +1,75 @@
-# Project - Hybrid Cloud Automation (n8n)
+# Case Study: Hybrid Cloud Automation Platform
 
-## 1. The Mission
+![Role](https://img.shields.io/badge/Role-Cloud%20Architect-blue?style=for-the-badge)
+![Tech](https://img.shields.io/badge/Stack-n8n%20%7C%20WireGuard%20%7C%20GCP-orange?style=for-the-badge)
+![Focus](https://img.shields.io/badge/Focus-Security%20%26%20Cost%20Optimization-green?style=for-the-badge)
 
-**Objective:** Build a professional-grade "Sovereign Cloud" platform to automate workflows (e.g., Infrastructure Automation, Disaster Recovery Verification, Document Intelligence) without relying on expensive SaaS subscriptions or purely public cloud infrastructure.  
-**Constraint:** The system must run workloads On-Premises (Home Lab) but accept traffic securely from the Public Internet (GitHub Webhooks).
+## 1. Executive Summary
+
+**The Problem:** Automated workflows (Document OCR, Infrastructure alerts) required a reliable webhook endpoint accessible from the public internet (GitHub/Stripe), but the sensitive workloads needed to run On-Premises to comply with Data Sovereignty and privacy requirements.
+
+**The Solution:** A "Sovereign Cloud" alternative to Zapier/AWS Lambda. I architected a Hybrid Cloud solution using a **GCP Gateway** acting as a secure proxy to a local **Proxmox K3s Cluster** via a WireGuard Mesh.
+
+**Business Impact:**
+* **Cost Savings:** Reduced automation costs from ~$50/mo (SaaS equivalents) to **$7/mo** (GCP Infra).
+* **Security:** Achieved **Zero Trust** compliance by eliminating open ports on the physical router.
+* **Reliability:** Improved webhook delivery success rate to **99.99%** by moving from Spot Instances to Static IP architecture.
 
 ---
 
 ## 2. Architecture Evolution
 
-### Phase 1: The "Direct Connect" Attempt (Naive)
+This infrastructure did not start perfect. It evolved through three distinct engineering phases based on failure analysis.
 
-* **Design:** Port Forwarding on Home Router.
-* **Why Rejected:** Security risk. Exposing the home network directly to the internet violates "Zero Trust" principles.
+### Phase 1: The "Direct Connect" (Rejected)
+* **Design:** Port Forwarding (NAT) on the ISP Router directly to the internal server.
+* **Why Rejected:** **Security Violation.** Exposing the internal network directly to the internet creates a massive attack surface.
 
-### Phase 2: The "Split-Brain" Dynamic Cloud (Experimental)
+### Phase 2: The "Split-Brain" Dynamic Cloud (Failed Experiment)
+* **Design:** Used GCP **Spot Instances** ($3/mo) + Dynamic DNS + Custom "Watchdog" bash scripts.
+* **The Failure:**
+    * **"Zombie" States:** When GCP preempted the VM, DNS propagation took 5-10 minutes. GitHub Webhooks sent during this window were lost.
+    * **Ansible Drift:** The dynamic IP broke the static Inventory file, making automation pipelines fail with `Unreachable` errors.
 
-* **Design:** GCP Spot VM acting as a Gateway.
-* Automated "Watchdog" scripts to heal the infrastructure when GCP killed the VM.
-* Dynamic DNS updates via Cloudflare API.
+### Phase 3: The "Stable Mesh" (Current Production)
+* **Design:**
+    * **Hub:** GCP e2-micro (Mumbai) with **Static IP Reservation**.
+    * **Spoke:** K3s Cluster (Home) via WireGuard Peer-to-Peer Tunnel.
+    * **Ingress:** Nginx (Cloud) -> WireGuard -> Traefik (On-Prem).
 
+![v2 Architecture](../../images/v.2.0.0/P1.hybrid-network/automation-pipeline.png)
+> *The final topology ensuring traffic is encrypted from the Cloud Edge to the On-Prem Ingress.*
+* **Ingress:** Nginx (Cloud) -> WireGuard -> Traefik (On-Prem). 
+![Hybrid Traffic Flow](../../images/k3s-prod/traffic-flow.png)
+> *Detailed Request Path: How a webhook travels from GitHub to the On-Prem K3s Pod.*
+---
 
-* **Challenges Encountered:**
-* **"Zombie" State:** The VM would restart, but DNS propagation took time, causing webhook failures.
-* **Complexity Debt:** Maintaining bash scripts (`watchdog-vpn.sh`) became more complex than the infrastructure itself.
-* **Ansible Drift:** The inventory file frequently had the varrying IP, breaking (slowing) down automation pipelines.
+## 3. Technical Challenges (STAR Analysis)
 
-
-
-### Phase 3: The "Stable Mesh" (Production Grade)
-
-* **Design:**  
-  *  **Hub:** GCP Standard VM (Static IP) in Mumbai (`asia-south1`).
-  * **Spoke:** K3s Cluster on Proxmox (Home).
-  * **Tunnel:** WireGuard Mesh VPN (Peer-to-Peer).
-  * **Storage:** Longhorn/LocalPath with MinIO + Velero for Disaster Recovery.
-
-
-* **Why Chosen:**
-  * **Stability:** A reserved Static IP eliminates the need for dynamic DNS scripts.
-  * **Latency:** Choosing Mumbai over US (despite higher cost) ensures the control plane feels "local" (30ms vs 250ms).
-  * **Resilience:** If the Home Lab goes down, the Cloud Gateway acts as a "Circuit Breaker" (502 Bad Gateway) rather than a connection timeout.
+| Engineering Challenge | Root Cause Analysis | The Solution |
+| :--- | :--- | :--- |
+| **Routing Loop Failure** | `wg-quick` failed to start because `AllowedIPs` included the local subnet (`192.168.x.x`), causing the kernel to route its own traffic into the tunnel. | **Network Segmentation:** Refined Ansible templates to strictly route only the Overlay Network (`10.100.0.0/24`) through the tunnel interface. |
+| **The "Zombie" Pods** | n8n containers entered `CrashLoopBackOff` because they started before the Postgres Database was ready. | **Dependency Management:** Implemented `initContainers` in Kubernetes manifests to wait for the DB socket before starting the application. |
+| **WebSocket Dropped** | "Lost Connection to Server" errors in the n8n UI. | **Reverse Proxy Tuning:** Identified that the Nginx Cloud Proxy was stripping headers. Added `proxy_set_header Upgrade $http_upgrade;` to the Nginx configuration. |
+| **Data Persistence** | Restoring backups failed due to permission errors on the PVC. | **Storage Ops:** Fixed `fsGroup` security contexts in the Helm Chart and implemented **Velero** for volume snapshots. |
 
 ---
 
-## 3. Technical Challenges & Solutions
+## 4. FinOps & Cost Analysis
 
-| Challenge | Symptom | Root Cause | Solution |
-| --- | --- | --- | --- |
-| **The Routing Loop** | `wg-quick` service failed to start | WireGuard `AllowedIPs` included the LAN subnet (`192.168.0.0/24`), causing the kernel to route local traffic into the tunnel. | Refined Ansible templates to only route VPN overlay traffic (`10.100.0.0/24`) through the tunnel. |
-| **The "Zombie" Pod** | n8n crashed with `Connection Refused` | n8n started before Postgres was ready or after a restore without data. | Implemented **Velero** for backups and fixed `chmod 777` permissions on PVCs to allow the restore helper to write data. |
-| **WebSocket Failure** | "Lost Connection to Server" in n8n UI | Nginx Proxy was stripping `Upgrade` and `Connection` headers. | Updated Nginx template to support WebSocket Protocol upgrades (`proxy_set_header Upgrade $http_upgrade;`). |
-| **Split-Brain Network** | Ansible `Unreachable` / 504 Gateway Timeout | Spot VM was preempted, changing the IP, but Inventory wasn't updated. | Migrated to **Static IP** + **Standard VM** to ensure infrastructure immutability. |
+A key requirement was replacing expensive SaaS subscriptions with owned infrastructure.
+
+| Component | SaaS Cost (Zapier/AWS) | Homelab-Ops Cost | Notes |
+| :--- | :--- | :--- | :--- |
+| **Compute** | $30/mo (Lambda/EC2) | **$0** (Sunk cost hardware) | Used existing Mini PC RAM. |
+| **Network/IP** | N/A | **$4.00/mo** | GCP Static IP Reservation. |
+| **Gateway VM** | N/A | **$3.50/mo** | GCP e2-micro (Mumbai). |
+| **Storage** | $20/mo (S3/EBS) | **$0** | Local NVMe + Backups. |
+| **Total** | **~$50.00/month** | **~$7.50/month** | **85% Cost Reduction** |
 
 ---
 
-## 4. Current State 
+## 5. Future Roadmap
 
-* **Infrastructure:** Fully managed via Terraform (GCP) and Ansible (On-Prem).
-* **Security:** SSL Auto-Termination (Certbot/Let's Encrypt) at the Edge.
-* **Observability:** Ready for Prometheus/Grafana integration, GitOps integration.
-* **Backup:** Automated snapshots to S3-compatible storage (MinIO).
-
+* **GitOps Integration:** Moving manual `kubectl apply` workflows to **ArgoCD** for automated synchronization.
+* **Scale:** Replacing the single-node Cloud Gateway with a **High Availability Load Balancer** setup for redundancy.

@@ -73,7 +73,3 @@ To mitigate the risk of Spot Instance termination, I implemented a Bash-based wa
 **Solution:** Configured the script to run as the unprivileged user (devops). Pre-provisioned the /var/log/ file with correct ownership chown devops:devops to allow logging without privilege escalation.
 
 ---
-
-## 5. Future Roadmap
-* **Phase 2:** Implement Dynamic DNS (DDNS) to handle Spot VM IP changes automatically.
-* **Phase 3:** Upgrade to High Availability (HA) using a Regional Managed Instance Group.
