@@ -10,12 +10,15 @@ echo "Starting Ops-Center Backup at $(date)"
 # - MinIO Data (Terraform State & K8s Backups)
 # - Homelab Ops Repo (Code)
 # - Zsh Configuration (Shell Setup)
-restic backup \
+# fix: Lowest CPU, lowest Disk/IO priority 
+nice -n 19 ionice -c 3 restic backup \
   /mnt/storage/minio-data \
   /home/devops/homelab-ops \
   /home/devops/.zshrc \
   /home/devops/.zsh_secrets \
-  --tag scheduled
+  --tag scheduled \
+  --exclude ".terraform" \
+  --exclude ".git"
 
 # 2. Prune Old Backups
 # Keep last 7 days and last 4 weeks
