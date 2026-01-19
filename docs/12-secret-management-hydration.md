@@ -1,8 +1,6 @@
 # Secret Management: The Vault Hydration Pattern
 
 **Scope:** Security & Automation Integration
-## Workfow Automation
-![Architecture Diagram](../images/v.2.0.0/P1.hybrid-network/secret-hydration-flow.png)
 ## 1. The Problem: "Terraform vs. Git"
 As I scaled the infrastructure, I encountered a classic DevOps conflict:
 1.  **Terraform** requires variables (API keys, passwords) in plain text files (`terraform.tfvars`) to execute.
@@ -46,6 +44,7 @@ I implemented an automated bridge that treats `terraform.tfvars` as a **build ar
 1.  **Define:** I update variables in Ansible (`all.yml` or `vault.yml`).
 2.  **Hydrate:** I run `ansible-playbook playbooks/hydrate_infra.yml`.
 3.  **Deploy:** Terraform reads the freshly generated `terraform.tfvars` files.
+![workflow of hydration](../images/v.2.0.0/P1.hybrid-network/secret-hydration-flow.png)
 
 ## 4. Implementation Details
 
@@ -77,6 +76,5 @@ token_secret = "{{ proxmox_api_token_secret }}"
 **Gitignore:** `**/terraform.tfvars` is globally ignored.
 
 **No Manual Edits:** We never edit `tfvars` files directly; they are overwritten by the automation on every run.
-
 
 ---

@@ -35,4 +35,3 @@ Proxmox does not support external SMTP by default. I configured a centralized re
 * **Routing:** Configured a "Notification Matcher" to route all \`severity=error\` alerts to the external relay.
 
 
-> Trust me all the things were so tempting i really enjoying the process.🤗

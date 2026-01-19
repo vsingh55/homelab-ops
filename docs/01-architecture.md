@@ -16,3 +16,6 @@ One of the biggest challenges was the mismatched drives (256GB SSD vs 1TB HDD).
     * **NVMe (local-lvm):** Reserved strictly for OS and VM Disks (Speed).
     * **HDD (HDD-Storage):** Mounted via `fstab` to `/mnt/hdd`. Configured Proxmox to use this *only* for ISOs and Backups.
     * **Result:** High IOPS for apps, massive capacity for archives.
+
+## 3. Architecture Diagram
+![planned architecture](../images/v.1.0.0/architecture.png)
