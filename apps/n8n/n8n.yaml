@@ -28,6 +28,8 @@ spec:
       labels:
         app: n8n
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
@@ -43,7 +45,8 @@ spec:
               mountPath: /home/node/.n8n
       containers:
         - name: n8n
-          image: n8nio/n8n:latest
+          image: homelab/n8n-custom:v6
+          imagePullPolicy: Never
           # Restart if dead (Liveness), wait to receive traffic (Readiness)
           livenessProbe:
             httpGet:
@@ -75,6 +78,12 @@ spec:
               value: "https"
             - name: WEBHOOK_URL
               value: "https://hooks.vijaysingh.cloud/"
+            # Unlock the ability to run Shell Commands via Javascript
+            - name: NODE_FUNCTION_ALLOW_EXTERNAL
+              value: "child_process"
+            # 2. ALSO allow built-in modules (Critical for newer n8n versions)
+            - name: NODE_FUNCTION_ALLOW_BUILTIN
+              value: "*"
             # Database Configuration
             - name: DB_TYPE
               value: "postgresdb"
@@ -106,10 +115,26 @@ spec:
           volumeMounts:
             - name: n8n-storage
               mountPath: /home/node/.n8n
+            # Mount Scripts and Keys
+            - name: scripts-vol
+              mountPath: /home/node/scripts
+            - name: ssh-key-vol
+              mountPath: /home/node/.ssh/id_rsa
+              subPath: id_rsa
+              readOnly: true
       volumes:
         - name: n8n-storage
           persistentVolumeClaim:
             claimName: n8n-pvc
+        # Defining where the data comes from
+        - name: scripts-vol
+          configMap:
+            name: n8n-scripts
+            defaultMode: 0755
+        - name: ssh-key-vol
+          secret:
+            secretName: n8n-ssh-key
+            defaultMode: 0400
 ---
 apiVersion: v1
 kind: Service

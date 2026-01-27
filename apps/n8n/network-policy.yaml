@@ -21,10 +21,19 @@ spec:
     matchLabels:
       app: n8n
   ingress:
+    #1. Allow Traefik (UI Access)
     - from:
       - namespaceSelector:
           matchLabels:
             kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: TCP
+          port: 5678
+    #2. Allow Grafana (Monitoring) -> n8n
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: monitoring
       ports:
         - protocol: TCP
           port: 5678
@@ -70,6 +79,19 @@ spec:
           port: 443
         - protocol: TCP
           port: 80
+    # Rule D: Allow SSH for Remediation (Port 22)
+    - to:
+      # Allow SSH to Local Infrastructure (Proxmox/VMs)
+      - ipBlock:
+          cidr: 192.168.0.0/16
+      # Allow SSH to Public Infrastructure (GCP)
+      - ipBlock:
+          cidr: 0.0.0.0/0
+          except:
+            - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 22
 ---
 # 4. Ingress: Allow Postgres <- n8n
 apiVersion: networking.k8s.io/v1

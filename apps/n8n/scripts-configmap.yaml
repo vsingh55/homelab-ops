@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-scripts
+  namespace: automation
+data:
+  remediate.py: |
+    import argparse
+    import subprocess
+    import json
+    import sys
+
+    # SECURITY: Only allow specific commands
+    ALLOWED_COMMANDS = {
+        "restart_nginx": "sudo systemctl restart nginx",
+        "clear_cache": "sync; echo 1 > /proc/sys/vm/drop_caches",
+        "check_disk": "df -h / | tail -1"
+    }
+
+    SSH_KEY = "/home/node/.ssh/id_rsa"
+    SSH_USER = "devops"
+
+    def run_ssh(target, cmd_key):
+        if cmd_key not in ALLOWED_COMMANDS:
+            return {"status": "error", "message": "Command not allowed"}
+        
+        cmd = ALLOWED_COMMANDS[cmd_key]
+        ssh_cmd = [
+            "ssh", "-o", "StrictHostKeyChecking=no",
+            "-i", SSH_KEY,
+            f"{SSH_USER}@{target}",
+            cmd
+        ]
+        
+        try:
+            res = subprocess.run(ssh_cmd, capture_output=True, text=True, timeout=10)
+            if res.returncode == 0:
+                return {"status": "success", "output": res.stdout.strip()}
+            else:
+                return {"status": "failed", "output": res.stderr.strip()}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
+    if __name__ == "__main__":
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--target", required=True)
+        parser.add_argument("--action", required=True)
+        args = parser.parse_args()
+        
+        print(json.dumps(run_ssh(args.target, args.action)))

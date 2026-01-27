@@ -85,3 +85,6 @@ proxmox_vms:
     memory: 8192
     disk_size: "20G"
     onboot: true
+
+ # n8n public key is automatically deployed to all servers 
+  n8n_automation_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIledY+Db5jV+IkBuk8kHYgdZ4WnNZT0ixTa5Rnt91OG n8n-automation"

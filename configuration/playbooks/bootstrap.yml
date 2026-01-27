@@ -79,13 +79,20 @@
           - docker-compose-plugin
         state: present
 
-    # 3. User Permissions (Security Best Practice)
+    # 3. User Permissions (Security Best Practice) 
     - name: Add 'devops' user to the docker group
       ansible.builtin.user:
         name: "{{ item }}"
         groups: docker
         append: yes
       loop: "{{ docker_users }}"
+      
+    # n8n Key Deployment- project n8n 
+    - name: Authorize n8n Automation Key
+      ansible.posix.authorized_key:
+        user: devops
+        state: present
+        key: "{{ n8n_automation_public_key }}"
 
     # 4. QEMU Guest Agent Installation
     - name: Install QEMU Guest Agent
