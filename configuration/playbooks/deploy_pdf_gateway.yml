@@ -1,0 +1,34 @@
+---
+- name: Configure GCP Gateway Proxy (Part 1 - Snakeoil Setup)
+  hosts: vpn-gateway-mumbai
+  become: yes
+  vars:
+    homelab_wireguard_ip: "10.100.0.3"  # Points to K3s
+    domain_name: "pdf.vijaysingh.cloud"
+    cert_email: "vscit23@gmail.com"
+  tasks:
+    - name: Deploy gateway Nginx proxy with temporary snakeoil certificates
+      import_role:
+        name: gateway
+      vars:
+        ssl_cert_path: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+        ssl_key_path: "/etc/ssl/private/ssl-cert-snakeoil.key"
+
+    - name: Fetch SSL certificates via Certbot
+      import_role:
+        name: certbot
+
+- name: Configure GCP Gateway Proxy (Part 2 - SSL Setup)
+  hosts: vpn-gateway-mumbai
+  become: yes
+  vars:
+    homelab_wireguard_ip: "10.100.0.3"  # Points to K3s
+    domain_name: "pdf.vijaysingh.cloud"
+    cert_email: "vscit23@gmail.com"
+  tasks:
+    - name: Redeploy gateway Nginx proxy with Let's Encrypt certificates
+      import_role:
+        name: gateway
+      vars:
+        ssl_cert_path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+        ssl_key_path: "/etc/letsencrypt/live/{{ domain_name }}/privkey.pem"

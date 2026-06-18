@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdf-generator
+  namespace: automation
+  labels:
+    app: pdf-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pdf-generator
+  template:
+    metadata:
+      labels:
+        app: pdf-generator
+    spec:
+      containers:
+        # Container 1: Flask Web Portal
+        - name: web-portal
+          image: homelab/python-automation:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+              name: http
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: data-volume
+              mountPath: /app/data
+
+        # Container 2: Folder Watcher Daemon
+        - name: folder-watcher
+          image: homelab/python-automation:v1
+          imagePullPolicy: Never
+          command: ["python", "src/main.py", "--watch"]
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+          volumeMounts:
+            - name: data-volume
+              mountPath: /app/data
+
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: pdf-generator-pvc

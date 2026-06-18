@@ -1,0 +1,60 @@
+---
+- name: Build and Package Python Automation Image
+  hosts: management
+  become: yes
+  tasks:
+    - name: Ensure build directory exists on Ops-Center
+      file:
+        path: /home/devops/build/python-automation
+        state: directory
+        owner: devops
+        group: devops
+        mode: '0755'
+
+    - name: Sync application code to Ops-Center
+      ansible.posix.synchronize:
+        src: ../../apps/python-automation/
+        dest: /home/devops/build/python-automation/
+        archive: yes
+        delete: yes
+
+    - name: Build Docker image on Ops-Center
+      shell: docker buildx build --load -t homelab/python-automation:v1 .
+      args:
+        chdir: /home/devops/build/python-automation
+
+    - name: Save Docker image to tarball
+      shell: docker save homelab/python-automation:v1 -o /home/devops/build/python-automation.tar
+
+    - name: Set permissions on tarball
+      file:
+        path: /home/devops/build/python-automation.tar
+        owner: devops
+        group: devops
+        mode: '0644'
+
+- name: Distribute and Load Image on K3s Node
+  hosts: production
+  become: yes
+  tasks:
+    - name: Copy tarball to K3s Production Node
+      command: scp -o StrictHostKeyChecking=no /home/devops/build/python-automation.tar devops@192.168.1.30:/tmp/python-automation.tar
+      delegate_to: ops-center
+      become: no
+
+    - name: Import image into K3s containerd cache
+      command: k3s ctr -n k8s.io images import /tmp/python-automation.tar
+
+    - name: Clean up temporary tarball on K3s node
+      file:
+        path: /tmp/python-automation.tar
+        state: absent
+
+- name: Clean up Ops-Center build artifacts
+  hosts: management
+  become: yes
+  tasks:
+    - name: Clean up temporary tarball on Ops-Center
+      file:
+        path: /home/devops/build/python-automation.tar
+        state: absent
