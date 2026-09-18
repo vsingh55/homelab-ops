@@ -12,8 +12,8 @@ passwordGW               = "{{ proxmox_gateway_password }}"
 
 # 2. Complex Objects (Converted from YAML to JSON for Terraform)
 gateway_config    = {{ proxmox_gateway_config | to_nice_json }}
-vms               = {{ proxmox_vms | to_nice_json }}
-ops_center_config = {{ proxmox_ops_center_config | to_nice_json }}
-k3s_prod_config   = {{ proxmox_k3s_prod_config | to_nice_json }}
+vms               = {{ proxmox_vms | dict2items | rejectattr('key', 'in', ['ops_center', 'k3s_prod', 'n8n_automation_public_key']) | items2dict | to_nice_json }}
+ops_center_config = {{ proxmox_vms.ops_center | to_nice_json }}
+k3s_prod_config   = {{ proxmox_vms.k3s_prod | to_nice_json }}
 
 # Future secrets will be injected here from Vault

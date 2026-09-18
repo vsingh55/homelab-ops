@@ -10,4 +10,9 @@ proxmox_api_token_secret: "{{ vault_proxmox_api_token_secret }}"
 proxmox_gateway_password: "{{ vault_proxmox_gateway_password }}"
 
 
+# MinIO Secrets
+minio_access_key: "{{ vault_minio_access_key }}"
+minio_secret_key: "{{ vault_minio_secret_key }}"
+ops_center_tailscale_ip: "100.87.130.97"
+
 # Other config

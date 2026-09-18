@@ -1,0 +1,97 @@
+name: Build, Scan, Sign, and Push Image
+
+on:
+    push:
+        branches: ["main"]
+        paths:
+            - "apps/paperless-custom/**"
+    workflow_dispatch:
+
+env:
+    IMAGE_NAME: paperless-custom
+    GAR_LOCATION: europe-west1
+    GAR_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    GAR_REPOSITORY: homelab-repo
+
+jobs:
+    build-scan-push:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            security-events: write # Required for uploading Trivy results
+            id-token: write # Required for keyless signing and Workload Identity Federation
+            packages: write
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            # 1. SonarQube Scan for Code Quality
+            - name: SonarQube Scan
+              uses: SonarSource/sonarqube-scan-action@master
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+              with:
+                  projectBaseDir: apps/paperless-custom
+
+            # 2. Build Image (Locally inside the runner to scan before pushing)
+            - name: Build Image
+              id: build
+              uses: docker/build-push-action@v5
+              with:
+                  context: ./apps/paperless-custom
+                  load: true # Load it into the runner so Trivy can scan it
+                  tags: ${{ env.IMAGE_NAME }}:latest
+
+            # 3. Security Scan (Trivy) - Fails pipeline if Critical/High Vulns found
+            - name: Run Trivy Vulnerability Scanner
+              uses: aquasecurity/trivy-action@master
+              with:
+                  image-ref: "${{ env.IMAGE_NAME }}:latest"
+                  format: "table"
+                  exit-code: "1"
+                  ignore-unfixed: true
+                  vuln-type: "os,library"
+                  severity: "CRITICAL,HIGH"
+
+            # ========================================================================
+            # Uncomment the sections below once GCP / GAR variables and secrets are set up
+            # ========================================================================
+
+            # 4. Authenticate to Google Cloud via Workload Identity (OIDC) - Preferred over JSON keys
+            # - name: Google Auth
+            #   id: auth
+            #   uses: google-github-actions/auth@v2
+            #   with:
+            #     workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+            #     service_account: '${{ secrets.GCP_SA_EMAIL }}'
+            #
+            # - name: Set up Cloud SDK
+            #   uses: google-github-actions/setup-gcloud@v2
+            #
+            # - name: Docker Auth to GAR
+            #   run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
+
+            # 5. Push Image to Google Artifact Registry
+            # - name: Push Image to GAR
+            #   uses: docker/build-push-action@v5
+            #   with:
+            #     context: ./apps/paperless-custom
+            #     push: true
+            #     tags: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GAR_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+            # 6. Install Cosign & Keyless Sign the Image using GitHub OIDC
+            # - name: Install Cosign
+            #   uses: sigstore/cosign-installer@v3
+            #
+            # - name: Sign the published Docker image
+            #   env:
+            #     DIGEST: ${{ steps.build.outputs.digest }}
+            #     TAGS: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.GAR_PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            #   run: |
+            #     # Keyless signing relies on the GitHub Actions identity token (OIDC)
+            #     cosign sign --yes "${TAGS}@${DIGEST}"

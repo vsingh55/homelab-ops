@@ -30,7 +30,7 @@ This directory contains the "Day 2" operational logic for the Homelab. It handle
 
 ## Security Model
 * **Jump Host:** The control node (Laptop) connects ONLY to `ops-center` via Tailscale.
-* **Tunneling:** Connection to internal VMs (`192.168.0.x`) is tunneled through `ops-center`.
+* **Tunneling:** Connection to internal VMs (`192.168.1.x`) is tunneled through `ops-center`.
 * **Secrets:** Sensitive data (passwords) is encrypted with `ansible-vault`.
 
 ## Workflows

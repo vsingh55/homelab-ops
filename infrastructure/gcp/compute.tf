@@ -13,23 +13,23 @@ resource "google_compute_instance" "vpn_gateway" {
   network_interface {
     network    = google_compute_network.vpc.name
     subnetwork = google_compute_subnetwork.subnet.name
-    
+
     access_config {
       nat_ip = google_compute_address.vpn_gateway_ip.address
     }
   }
 
   metadata = {
-    enable-oslogin = "TRUE" 
+    enable-oslogin = "TRUE"
   }
 
-  
+
   scheduling {
-    preemptible                 = false
-    automatic_restart           = false
-    provisioning_model          = "STANDARD"
+    preemptible        = false
+    automatic_restart  = false
+    provisioning_model = "STANDARD"
   }
-  
+
   tags = ["vpn-gateway", "http-server", "https-server"]
-  
+
 }

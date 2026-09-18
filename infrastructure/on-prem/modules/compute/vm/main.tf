@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     proxmox = {
-      source  = "Telmate/proxmox"
+      source = "Telmate/proxmox"
     }
   }
 }
@@ -16,9 +16,9 @@ resource "proxmox_vm_qemu" "vm" {
   cpu {
     cores = var.cores
   }
-  memory  = var.memory
-  scsihw  = "virtio-scsi-pci"
-  agent   = var.agent_enabled # Exposed for K3s/Ops Center
+  memory = var.memory
+  scsihw = "virtio-scsi-pci"
+  agent  = var.agent_enabled # Exposed for K3s/Ops Center
 
   vga {
     type = "std"
@@ -32,10 +32,10 @@ resource "proxmox_vm_qemu" "vm" {
   }
 
   # Boot & Disk Configuration
-  boot    = "order=scsi0;net0"
-  onboot  = var.onboot
+  boot     = "order=scsi0;net0"
+  onboot   = var.onboot
   vm_state = var.onboot ? "running" : "stopped"
-  startup = var.startup_param
+  startup  = var.startup_param
 
   disks {
     scsi {
@@ -45,7 +45,7 @@ resource "proxmox_vm_qemu" "vm" {
           size    = var.disk_size
         }
       }
-      
+
       # block to only create scsi1 if size is not "0G"
       dynamic "scsi1" {
         for_each = var.data_disk_size != "0G" ? [1] : []
@@ -76,14 +76,14 @@ resource "proxmox_vm_qemu" "vm" {
 
   # This allows Proxmox to reclaim "Cache" memory from the VM
   balloon = 1
-  
+
   # To fix tag drift issues with Proxmox UI and API 
   lifecycle {
     ignore_changes = [
       tags,
     ]
   }
-  
+
   # SSH Config Injection (Local Convenience)
 
   provisioner "local-exec" {

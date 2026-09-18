@@ -1,15 +1,14 @@
 # Stage 1: The Builder (Compiles dependencies)
-FROM python:3.11-slim-bookworm as builder
+FROM python:3.11-alpine as builder
 
 WORKDIR /usr/src/paperless
 
-# Install build dependencies (gcc, libpq, etc.)
-# We do this in a separate stage so they don't bloat the final image
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
+# Install build dependencies
+RUN apk add --no-cache \
+    build-base \
+    postgresql-dev \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    linux-headers
 
 RUN git clone --branch v2.5.0 --depth 1 https://github.com/paperless-ngx/paperless-ngx.git .
 
@@ -17,23 +16,23 @@ RUN git clone --branch v2.5.0 --depth 1 https://github.com/paperless-ngx/paperle
 RUN pip install --upgrade pipenv
 
 # Stage 2: The Final Runtime (Minimal & Secure)
-FROM python:3.11-slim-bookworm
+FROM python:3.11-alpine
 
-# Add metadata for image management
+# Metadata for image management
 LABEL org.opencontainers.image.source="https://github.com/vsingh55/homelab-ops"
-LABEL org.opencontainers.image.description="Hardened Paperless-ngx Base for Homelab"
+LABEL org.opencontainers.image.description="Hardened Paperless-ngx Base for Homelab (Alpine)"
 
-# Create a non-root user (Security Best Practice)
-RUN addgroup --system paperless && adduser --system --group paperless
+# Create a non-root user 
+RUN addgroup -S paperless && adduser -S paperless -G paperless
 
 WORKDIR /usr/src/paperless
 
-# Install ONLY runtime dependencies (no gcc/git)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
+# Install ONLY runtime dependencies
+RUN apk add --no-cache \
+    postgresql-libs \
     imagemagick \
     ghostscript \
-    && rm -rf /var/lib/apt/lists/*
+    tzdata
 
 # Copy only the necessary artifacts from the builder stage
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages

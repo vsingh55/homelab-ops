@@ -32,13 +32,13 @@ resource "google_compute_firewall" "allow_wireguard" {
     protocol = "udp"
     ports    = ["51820"]
   }
-  
+
   allow {
     protocol = "tcp"
     ports    = ["22"]
   }
 
-  source_ranges = ["0.0.0.0/0"] 
+  source_ranges = ["0.0.0.0/0"]
   target_tags   = ["vpn-gateway"]
 }
 

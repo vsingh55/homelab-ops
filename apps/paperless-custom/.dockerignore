@@ -4,6 +4,7 @@ infrastructure
 configuration
 kubernetes
 docs
+process
 README.md
 images
 .ansible_vault_pass

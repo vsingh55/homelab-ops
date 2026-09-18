@@ -14,9 +14,9 @@ timezone: "Asia/Kolkata"
 # ==============================================================================
 # SECTION 3: INFRASTRUCTURE SOURCE OF TRUTH (Terraform Hydration)
 # ==============================================================================
-gcp_project_id: "homelab-ops-482221"
-gcp_region: "asia-south1"
-gcp_zone: "asia-south1-a"
+gcp_project_id: "homelab-vijay"
+gcp_region: "us-east1"
+gcp_zone: "us-east1-b"
 project_name: "homelab"
 gcp_environment: "prod"
 subnet_cidr: "10.0.1.0/24"
@@ -24,13 +24,13 @@ subnet_cidr: "10.0.1.0/24"
 # ==============================================================================
 # SECTION 4: PROXMOX INFRASTRUCTURE DEFINITIONS
 # ==============================================================================
-proxmox_api_url: "https://192.168.0.3:8006/api2/json"
+proxmox_api_url: "https://100.108.178.93:8006/api2/json"
 proxmox_api_token_id: "root@pam!terraform"
 proxmox_ssh_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPLBRLuIw6ZBC/6xYG/kH/Q90D4Js3DJ396gpIEg4GNX vsc@fedora"
 
 # Gateway Configuration
 proxmox_gateway_config:
-  ip: "192.168.0.10"
+  ip: "192.168.1.10"
   onboot: false
 
 # VM Specs - The Blueprint for Lab
@@ -38,31 +38,31 @@ proxmox_vms:
   # Zone A: Lab (Academy Plane)
   jumpbox:
     vmid: 200
-    ip: "192.168.0.20"
+    ip: "192.168.1.20"
     cores: 1
     memory: 1024
     startup_param: "order=4,up=40,down=40"
     onboot: false
-  
+
   server:
     vmid: 210
-    ip: "192.168.0.21"
+    ip: "192.168.1.21"
     cores: 2
     memory: 2048
     startup_param: "order=3,up=40,down=40"
     onboot: false
-  
+
   node_0:
     vmid: 220
-    ip: "192.168.0.22"
+    ip: "192.168.1.22"
     cores: 2
     memory: 2048
     startup_param: "order=3,up=40,down=40"
     onboot: false
-  
+
   node_1:
     vmid: 221
-    ip: "192.168.0.23"
+    ip: "192.168.1.23"
     cores: 2
     memory: 2048
     startup_param: "order=3,up=20,down=20"
@@ -71,7 +71,7 @@ proxmox_vms:
   # Zone M: Management
   ops_center:
     vmid: 900
-    ip: "192.168.0.5"
+    ip: "192.168.1.50"
     cores: 2
     memory: 2048
     disk_size: "20G"
@@ -80,11 +80,11 @@ proxmox_vms:
   # Zone P: Production
   k3s_prod:
     vmid: 500
-    ip: "192.168.0.30"
+    ip: "192.168.1.30"
     cores: 2
     memory: 8192
-    disk_size: "20G"
+    disk_size: "30G"
     onboot: true
 
- # n8n public key is automatically deployed to all servers 
+  # n8n public key is automatically deployed to all servers
   n8n_automation_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIledY+Db5jV+IkBuk8kHYgdZ4WnNZT0ixTa5Rnt91OG n8n-automation"

@@ -4,17 +4,17 @@
 module "gateway" {
   source = "./modules/compute/lxc"
 
-  target_node  = var.target_node
-  hostname     = "gateway"
-  vmid         = 100
-  ostemplate   = var.lxc_template
-  password     = var.passwordGW
-  ssh_key      = var.ssh_key
-  cores        = 1
-  memory       = 512
-  ip_address   = var.gateway_config.ip
-  gateway_ip   = "192.168.0.1" # Physical Router IP
-  onboot       = var.gateway_config.onboot
+  target_node = var.target_node
+  hostname    = "gateway"
+  vmid        = 100
+  ostemplate  = var.lxc_template
+  password    = var.passwordGW
+  ssh_key     = var.ssh_key
+  cores       = 1
+  memory      = 512
+  ip_address  = var.gateway_config.ip
+  gateway_ip  = "192.168.1.1" # Physical Router IP
+  onboot      = var.gateway_config.onboot
 }
 
 # K8s Cluster
@@ -24,10 +24,10 @@ module "k8s_cluster" {
   for_each = var.vms
 
   target_node   = var.target_node
-  vm_name       = each.key
+  vm_name       = replace(each.key, "_", "-")
   vmid          = each.value.vmid
   template_name = var.vm_template
-  
+
   cores         = each.value.cores
   memory        = each.value.memory
   disk_size     = "8G" # Standard for lab nodes
@@ -51,19 +51,19 @@ module "ops_center" {
   vmid          = var.ops_center_config.vmid
   template_name = var.vm_template
 
-  cores         = var.ops_center_config.cores
-  memory        = var.ops_center_config.memory
-  disk_size     = var.ops_center_config.disk_size
+  cores     = var.ops_center_config.cores
+  memory    = var.ops_center_config.memory
+  disk_size = var.ops_center_config.disk_size
   # Add the 1TB HDD Config
-  data_disk_size    = "250G"        # Allocating 250GB for data recovery tasks
-  data_disk_storage = "backup-hdd"  # Must match the ID of directory created in Proxmox for the HDD
-  agent_enabled = 1
-  onboot        = var.ops_center_config.onboot
-  
-  ci_user       = var.ci_user
-  ssh_key       = var.ssh_key
-  ip_address    = var.ops_center_config.ip
-  gateway_ip    = "192.168.0.1" # Direct access to physical router
+  data_disk_size    = "250G"       # Allocating 250GB for data recovery tasks
+  data_disk_storage = "backup-hdd" # Must match the ID of directory created in Proxmox for the HDD
+  agent_enabled     = 1
+  onboot            = var.ops_center_config.onboot
+
+  ci_user    = var.ci_user
+  ssh_key    = var.ssh_key
+  ip_address = var.ops_center_config.ip
+  gateway_ip = "192.168.1.1" # Direct access to physical router
 }
 
 # ==============================================
@@ -83,8 +83,8 @@ module "k3s_prod" {
   agent_enabled = 1
   onboot        = var.k3s_prod_config.onboot
 
-  ci_user       = var.ci_user
-  ssh_key       = var.ssh_key
-  ip_address    = var.k3s_prod_config.ip
-  gateway_ip    = "192.168.0.1" 
+  ci_user    = var.ci_user
+  ssh_key    = var.ssh_key
+  ip_address = var.k3s_prod_config.ip
+  gateway_ip = "192.168.1.1"
 }

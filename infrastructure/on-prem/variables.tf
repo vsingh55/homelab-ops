@@ -61,7 +61,7 @@ variable "lxc_template" {
 variable "gateway_config" {
   description = "Configuration for the Gateway LXC"
   type = object({
-    ip = string
+    ip     = string
     onboot = bool
   })
 }

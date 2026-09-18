@@ -73,7 +73,7 @@ spec:
       - ipBlock:
           cidr: 0.0.0.0/0
           except:
-            - 192.168.0.0/16  
+            - 192.168.1.0/24  
       ports:
         - protocol: TCP
           port: 443
@@ -83,7 +83,7 @@ spec:
     - to:
       # Allow SSH to Local Infrastructure (Proxmox/VMs)
       - ipBlock:
-          cidr: 192.168.0.0/16
+          cidr: 192.168.1.0/24
       # Allow SSH to Public Infrastructure (GCP)
       - ipBlock:
           cidr: 0.0.0.0/0

@@ -18,13 +18,13 @@ variable "environment" {
 variable "gcp_region" {
   description = "Region for GCP resources"
   type        = string
-  default     = "asia-south1" # Mumbai
+  default     = "us-east1" # South Carolina
 }
 
 variable "gcp_zone" {
   description = "Zone for GCP resources"
   type        = string
-  default     = "asia-south1-a"
+  default     = "us-east1-b"
 }
 
 variable "subnet_cidr" {
