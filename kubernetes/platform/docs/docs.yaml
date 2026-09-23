@@ -1,0 +1,195 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platform
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mkdocs-config
+  namespace: platform
+data:
+  mkdocs.yml: |
+    site_name: "Vijay Singh | Homelab Ops & Platform Engineering"
+    site_description: "Production Homelab, Hybrid Cloud Architecture, Disaster Recovery & FinOps Engineering Handbook"
+    site_author: "Vijay Singh"
+    repo_url: "https://github.com/vsingh55/homelab-ops"
+    repo_name: "vsingh55/homelab-ops"
+
+    theme:
+      name: material
+      palette:
+        - scheme: default
+          primary: indigo
+          accent: deep purple
+          toggle:
+            icon: material/brightness-7
+            name: Switch to dark mode
+        - scheme: slate
+          primary: indigo
+          accent: deep purple
+          toggle:
+            icon: material/brightness-4
+            name: Switch to light mode
+      features:
+        - navigation.instant
+        - navigation.tabs
+        - navigation.sections
+        - navigation.top
+        - search.suggest
+        - search.highlight
+        - content.code.copy
+
+    markdown_extensions:
+      - admonition
+      - pymdownx.details
+      - pymdownx.superfences:
+          custom_fences:
+            - name: mermaid
+              class: mermaid
+              format: !!python/name:pymdownx.superfences.fence_code_format
+      - pymdownx.highlight
+      - pymdownx.inlinehilite
+      - tables
+      - attr_list
+
+    nav:
+      - "Overview": index.md
+      - "Architecture & Engineering":
+          - "01. Architecture Topology": 01-architecture.md
+          - "02. Proxmox Setup": 02-proxmox-setup.md
+          - "03. Backup & Disaster Recovery": 03-backup-dr.md
+          - "04. Infra Provisioning": 04-infrastructure-provisioning.md
+          - "05. Infrastructure Challenges": 05-infrastructure-challenges.md
+          - "06. Remote Ops Transformation": 06-remote-ops-transformation.md
+          - "07. Ansible Automation Journey": 07-ansible-automation-journey.md
+          - "08. Debugging WAN Connectivity": 08-debugging-wan-connectivity.md
+          - "09. Application Observability": 09-application-layer-observability.md
+          - "10. Terraform Modularization": 10-terraform-modularization.md
+          - "11. Comprehensive Backups": 11-comprehensive-backups.md
+          - "12. Secret Management": 12-secret-management-hydration.md
+          - "13. Debugging Boot Failure": 13-debugging-boot-failure.md
+          - "14. K3s Optimization & Security": 14-k3s-optimization-and-security.md.md
+      - "Execution Phases":
+          - "Phases Overview": execution-phases/README.md
+          - "Phase 1: Action Guide": execution-phases/01-phase-1-action-guide.md
+          - "Phase 1: Baseline Architecture": execution-phases/01-phase-1-architecture-baseline.md
+          - "Phase 2: Codebase Pruning": execution-phases/02-phase-2-codebase-pruning.md
+          - "Phase 3: OCI Remote State": execution-phases/03-phase-3-oci-remote-state.md
+          - "Phase 4: Proxmox Consolidation & K3s Resizing": execution-phases/04-phase-4-proxmox-consolidation-k3s-resizing.md
+          - "Phase 5: Cloudflare Ingress & GHCR Migration": execution-phases/05-phase-5-gcp-decommissioning-cloudflare-ingress.md
+          - "Phase 6: GitOps Bootstrap & SOPS": execution-phases/06-phase-6-gitops-bootstrap-sops.md
+          - "Phase 7: Application Fleet Deployment": execution-phases/07-phase-7-application-fleet-deployment.md
+          - "Full Implementation Plan": execution-phases/ImplementationPlan.md
+      - "Engineering Journals":
+          - "Hybrid Network": journal/project-1-hybrid-network.md
+          - "Hybrid Cloud Automation (n8n)": journal/project-hybrid-cloud-automation.md
+          - "Self Healing Architecture": journal/project-self-healing-architecture.md
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homelab-docs
+  namespace: platform
+  labels:
+    app.kubernetes.io/name: homelab-docs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homelab-docs
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homelab-docs
+    spec:
+      volumes:
+      - name: shared-site
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: mkdocs-config
+      - name: extra-phases-volume
+        configMap:
+          name: execution-phases-docs
+      initContainers:
+      - name: git-clone-and-build
+        image: squidfunk/mkdocs-material:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          set -e
+          echo "Cloning repository..."
+          git clone --depth 1 https://github.com/vsingh55/homelab-ops.git /tmp/repo
+          cd /tmp/repo
+          cp /config/mkdocs.yml /tmp/repo/mkdocs.yml
+          cp -r /tmp/repo/images /tmp/repo/docs/images 2>/dev/null || true
+          mkdir -p /tmp/repo/docs/execution-phases
+          cp /extra-phases/* /tmp/repo/docs/execution-phases/ 2>/dev/null || true
+          if [ ! -f /tmp/repo/docs/index.md ]; then
+            cp /tmp/repo/README.md /tmp/repo/docs/index.md
+          fi
+          echo "Building static MkDocs site..."
+          mkdocs build -d /site
+          echo "Build complete. Static assets ready in /site."
+        volumeMounts:
+        - name: shared-site
+          mountPath: /site
+        - name: config-volume
+          mountPath: /config
+        - name: extra-phases-volume
+          mountPath: /extra-phases
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            cpu: 20m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        volumeMounts:
+        - name: shared-site
+          mountPath: /usr/share/nginx/html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homelab-docs
+  namespace: platform
+  labels:
+    app.kubernetes.io/name: homelab-docs
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app.kubernetes.io/name: homelab-docs
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homelab-docs-ingress
+  namespace: platform
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: docs.vijaysingh.cloud
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: homelab-docs
+            port:
+              number: 80

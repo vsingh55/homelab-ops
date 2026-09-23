@@ -36,11 +36,6 @@ variable "ssh_key" {
   description = "Public SSH Key for VM access"
 }
 
-variable "passwordGW" {
-  type        = string
-  sensitive   = true
-  description = "Password for the Gateway LXC"
-}
 
 variable "vm_template" {
   type        = string
@@ -48,47 +43,9 @@ variable "vm_template" {
   description = "Name of the VM template to clone"
 }
 
-variable "lxc_template" {
-  type        = string
-  default     = "local:vztmpl/ubuntu-22.04-standard_22.04-1_amd64.tar.zst"
-  description = "LXC Template path"
-}
-
 # ==============================================
 # Resource Configurations
 # ==============================================
-
-variable "gateway_config" {
-  description = "Configuration for the Gateway LXC"
-  type = object({
-    ip     = string
-    onboot = bool
-  })
-}
-
-variable "vms" {
-  description = "Map of VM configurations for the Kubernetes Lab cluster"
-  type = map(object({
-    vmid          = number
-    ip            = string
-    cores         = number
-    memory        = number
-    startup_param = string
-    onboot        = bool
-  }))
-}
-
-variable "ops_center_config" {
-  description = "Configuration for the Management Node"
-  type = object({
-    vmid      = number
-    ip        = string
-    cores     = number
-    memory    = number
-    disk_size = string
-    onboot    = bool
-  })
-}
 
 variable "data_disk_size" {
   description = "Size of the secondary data disk (e.g., 500G). Set to 0G to disable."

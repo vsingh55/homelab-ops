@@ -1,8 +1,3 @@
 ---
-# Connection settings for Proxmox Node
-
-# Tunnel PVE connection through Ops-Center
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q devops@ops-center"'
-
-# Other hypervisor configs
+# Connection settings for Proxmox Node (Direct Tailscale / LAN)
 pve_cluster_name: home-cluster

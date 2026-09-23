@@ -61,9 +61,9 @@ This repository documents the complete lifecycle of building a production infras
 | :--- | :--- | :--- |
 | **1. Serverless "Burst" Worker** | **Event-Driven Hybrid Pattern:**<br>Instead of running heavy OCR tasks locally, MinIO upload events will trigger a container in the cloud.<br>_Why? Offloads compute-heavy tasks to Google Cloud Free Tier._ | **Cloud Run**, **Eventarc**, **Pub/Sub** |
 | **2. Supply Chain Security** | **Secure Registry Pipeline:**<br>Implementing image signing and vulnerability scanning before any container reaches the Production cluster. | **Artifact Registry** (Optional), Trivy, Cosign, Kyverno |
-| **3. GreenOps Automation** | **"Eco-Mode" Lab Manager:**<br>An **n8n** workflow that interacts with the Proxmox API to automatically freeze/thaw the 16GB "Lab Zone" based on study schedules. | Proxmox API, n8n |
-| **4. GitOps Transformation** | **Pull-Based State Management:**<br>Migrating from Ansible-push to **ArgoCD**. The cluster will sync itself with this repo, ensuring "Configuration Drift" is impossible. | ArgoCD, Kustomize |
-| **5. Hybrid Identity (IAM)** | **Single Sign-On (SSO):**<br>Centralizing access for service, Traefik, and SSH under one identity provider with MFA enforcement. | Keycloak, OIDC |
+| **3. Sovereign Storage & DR** | **Tiered Storage & True 3-2-1 DR:**<br>Hot NVMe for K3s OS/databases; Cold 1TB HDD for Paperless originals & media. Automated nightly encrypted Restic backups to OCI Mumbai Always Free Object Storage. | Proxmox, Restic, OCI Object Storage |
+| **4. GitOps Transformation** | **Pull-Based State Management:**<br>Continuous reconciliation via **Flux CD v2** with **Mozilla SOPS + Age** in-memory secret decryption. Guarantees zero configuration drift and immutable Git audit trails. | Flux CD v2, SOPS, Age, Kustomize |
+| **5. Zero Trust Identity (IAM)** | **Single Sign-On (SSO) & MFA:**<br>Centralizing public edge access behind **Cloudflare Zero Trust Access** with Google SSO/MFA, and internal infrastructure access behind **Tailscale**. | Cloudflare Access, Tailscale |
 
 ---
 #### 📉 Architecture Evolution Plan

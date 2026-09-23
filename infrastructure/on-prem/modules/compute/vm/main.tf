@@ -53,6 +53,7 @@ resource "proxmox_vm_qemu" "vm" {
           disk {
             storage = var.data_disk_storage
             size    = var.data_disk_size
+            backup  = false
           }
         }
       }
