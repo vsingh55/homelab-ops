@@ -75,8 +75,8 @@ resource "proxmox_vm_qemu" "vm" {
   sshkeys   = var.ssh_key
   ipconfig0 = "ip=${var.ip_address}/24,gw=${var.gateway_ip}"
 
-  # This allows Proxmox to reclaim "Cache" memory from the VM
-  balloon = 1
+  # Disable ballooning to guarantee full dedicated RAM to k3s-prod and prevent OOM deadlocks
+  balloon = 0
 
   # To fix tag drift issues with Proxmox UI and API 
   lifecycle {
