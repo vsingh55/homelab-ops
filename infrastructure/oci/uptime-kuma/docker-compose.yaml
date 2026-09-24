@@ -1,0 +1,16 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: always
+    volumes:
+      - ./uptime-kuma-data:/app/data
+    ports:
+      - "3001:3001"
+    environment:
+      - UPTIME_KUMA_PORT=3001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

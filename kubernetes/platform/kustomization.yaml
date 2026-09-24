@@ -6,3 +6,4 @@ resources:
   - homepage/homepage.yaml
   - monitoring/grafana-telemetry-ingress.yaml
   - docs/docs.yaml
+  - postgres-operator

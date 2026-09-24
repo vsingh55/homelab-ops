@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: minio-creds
+    namespace: database
+type: Opaque
+stringData:
+    ACCESS_KEY: ENC[AES256_GCM,data:FulRgLB8j2SKCg==,iv:1Tg3fSjlWwQo0BXpi2UEjTTpmlipe/UrD1tzr+DorBg=,tag:UNvZbJlCqJF5PPfmY6bOSg==,type:str]
+    SECRET_KEY: ENC[AES256_GCM,data:vuqtd3iATL9wR942iQ==,iv:iFbtOr6czR+jV2IjWC4QBHdzaDzllY9swtgRcLucaiQ=,tag:y1+dJoW8nMdzulvAOLZOMg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAxTy9jUGZOaEJJZy9HZEMw
+            RXF5emdmd0JDcEN2UWk1VjJGc3MwR3hNM2hVClBxTkhxakpnbmlqR0dJR3BNM3Yz
+            a3l3am1jSFMwZUNaRjdNUEF6dmhKWDQKLS0tIDdJNFNsUnQzVXNyWHZQVmIrYUlU
+            c3U5b3JJTS9zdWgvc2dXNFBHcnovZWMKYYlhrPy6rlEnGIHdcPhnP1HZmL6XMijh
+            11JgcPL+/VgoUjfNGUISk5EBrq0jzfFZDpahFkyP10khYkVNEC7Jqg==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1ngq6yxpu6lszk4735vap6twle8jgp982f2g7hcq8rhhudhfz6cksyjv9y9
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-09-24T06:18:06Z"
+    mac: ENC[AES256_GCM,data:sILXFuUUNz0FRVX6qvZckX9gc3HmeQlqRq4wCEma+5OJwYLdITvDngCfEc8BVmxwjBgJCppwvDXyYx3vwakTXi6cY0FFveeCB7Qpipmcypn5mW9NOc9dc7Gq/SyscJpWPBLVUqTCDkJF2d4rp++O4i/JllF1gIoWoRULd44WqIg=,iv:lDimu1/x1PT4uffw30adQq//CJLSO2S/0O5RmpjCLwk=,tag:EJHhRgICke/a/d5xWz5Mig==,type:str]
+    version: 3.13.3

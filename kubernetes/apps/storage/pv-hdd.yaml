@@ -1,0 +1,43 @@
+# Storage Tier 2: Cold SATA HDD (1TB Mount at /mnt/hdd)
+# NOTE: Paths and storage capacities can be customized here based on your finalized data organization.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hdd-books
+spec:
+  capacity:
+    storage: 200Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-hdd
+  hostPath:
+    path: /mnt/hdd/books
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hdd-paperless
+spec:
+  capacity:
+    storage: 150Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-hdd
+  hostPath:
+    path: /mnt/hdd/paperless
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-hdd-media
+spec:
+  capacity:
+    storage: 150Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-hdd
+  hostPath:
+    path: /mnt/hdd/media

@@ -1,0 +1,183 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: documents
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: paperless-pvc
+  namespace: documents
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-hdd
+  resources:
+    requests:
+      storage: 150Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-redis
+  namespace: documents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperless-redis
+  template:
+    metadata:
+      labels:
+        app: paperless-redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paperless-redis
+  namespace: documents
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: redis
+  selector:
+    app: paperless-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-ngx
+  namespace: documents
+  labels:
+    app.kubernetes.io/name: paperless-ngx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: paperless-ngx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: paperless-ngx
+    spec:
+      containers:
+      - name: paperless-ngx
+        image: ghcr.io/paperless-ngx/paperless-ngx:latest
+        env:
+        - name: PAPERLESS_REDIS
+          value: "redis://paperless-redis.documents.svc.cluster.local:6379"
+        - name: PAPERLESS_DBHOST
+          value: "postgres-ha-rw.database.svc.cluster.local"
+        - name: PAPERLESS_DBPORT
+          value: "5432"
+        - name: PAPERLESS_DBUSER
+          value: "n8n"
+        - name: PAPERLESS_DBPASS
+          value: "ChangeMeToSomethingStrong123!"
+        - name: PAPERLESS_DBNAME
+          value: "n8n"
+        - name: PAPERLESS_URL
+          value: "https://docs-ocr.vijaysingh.cloud"
+        - name: PAPERLESS_OCR_THREADS
+          value: "1" # Throttled to prevent hypervisor CPU starvation
+        - name: PAPERLESS_OCR_MAX_IMAGE_PIXELS
+          value: "60000000"
+        - name: USERMAP_UID
+          value: "1000"
+        - name: USERMAP_GID
+          value: "1000"
+        - name: PAPERLESS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: paperless-secrets
+              key: PAPERLESS_SECRET_KEY
+        - name: PAPERLESS_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: paperless-secrets
+              key: PAPERLESS_ADMIN_USER
+        - name: PAPERLESS_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: paperless-secrets
+              key: PAPERLESS_ADMIN_PASSWORD
+        ports:
+        - containerPort: 8000
+          name: http
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 1536Mi
+        volumeMounts:
+        - name: data
+          mountPath: /usr/src/paperless/data
+          subPath: data
+        - name: data
+          mountPath: /usr/src/paperless/media
+          subPath: media
+        - name: data
+          mountPath: /usr/src/paperless/export
+          subPath: export
+        - name: data
+          mountPath: /usr/src/paperless/consume
+          subPath: consume
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: paperless-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: paperless-ngx
+  namespace: documents
+  labels:
+    app.kubernetes.io/name: paperless-ngx
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  selector:
+    app.kubernetes.io/name: paperless-ngx
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: paperless-ingress
+  namespace: documents
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: docs-ocr.vijaysingh.cloud
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: paperless-ngx
+            port:
+              number: 8000

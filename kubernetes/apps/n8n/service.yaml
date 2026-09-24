@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: n8n
+  namespace: automation
+  labels:
+    app.kubernetes.io/name: n8n
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5678
+    targetPort: 5678
+    name: http
+  selector:
+    app.kubernetes.io/name: n8n

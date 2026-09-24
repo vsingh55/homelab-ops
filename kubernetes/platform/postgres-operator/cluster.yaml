@@ -1,0 +1,30 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-ha
+  namespace: database
+spec:
+  instances: 2
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 20Gi
+    storageClass: local-path
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://postgres-backups/
+      endpointURL: http://minio.database.svc.cluster.local:9000
+      s3Credentials:
+        accessKeyId:
+          name: minio-creds
+          key: ACCESS_KEY
+        secretAccessKey:
+          name: minio-creds
+          key: SECRET_KEY
+      wal:
+        compression: gzip
+  bootstrap:
+    initdb:
+      database: n8n
+      owner: n8n
+      secret:
+        name: postgres-ha-app-user

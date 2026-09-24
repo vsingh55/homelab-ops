@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: postgres-ha-app-user
+    namespace: database
+type: kubernetes.io/basic-auth
+stringData:
+    username: ENC[AES256_GCM,data:lzwo,iv:mEii+HQ/JjAs2DnNbr6DjXfutvDb5PYai86DfwWaYn4=,tag:xEXltOxkhXhPAP9VbfqLQw==,type:str]
+    password: ENC[AES256_GCM,data:ckGkQwlXvtMgpFpk7W1OC60EkQ+vCMwApPW463s=,iv:flsyRmeVsMfoGQO0f8TciHRyH108Tr3n+ArLWtQWsGI=,tag:/r9pm6UQjfB2FqWFrqj7HQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB3aDZpT29vVnQyMFI5YUNk
+            ekRoWnkySnY1VTQ5R24ram1aTllqMitKN0FFCkg2Q1lZcTluVFhaVTJWclVoSkp6
+            b1ZhaGsraHM2TVFSbGhtMjVUSmZUNzAKLS0tIGY2cU1wcnFMQTNRWmswc0tjMmdR
+            SzFkVTlDWHQxaSsxU0gzeUtyaERZS1EKeXexovLyEOWZ7xMVJnzuOnhUe75FGTZT
+            k3cTFzHgcImhHFS9TbL40ZgOYbJiPQh0TTkTOD2HDEcr8fNJzu1J/g==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age1ngq6yxpu6lszk4735vap6twle8jgp982f2g7hcq8rhhudhfz6cksyjv9y9
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-09-24T06:08:16Z"
+    mac: ENC[AES256_GCM,data:p00ld96ZIeOM29dFkvRkLcr5f8ifE2tMkdwqWOv1JAEGxdhTqudNt6p0MQkqrGkEQr/+0yjkLiN+cj5yJvIr6eDWDIiMKYjtp89k5yW68ka492qLbWiwq7aW+4zo+viz4oze4WNt3122YWFTlhBHydtM8NSRsCMKrbnyLCSzDBg=,iv:si7HGq1UcoREBmaedUQn2d/vdZAg/AB+BOAzTb0dp58=,tag:TXerEFP4Dr7OAd2wjyJqXw==,type:str]
+    version: 3.13.3
