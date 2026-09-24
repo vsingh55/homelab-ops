@@ -1,0 +1,3 @@
+status.vijaysingh.cloud, http://status.vijaysingh.cloud {
+    reverse_proxy uptime-kuma:3001
+}

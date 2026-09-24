@@ -2,7 +2,6 @@ services:
   uptime-kuma:
     image: louislam/uptime-kuma:2
     container_name: uptime-kuma
-
     restart: always
     volumes:
       - ./uptime-kuma-data:/app/data
@@ -15,3 +14,17 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+    depends_on:
+      - uptime-kuma

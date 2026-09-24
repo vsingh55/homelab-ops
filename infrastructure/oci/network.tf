@@ -79,6 +79,32 @@ resource "oci_core_security_list" "homelab_public_security_list" {
     description = "Uptime Kuma status portal and dashboard"
   }
 
+  # Inbound: HTTP (Port 80)
+  ingress_security_rules {
+    protocol  = "6" # TCP
+    source    = "0.0.0.0/0"
+    stateless = false
+
+    tcp_options {
+      min = 80
+      max = 80
+    }
+    description = "HTTP standard web access (for reverse proxy)"
+  }
+
+  # Inbound: HTTPS (Port 443)
+  ingress_security_rules {
+    protocol  = "6" # TCP
+    source    = "0.0.0.0/0"
+    stateless = false
+
+    tcp_options {
+      min = 443
+      max = 443
+    }
+    description = "HTTPS secure web access for status page"
+  }
+
   # Inbound: ICMP Ping
   ingress_security_rules {
     protocol  = "1" # ICMP
