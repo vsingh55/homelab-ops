@@ -38,7 +38,7 @@ spec:
         image: ghcr.io/ignisda/ryot:latest
         env:
         - name: DATABASE_URL
-          value: "sqlite:///data/ryot.db"
+          value: "postgres://n8n:ChangeMeToSomethingStrong123!@postgres-ha-rw.database.svc.cluster.local:5432/ryot?sslmode=disable"
         - name: FRONTEND_URL
           value: "https://health.vijaysingh.cloud"
         - name: SERVER_ADMIN_ACCESS_TOKEN
