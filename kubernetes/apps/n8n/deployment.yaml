@@ -9,10 +9,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: n8n
+      app: n8n
   template:
     metadata:
       labels:
+        app: n8n
         app.kubernetes.io/name: n8n
     spec:
       securityContext:
