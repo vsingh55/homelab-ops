@@ -25,13 +25,19 @@ spec:
         image: miniflux/miniflux:latest
         env:
         - name: DATABASE_URL
-          value: "postgres://n8n:ChangeMeToSomethingStrong123!@postgres-ha-rw.database.svc.cluster.local:5432/miniflux?sslmode=disable"
+          valueFrom:
+            secretKeyRef:
+              name: miniflux-secrets
+              key: DATABASE_URL
         - name: RUN_MIGRATIONS
           value: "1"
         - name: ADMIN_USERNAME
           value: "admin"
         - name: ADMIN_PASSWORD
-          value: "ChangeMeMiniflux123!"
+          valueFrom:
+            secretKeyRef:
+              name: miniflux-secrets
+              key: ADMIN_PASSWORD
         - name: BASE_URL
           value: "https://rss.vijaysingh.cloud"
         ports:

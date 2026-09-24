@@ -38,13 +38,22 @@ spec:
         image: ghcr.io/ignisda/ryot:latest
         env:
         - name: DATABASE_URL
-          value: "postgres://n8n:ChangeMeToSomethingStrong123!@postgres-ha-rw.database.svc.cluster.local:5432/ryot?sslmode=disable"
+          valueFrom:
+            secretKeyRef:
+              name: ryot-secrets
+              key: DATABASE_URL
         - name: FRONTEND_URL
           value: "https://health.vijaysingh.cloud"
         - name: SERVER_ADMIN_ACCESS_TOKEN
-          value: "RyotAdminToken2026!"
+          valueFrom:
+            secretKeyRef:
+              name: ryot-secrets
+              key: SERVER_ADMIN_ACCESS_TOKEN
         - name: SERVER_ACCESS_TOKEN_SECRET
-          value: "homelab-ryot-secret-token-32chars-minimum-length"
+          valueFrom:
+            secretKeyRef:
+              name: ryot-secrets
+              key: SERVER_ACCESS_TOKEN_SECRET
         ports:
         - containerPort: 8000
           name: http

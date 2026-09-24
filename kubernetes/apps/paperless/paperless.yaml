@@ -89,7 +89,10 @@ spec:
         - name: PAPERLESS_DBUSER
           value: "n8n"
         - name: PAPERLESS_DBPASS
-          value: "ChangeMeToSomethingStrong123!"
+          valueFrom:
+            secretKeyRef:
+              name: paperless-secrets
+              key: PAPERLESS_DBPASS
         - name: PAPERLESS_DBNAME
           value: "n8n"
         - name: PAPERLESS_URL
