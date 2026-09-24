@@ -1,0 +1,3 @@
+# OCI Object Storage S3 Compatibility Configuration
+bucket    = "homelab-terraform-state"
+endpoints = { s3 = "https://<OCI_NAMESPACE>.compat.objectstorage.ap-mumbai-1.oraclecloud.com" }

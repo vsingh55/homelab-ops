@@ -167,13 +167,28 @@ spec:
 3. Deploy **Paperless-ngx** with its document storage claim bound to `pv-hdd-paperless`.
 
 ### Step 7.5: Deploy Uptime Kuma on OCI Always Free & Configure Slack
-1. In the OCI Mumbai Ampere VM, launch Uptime Kuma via Docker Compose.
-2. In the Uptime Kuma web interface, add HTTP monitors for:
-   - `https://preiya.vijaysingh.cloud`
+1. **Provision OCI Mumbai Always Free Compute Instance via Terraform:**
+   ```bash
+   cd infrastructure/oci
+   cp terraform.tfvars.example terraform.tfvars # Fill in OCI OCIDs and API key path
+   terraform init -backend-config=backend.conf
+   terraform apply
+   ```
+2. **Deploy Uptime Kuma & Docker Stack via Ansible:**
+   ```bash
+   cd ../../configuration
+   # Update inventory/hosts.yml with the provisioned OCI instance IP
+   ansible-playbook -i inventory/hosts.yml playbooks/deploy_uptime_kuma.yml
+   ```
+3. In the Uptime Kuma web interface (`http://<OCI_IP>:3001` or `https://status.vijaysingh.cloud`), add monitors for:
    - `https://docs.vijaysingh.cloud`
    - `https://hooks.vijaysingh.cloud`
+   - `https://hub.vijaysingh.cloud`
+   - `https://docs-ocr.vijaysingh.cloud`
+   - `https://rss.vijaysingh.cloud`
    - Ping monitor to home router via Tailscale IP.
-3. Configure Slack Webhook notifications targeting `#homelab-alerts`.
+4. Configure Slack Incoming Webhook notifications targeting `#homelab-alerts`.
+
 
 ### Step 7.6: Centralize Slack ChatOps Routing
 Configure n8n and Prometheus Alertmanager to route alerts to dedicated Slack channels:

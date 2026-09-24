@@ -1,0 +1,11 @@
+---
+# ==============================================================================
+# Playbook: Deploy Uptime Kuma Out-of-Band Monitoring (OCI Mumbai)
+# Provisions Docker, Compose, Uptime Kuma stack, and firewall on OCI instance.
+# ==============================================================================
+
+- name: Deploy Out-of-Band Uptime Kuma on OCI Mumbai Instance
+  hosts: monitoring_oci
+  become: true
+  roles:
+    - uptime-kuma

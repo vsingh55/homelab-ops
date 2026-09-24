@@ -1,0 +1,26 @@
+# ==============================================================================
+# OCI Always Free Uptime Kuma Instance Configuration Template
+# Copy this file to 'terraform.tfvars' and supply your OCI API credentials.
+# NOTE: 'terraform.tfvars' is git-ignored and MUST NOT be committed to git.
+# ==============================================================================
+
+# OCI API Authentication (Found in OCI Console under Profile -> User Settings -> API Keys)
+tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+user_ocid        = "ocid1.user.oc1..aaaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+fingerprint      = "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
+private_key_path = "~/.oci/oci_api_key.pem"
+compartment_id   = "ocid1.tenancy.oc1..aaaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" # Or specific compartment OCID
+region           = "ap-mumbai-1"
+
+# SSH Access
+ssh_public_key_path = "~/.ssh/id_ed25519.pub"
+
+# Compute Shape (Always Free Eligible)
+# Options:
+# - VM.Standard.A1.Flex (Ampere ARM, up to 4 OCPUs & 24GB RAM free per tenancy)
+# - VM.Standard.E2.1.Micro (AMD x86_64, 1 OCPU, 1GB RAM)
+instance_shape          = "VM.Standard.A1.Flex"
+ocpus                   = 1
+memory_in_gbs           = 6
+boot_volume_size_in_gbs = 50
+environment             = "production"

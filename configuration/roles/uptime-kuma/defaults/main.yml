@@ -1,0 +1,6 @@
+---
+# Defaults for Uptime Kuma Out-of-Band Monitoring
+uptime_kuma_dir: "/opt/uptime-kuma"
+uptime_kuma_port: 3001
+uptime_kuma_image: "louislam/uptime-kuma:1"
+uptime_kuma_user: "{{ ansible_user | default('ubuntu') }}"
