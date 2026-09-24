@@ -15,9 +15,50 @@ test-ingress.yaml
 # ----------------------------------------------------------------
 # Security & Secrets
 # ----------------------------------------------------------------
-# Ignore decrypted vault files 
+# Environment files & local overrides
+.env*
+!*.env.example
+
+# SOPS / Age Keys & Decrypted Artifacts
+*.agekey
+*age*keys*.txt
+keys.txt
+*.dec.yaml
+*.dec.yml
 *.unencrypted
-.env
+*.unencrypted.yaml
+*.unencrypted.yml
+
+# Private Keys, Certificates & VPN Profiles
+*.key
+*.pem
+*.pfx
+*.p12
+*.ovpn
+id_rsa*
+id_ed25519*
+id_ecdsa*
+
+# Cloud Credential Files
+*.credential*.json
+*service-account*.json
+gcp-key*.json
+
+# Kubernetes Plaintext Secrets (Only *.enc.yaml should be committed)
+kubernetes/**/*secret*.yaml
+kubernetes/**/*secrets*.yaml
+kubernetes/**/*secret*.yml
+kubernetes/**/*secrets*.yml
+apps/**/*secret*.yaml
+apps/**/*secrets*.yaml
+apps/**/*secret*.yml
+apps/**/*secrets*.yml
+!*secret*.example.yaml
+!*secrets*.example.yaml
+!*secret*.enc.yaml
+!*secrets*.enc.yaml
+!*.enc.yaml
+!*.enc.yml
 
 # ----------------------------------------------------------------
 # IDE Settings 

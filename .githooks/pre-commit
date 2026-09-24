@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Git Pre-Commit Security Hook: Secret Leak Prevention
+# Prevents accidental commits of private keys, plaintext Kubernetes secrets,
+# or credential strings to git.
+# ==============================================================================
+
+set -eo pipefail
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+
+if [ -z "$staged_files" ]; then
+    exit 0
+fi
+
+errors=0
+
+for file in $staged_files; do
+    if [ ! -f "$file" ]; then
+        continue
+    fi
+
+    # Skip checking the hook scripts themselves
+    if [[ "$file" =~ ^\.githooks/ ]]; then
+        continue
+    fi
+
+    # 1. Check for Age Private Keys
+    if git diff --cached "$file" | grep -q "AGE-SECRET-KEY-1"; then
+        echo "❌ [SECURITY ERROR] $file contains an Age private key (AGE-SECRET-KEY-1)!"
+        errors=$((errors + 1))
+    fi
+
+    # 2. Check for SSH/TLS Private Keys
+    if git diff --cached "$file" | grep -qE "BEGIN (RSA|OPENSSH|EC|DSA|PGP)? PRIVATE KEY"; then
+        echo "❌ [SECURITY ERROR] $file contains an unencrypted private key!"
+        errors=$((errors + 1))
+    fi
+
+    # 3. Check for Plaintext Kubernetes Secrets
+    if [[ "$file" =~ \.(ya?ml)$ ]] && [[ ! "$file" =~ (\.enc\.ya?ml|\.example\.ya?ml)$ ]]; then
+        if git diff --cached "$file" | grep -qE "^[+ ]*kind:[[:space:]]*Secret"; then
+            if ! git diff --cached "$file" | grep -q "sops:"; then
+                echo "❌ [SECURITY ERROR] $file defines 'kind: Secret' without SOPS encryption!"
+                echo "   👉 Secrets must be encrypted using SOPS and named '*.enc.yaml'."
+                errors=$((errors + 1))
+            fi
+        fi
+    fi
+
+    # 4. Check for Cloud Secret Keys
+    if git diff --cached "$file" | grep -qiE "AWS_SECRET_ACCESS_KEY.*="; then
+        echo "❌ [SECURITY ERROR] $file appears to contain an AWS Secret Access Key!"
+        errors=$((errors + 1))
+    fi
+done
+
+if [ $errors -gt 0 ]; then
+    echo ""
+    echo "🚨 Commit aborted: Found $errors sensitive credential violation(s)."
+    echo "💡 Encrypt secrets with Mozilla SOPS ('sops --encrypt --in-place <file.yaml>') before committing."
+    exit 1
+fi
+
+exit 0

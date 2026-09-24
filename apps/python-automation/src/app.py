@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from main import process_file
 
 app = Flask(__name__)
-app.secret_key = "etap_report_generator_key"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", os.urandom(24).hex())
 
 # Configure absolute paths relative to the project root directory
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
