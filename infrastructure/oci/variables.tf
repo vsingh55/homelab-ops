@@ -1,26 +1,30 @@
 variable "tenancy_ocid" {
-  description = "The OCID of your OCI tenancy."
+  description = "The OCID of your OCI tenancy (optional if using ~/.oci/config profile)."
   type        = string
+  default     = null
   sensitive   = true
 }
 
 variable "user_ocid" {
-  description = "The OCID of the OCI user calling the API."
+  description = "The OCID of the OCI user calling the API (optional if using ~/.oci/config profile)."
   type        = string
+  default     = null
   sensitive   = true
 }
 
 variable "fingerprint" {
-  description = "Fingerprint for the OCI API private key."
+  description = "Fingerprint for the OCI API private key (optional if using ~/.oci/config profile)."
   type        = string
+  default     = null
   sensitive   = true
 }
 
 variable "private_key_path" {
   description = "The local absolute or home-relative path to the OCI API signing private key."
   type        = string
-  default     = "~/.oci/oci_api_key.pem"
+  default     = null
 }
+
 
 variable "compartment_id" {
   description = "The OCID of the compartment to contain all resources (use tenancy_ocid for root compartment)."
