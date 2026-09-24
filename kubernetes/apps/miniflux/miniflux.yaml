@@ -25,7 +25,7 @@ spec:
         image: miniflux/miniflux:latest
         env:
         - name: DATABASE_URL
-          value: "postgres://n8n:ChangeMeToSomethingStrong123!@postgres-ha-rw.database.svc.cluster.local:5432/n8n?sslmode=disable"
+          value: "postgres://n8n:ChangeMeToSomethingStrong123!@postgres-ha-rw.database.svc.cluster.local:5432/miniflux?sslmode=disable"
         - name: RUN_MIGRATIONS
           value: "1"
         - name: ADMIN_USERNAME

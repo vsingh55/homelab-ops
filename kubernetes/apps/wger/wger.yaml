@@ -41,6 +41,10 @@ spec:
           value: "sqlite:///data/ryot.db"
         - name: FRONTEND_URL
           value: "https://health.vijaysingh.cloud"
+        - name: SERVER_ADMIN_ACCESS_TOKEN
+          value: "RyotAdminToken2026!"
+        - name: SERVER_ACCESS_TOKEN_SECRET
+          value: "homelab-ryot-secret-token-32chars-minimum-length"
         ports:
         - containerPort: 8000
           name: http
