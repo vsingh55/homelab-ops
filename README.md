@@ -15,7 +15,7 @@
 
 ---
 
-## 🧭 Executive Overview: The Project at a Glance
+## Executive Overview: The Project at a Glance
 
 **Homelab-Ops** is a production-grade, self-healing **Sovereign Cloud Platform** engineered on physical bare-metal hardware in Mumbai, India, integrated with supporting cloud infrastructure in **Oracle Cloud Infrastructure (OCI)** and **Google Cloud Platform (GCP)**.
 
@@ -28,7 +28,7 @@ This platform simulates enterprise-scale infrastructure engineering while operat
 
 ---
 
-## 🏛️ Architecture & System Design
+## Architecture & System Design
 
 To provide complete architectural clarity without visual clutter, the platform is organized into three distinct structural diagrams:
 
@@ -54,7 +54,7 @@ To provide complete architectural clarity without visual clutter, the platform i
 ---
 
 
-## 📖 The Engineering Story: From Bare Metal to Sovereign GitOps
+## The Engineering Story: From Bare Metal to Sovereign GitOps
 
 ### Act I: The Bare-Metal Foundation
 Every robust platform begins with physical constraints. The on-premise foundation is an ultra-efficient Intel Core i5 Mini PC with 16GB DDR4 RAM, a 256GB NVMe SSD, and a 1TB SATA mechanical drive. 
@@ -90,7 +90,7 @@ To achieve enterprise-grade resilience, the architecture integrates **Oracle Clo
 
 ---
 
-## ⚡ Core Architecture Pillars
+## Core Architecture Pillars
 
 | Architectural Pillar | Core Technologies | How It Solves the Problem |
 | :--- | :--- | :--- |
@@ -103,7 +103,7 @@ To achieve enterprise-grade resilience, the architecture integrates **Oracle Clo
 
 ---
 
-## 📦 Application Fleet & Workload Catalog
+## Application Fleet & Workload Catalog
 
 All services are containerized, declared in Git, and routed through Cloudflare Zero Trust:
 
@@ -133,7 +133,7 @@ Productivity & Personal Health
 
 ---
 
-## 🖥️ Physical Hardware & Resource Budgeting
+## Physical Hardware & Resource Budgeting
 
 ```mermaid
 pie title Mini PC 16GB RAM Allocation
@@ -154,7 +154,7 @@ pie title Mini PC 16GB RAM Allocation
 
 ---
 
-## 📚 Standard Engineering Documentation & ADRs
+## Standard Engineering Documentation & ADRs
 
 Following CNCF and enterprise platform standards, all architecture decisions and technical specifications are documented in the `docs/` hierarchy:
 
@@ -177,7 +177,7 @@ Following CNCF and enterprise platform standards, all architecture decisions and
 
 ---
 
-## 🛠️ Quick Operator Runbook
+## Quick Operator Runbook
 
 ### Secret Encryption Workflow (SOPS + Age)
 ```bash
@@ -211,7 +211,7 @@ kubectl logs -n cloudflared -l app.kubernetes.io/name=cloudflared --tail=50
 
 ---
 
-## 👤 Engineering Leadership & Contacts
+## Engineering Leadership & Contacts
 
 **Vijay Singh** — DevOps & Platform Engineer  
 * **GitHub:** [@vsingh55](https://github.com/vsingh55)  
