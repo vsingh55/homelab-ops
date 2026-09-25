@@ -35,7 +35,16 @@ To provide complete architectural clarity without visual clutter, the platform i
 ### 1. Global Multi-Cloud & Network Ingress Topology
 *How external traffic, edge security, multi-cloud support, and the secure administrative mesh are organized:*
 
-![Global Multi-Cloud & Network Ingress Topology](images/v.2.1.0/global-network-topology.png)
+<table>
+  <tr>
+    <th align="center">🖼️ Version 1</th>
+    <th align="center">🖼️ Version 2</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="images/v.2.1.0/global-network-topology.png" alt="Global Network Topology v1" width="500"/></td>
+    <td align="center"><img src="images/v.2.1.0/global-network-topology-v2.png" alt="Global Network Topology v2" width="500"/></td>
+  </tr>
+</table>
 
 ---
 
