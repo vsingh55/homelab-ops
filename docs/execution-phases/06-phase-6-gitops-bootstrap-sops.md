@@ -54,6 +54,8 @@ flowchart TD
     Decrypted -->|Mounted as Volume / Env| Pod
 ```
 
+![Declarative GitOps & Secret Lifecycle Pipeline](../../images/v.3.0.0/gitops-pipeline.png)
+
 ---
 
 ## 3. The "What": Concrete Repository Deliverables

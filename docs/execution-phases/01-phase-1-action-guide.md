@@ -26,13 +26,13 @@ In enterprise DevOps engineering, **you never touch running systems or delete vi
 
 Before proceeding, you must align on these 5 foundational decisions:
 
-| # | Decision | Legacy State | Target Future State | Impact / Rationale |
-|---|---|---|---|---|
-| **D1** | **Purge Academy Zone** | 5 VMs/LXCs (`gateway`, `jumpbox`, `server`, `node-0`, `node-1`) consuming ~7.5GB RAM | Completely eliminated from Proxmox and codebase | CKA/CKS certification complete; reclaims **~7.5GB RAM** on host. |
-| **D2** | **Decommission `ops-center`** | 2GB RAM KVM VM hosting MinIO & SSH bastion | Eliminated; Terraform state moves to **OCI Always Free Mumbai S3** | Reclaims **2GB RAM, 2 vCPUs, 20GB NVMe, and 250GB HDD** virtual disk. |
-| **D3** | **Resize `k3s-prod`** | 8GB RAM, 2 vCPUs, 30GB disk | Resized to **12GB RAM, 4 vCPUs**, with direct **1TB SATA HDD** mount | Provides >60% memory headroom (~7.5GB free buffer) for media and OCR apps. |
-| **D4** | **Laptop Direct Control** | Dual-hop SSH proxy via `ops-center` | **Direct execution from Laptop** via Tailscale mesh (`100.x.x.x`) | Eliminates proxy latency, removes bastion single point of failure. |
-| **D5** | **Cloudflare Edge Ingress** | GCP `e2-micro` VM in South Carolina via WireGuard (~500ms latency, ~$10/mo) | **Cloudflare Zero Trust Tunnels (`cloudflared`)** via Indian Anycast PoPs | Drops latency to **<15ms**, eliminates recurring cloud cost, zero open ports. |
+| # | Decision | Legacy State (v1.0) | Production State (v3.0 Implemented) | Impact / Rationale | Status |
+|---|---|---|---|---|---|
+| **D1** | **Purge Academy Zone** | 5 VMs/LXCs (`gateway`, `jumpbox`, `server`, `node-0`, `node-1`) consuming ~7.5GB RAM | Completely eliminated from Proxmox and codebase | CKA/CKS certification complete; reclaimed **~7.5GB RAM** on host. | ✅ Implemented |
+| **D2** | **Decommission `ops-center`** | 2GB RAM KVM VM hosting MinIO & SSH bastion | Eliminated; Terraform state migrated to **OCI Always Free Mumbai S3** | Reclaimed **2GB RAM, 2 vCPUs, 20GB NVMe, and 250GB HDD** virtual disk. | ✅ Implemented |
+| **D3** | **Resize `k3s-prod`** | 8GB RAM, 2 vCPUs, 30GB disk | Resized to **12GB RAM, 4 vCPUs**, with direct **1TB SATA HDD** mount | Provides >60% memory headroom (~7.5GB free buffer) for media and OCR apps. | ✅ Implemented |
+| **D4** | **Laptop Direct Control** | Dual-hop SSH proxy via `ops-center` | **Direct execution from Laptop** via Tailscale mesh (`100.x.x.x`) | Eliminated proxy latency, removed bastion single point of failure. | ✅ Implemented |
+| **D5** | **Cloudflare Edge Ingress** | GCP `e2-micro` VM in South Carolina via WireGuard (~500ms latency, ~$10/mo) | **Cloudflare Zero Trust Tunnels (`cloudflared`)** via Indian Anycast PoPs | Dropped latency to **<15ms**, eliminated recurring cloud cost, zero open ports. | ✅ Implemented |
 
 ---
 

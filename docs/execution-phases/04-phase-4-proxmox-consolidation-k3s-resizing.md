@@ -57,6 +57,8 @@ flowchart TD
     end
 ```
 
+![Sovereign Bare-Metal & Cluster Architecture](../../images/v.3.0.0/bare-metal-cluster-architecture.png)
+
 ---
 
 ## 4. The "How": Step-by-Step Technical Execution

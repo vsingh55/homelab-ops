@@ -4,8 +4,8 @@
 ## Architecture
 
 The system bridges the gap between containerized logic (K3s) and physical hardware (Proxmox) using a secure, identity-based command channel.
-![architechture](../../images/v.2.1.0/architecture.png)
-![workflow](../../images/v.2.1.0/workflow-pipeline.png)
+![architechture](../../images/v.3.0.0/architecture.png)
+![workflow](../../images/v.3.0.0/workflow-pipeline.png)
 
 ## Key Features
 

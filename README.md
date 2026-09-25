@@ -35,21 +35,21 @@ To provide complete architectural clarity without visual clutter, the platform i
 ### 1. Global Multi-Cloud & Network Ingress Topology
 *How external traffic, edge security, multi-cloud support, and the secure administrative mesh are organized:*
 
-![Global Network Topology v1](images/v.2.1.0/global-network-topology.png)
+![Global Network Topology](images/v.3.0.0/global-network-topology.png)
 
 ---
 
 ### 2. Sovereign Bare-Metal & Cluster Architecture
 *How physical hardware, hypervisor resource fencing, and tiered storage are partitioned:*
 
-![Sovereign Bare-Metal & Cluster Architecture](images/v.2.1.0/bare-metal-cluster-architecture.png)
+![Sovereign Bare-Metal & Cluster Architecture](images/v.3.0.0/bare-metal-cluster-architecture.png)
 
 ---
 
 ### 3. Declarative GitOps & Secret Lifecycle Pipeline
 *How code changes flow automatically from Git into production without configuration drift:*
 
-![Declarative GitOps & Secret Lifecycle Pipeline](images/v.2.1.0/gitops-pipeline.png)
+![Declarative GitOps & Secret Lifecycle Pipeline](images/v.3.0.0/gitops-pipeline.png)
 
 ---
 

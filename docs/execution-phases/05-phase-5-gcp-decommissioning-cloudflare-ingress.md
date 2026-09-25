@@ -43,6 +43,8 @@ flowchart LR
     end
 ```
 
+![Global Multi-Cloud & Network Ingress Topology](../../images/v.3.0.0/global-network-topology.png)
+
 ---
 
 ## 3. The "What": Concrete Deliverables

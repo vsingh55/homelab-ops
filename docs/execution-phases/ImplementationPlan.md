@@ -8,16 +8,17 @@ Maximize hardware utilization on the physical Mini PC (16GB RAM, Intel i5, 256GB
 
 Through our comprehensive architectural interview, we identified and agreed upon the following fundamental optimizations:
 
-| Domain | Legacy State | Optimized Future State | Operational & Resource Gain |
-| :--- | :--- | :--- | :--- |
-| **Academy Zone** | 5 VMs/LXCs (`gateway`, `jumpbox`, `server`, `node-0`, `node-1`) for lab exercises | **Completely deleted from Proxmox and codebase** | Reclaims **~7.5 GB RAM definition** and eliminates 5 idle VM configurations |
-| **Management Plane (`ops-center`)** | 2GB RAM KVM VM hosting MinIO (Terraform state/backups) and acting as an SSH bastion | **Completely eliminated**. Terraform state moves to **OCI Always Free Object Storage in Mumbai**; in-cluster S3 handles K8s backups | Reclaims **2 GB RAM, 2 vCPUs, 20GB NVMe, and 250GB HDD virtual disk** |
-| **Operations Control Node** | Dual-hop pattern: Laptop SSH jumps through `ops-center` to run Ansible/Terraform | **Direct execution from Laptop** connecting via Tailscale directly to Proxmox and K3s | Eliminates proxy latency, eliminates bastion maintenance, simplifies workflow |
-| **Production Plane (`k3s-prod`)** | 8GB RAM, 2 vCPUs, 30GB disk on NVMe | **Resized to 12GB RAM, 4 vCPUs**, with direct virtual disk mount to the **1TB SATA HDD** | Massive memory buffer (>60% headroom) for production workloads, zero OOM risk |
-| **Public Edge & Ingress** | GCP Compute `e2-micro` in `us-east1` running WireGuard (~500ms latency, ~$7–$12/mo) | **Cloudflare Zero Trust Tunnels (`cloudflared`)** terminating at Indian edge PoPs (Mumbai/Delhi/Chennai) | Latency drops to **<15ms**, saves **~$10/month**, zero open router ports |
-| **Container Registry** | GCP Artifact Registry (`homelab-repo` in `us-east1`) with Workload Identity Federation | **GitHub Container Registry (`ghcr.io`)** via GitHub Actions | **₹0.00 cost**, zero GCP dependencies, seamless GitHub integration |
-| **GitOps & Secrets** | Manual `kubectl apply` and Ansible-push model | **Flux CD v2** pull-based GitOps with **Mozilla SOPS + Age** in-memory secret decryption | True GitOps, zero config drift, immutable Git audit log |
-| **Out-of-Band Monitoring & DR** | Local-only monitoring; backups co-located on physical HDD | **OCI Mumbai Always Free instance running Uptime Kuma** (Slack alerts) + nightly encrypted Restic push | True out-of-band outage alerts and unbreakable **3-2-1 off-site disaster recovery** |
+| Domain | Legacy State (v1.0) | Production State (v3.0 Implemented) | Operational & Resource Gain | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **Academy Zone** | 5 VMs/LXCs (`gateway`, `jumpbox`, `server`, `node-0`, `node-1`) for lab exercises | **Completely deleted from Proxmox and codebase** | Reclaimed **~7.5 GB RAM definition** and eliminated 5 idle VM configurations | ✅ Completed |
+| **Management Plane (`ops-center`)** | 2GB RAM KVM VM hosting MinIO (Terraform state/backups) and acting as an SSH bastion | **Completely eliminated**. Terraform state migrated to **OCI Always Free Object Storage in Mumbai**; in-cluster S3 handles K8s backups | Reclaimed **2 GB RAM, 2 vCPUs, 20GB NVMe, and 250GB HDD virtual disk** | ✅ Completed |
+| **Operations Control Node** | Dual-hop pattern: Laptop SSH jumps through `ops-center` to run Ansible/Terraform | **Direct execution from Laptop** connecting via Tailscale directly to Proxmox and K3s | Eliminated proxy latency, removed bastion single point of failure | ✅ Completed |
+| **Production Plane (`k3s-prod`)** | 8GB RAM, 2 vCPUs, 30GB disk on NVMe | **Resized to 12GB RAM, 4 vCPUs**, with direct virtual disk mount to the **1TB SATA HDD** | Massive memory buffer (>60% headroom) for production workloads, zero OOM risk | ✅ Completed |
+| **Public Edge & Ingress** | GCP Compute `e2-micro` in `us-east1` running WireGuard (~500ms latency, ~$7–$12/mo) | **Cloudflare Zero Trust Tunnels (`cloudflared`)** terminating at Indian edge PoPs (Mumbai/Delhi/Chennai) | Latency dropped to **<15ms**, saved **~$10/month**, zero open router ports | ✅ Completed |
+| **Container Registry** | GCP Artifact Registry (`homelab-repo` in `us-east1`) with Workload Identity Federation | **GitHub Container Registry (`ghcr.io`)** via GitHub Actions | **₹0.00 cost**, zero GCP dependencies, seamless GitHub integration | ✅ Completed |
+| **GitOps & Secrets** | Manual `kubectl apply` and Ansible-push model | **Flux CD v2** pull-based GitOps with **Mozilla SOPS + Age** in-memory secret decryption | True GitOps, zero config drift, immutable Git audit log | ✅ Completed |
+| **CI/CD Automation** | Node-local deployment scripts; static VPN credentials | **Ephemeral Tailscale ZTNA in GitHub Actions** via scoped OAuth (`tag:ci`) for automatic zero-downtime rolling updates | Permanent key-rotation-free automation with zero inbound ports | ✅ Completed |
+| **Out-of-Band Monitoring & DR** | Local-only monitoring; backups co-located on physical HDD | **OCI Mumbai Always Free instance running Uptime Kuma** (Slack alerts) + nightly encrypted Restic push | True out-of-band outage alerts and unbreakable **3-2-1 off-site disaster recovery** | ✅ Completed |
 
 ---
 

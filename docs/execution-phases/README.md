@@ -1,6 +1,6 @@
 # Homelab Modernization & Hardware Optimization Execution Master Index
 
-> **Architecture Standard:** Lean Sovereign Cloud Architecture (v2.0)  
+> **Architecture Standard:** Sovereign Cloud Architecture (v3.0.0)  
 > **Hardware Target:** 16GB RAM Mini PC (Intel Core i5, 256GB NVMe SSD, 1TB SATA mechanical HDD)  
 > **Author / Role:** Principal Architect / Homelab Platform Team  
 > **Repository:** `https://github.com/vsingh55/homelab-ops`  
