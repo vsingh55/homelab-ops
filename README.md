@@ -103,18 +103,6 @@ Encrypted · No Bastions · 100.x.x.x"]
     Workstation ==>                                    Tailscale
     Tailscale   -. "Direct SSH / Proxmox API"      .-> PVE
     Tailscale   -. "kubectl 100.x.x.x"             .-> K3S
-```───────────────
-    Users        -- "HTTP / Webhook"                --> CF
-    CF           <== "QUIC Tunnel · Zero Open Ports" ==> K3S
-
-    OCI          -. "Out-of-Band Health Probing"    .-> CF
-    K3S          -. "State & Encrypted Backup Sync" .-> OCI
-
-    Workstation  ==>                                    Tailscale
-    Tailscale    -. "Direct SSH / Proxmox API"      .-> PVE
-    Tailscale    -. "kubectl · 100.x.x.x"           .-> K3S
-
-    PVE          -- "Hosts VM 500"                  --> K3S
 ```
 
 ---
