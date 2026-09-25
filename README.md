@@ -74,6 +74,7 @@ The modern platform runs on pure **GitOps Continuous Delivery** powered by **Flu
 * The cluster continuously synchronizes its desired state from this Git repository.
 * Workload reconciliation is deterministically ordered: platform foundations (storage classes, operators, ingress daemons) must report healthy before application workloads are scheduled (`apps` depends on `platform`).
 * Sensitive tokens and database passwords are encrypted declaratively using **Mozilla SOPS + Age**. Because secrets remain encrypted in Git, they can be safely reviewed in pull requests, while the in-cluster Flux decryptor hydrates them into memory without leaving plaintext traces on physical disks.
+* **Zero-Trust Ephemeral CI/CD Automation:** Continuous integration workflows (such as automated documentation deployments) leverage **Zero-Trust Network Access (ZTNA)** via Tailscale. Instead of exposing Kubernetes API server ports to the public internet or maintaining static VPN credentials, cloud GitHub Actions runners authenticate dynamically using scoped OAuth clients (`tag:ci`), join an ephemeral WireGuard mesh, execute rolling updates, and self-terminate immediately upon job completion—ensuring zero permanent attack surfaces.
 
 ### Act IV: Storage Economics & Stateful High Availability
 Single-node virtualization often stumbles when high-IOPS database queries compete with heavy background disk writes:
@@ -99,6 +100,7 @@ To achieve enterprise-grade resilience, the architecture integrates **Oracle Clo
 | **In-Git Secret Decryption** | Mozilla SOPS, Age Cryptography | Secrets versioned declaratively in Git with asymmetric encryption; decrypted exclusively in-memory by Flux. |
 | **Dual-Tier Storage Strategy** | NVMe Flash (256GB), SATA Mechanical (1TB) | Isolates high-IOPS database operations from bulk document indexing and media streaming workloads. |
 | **Stateful Resilience & HA** | CloudNativePG (PostgreSQL Operator) | Self-healing relational database clustering with automated failover and continuous WAL archiving. |
+| **Zero-Trust CI/CD Automation** | Tailscale Ephemeral Mesh, GitHub Actions | Connects cloud runners to private Kubernetes clusters via scoped OAuth and WireGuard; eliminates public API exposure and credential expiration. |
 | **Multi-Cloud Support Plane** | OCI Mumbai, GCP Support VM, Uptime Kuma | Independent external heartbeat monitoring and remote state locking; operates even during power or ISP outages. |
 
 ---
