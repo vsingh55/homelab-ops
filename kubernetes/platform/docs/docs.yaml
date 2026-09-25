@@ -72,7 +72,7 @@ data:
           - "13. Debugging Boot Failure": 13-debugging-boot-failure.md
           - "14. K3s Optimization & Security": 14-k3s-optimization-and-security.md.md
       - "Architecture Decisions (ADRs)":
-          - "Enterprise ADR Register": process/architecture_decision_records.md
+          - "Enterprise ADR Register": adr/README.md
       - "Execution Phases":
           - "Phases Overview": execution-phases/README.md
           - "Phase 1: Action Guide": execution-phases/01-phase-1-action-guide.md
