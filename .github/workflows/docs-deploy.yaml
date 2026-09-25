@@ -1,8 +1,7 @@
 name: Docs Site — Auto Redeploy on Push
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TRIGGER: fires on every push to main that touches docs-related paths.
-# Scoped paths avoid unnecessary restarts from unrelated commits.
+# TRIGGER: only fires on paths that affect the docs site output.
 # ─────────────────────────────────────────────────────────────────────────────
 on:
   push:
@@ -12,15 +11,14 @@ on:
       - "docs/**"
       - "images/**"
       - "process/**"
-      - "kubernetes/platform/docs/**"   # manifest changes also need a restart
-  workflow_dispatch:                    # manual trigger from GitHub Actions UI
+      - "kubernetes/platform/docs/**"
+  workflow_dispatch:
 
 jobs:
   redeploy-docs:
     name: Restart homelab-docs pod
     runs-on: ubuntu-latest
 
-    # Minimal permissions — cluster access is via secret only
     permissions:
       contents: read
 
@@ -29,35 +27,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ── 2. Install kubectl ────────────────────────────────────────────────
+      # ── 2. Join the GitHub runner to your Tailscale network ───────────────
+      # The runner becomes an ephemeral Tailscale node (100.x.x.x).
+      # After the job finishes the device is automatically removed.
+      # Requires two GitHub secrets (see setup guide below):
+      #   TS_OAUTH_CLIENT_ID     — from tailscale.com/settings/oauth
+      #   TS_OAUTH_CLIENT_SECRET — from tailscale.com/settings/oauth
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci                 # Tailscale ACL tag for CI machines
+          version: latest
+
+      # ── 3. Install kubectl ────────────────────────────────────────────────
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
         with:
           version: "latest"
 
-      # ── 3. Configure cluster access from secret ───────────────────────────
-      # KUBECONFIG secret = full kubeconfig file content (see README below).
-      # GitHub automatically masks all secret values in logs — never printed.
+      # ── 4. Configure cluster access ───────────────────────────────────────
+      # KUBECONFIG secret = your kubeconfig with the Tailscale IP of k3s.
+      # Now reachable because the runner is on the same Tailscale network.
       - name: Configure kubeconfig
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      # ── 4. Rolling restart ────────────────────────────────────────────────
-      # Sets a new annotation on the pod template → Kubernetes creates a new pod
-      # (init container re-clones repo + rebuilds mkdocs) → terminates old pod.
-      # Zero-downtime: nginx stays up serving old content until new pod is ready.
+      # ── 5. Rolling restart ────────────────────────────────────────────────
+      # New pod init-container re-clones repo + rebuilds mkdocs site.
+      # Nginx keeps serving old content until the new pod passes readiness.
       - name: Rollout restart homelab-docs
         run: |
           kubectl rollout restart deployment/homelab-docs -n platform
 
-      # ── 5. Wait for rollout and report status ─────────────────────────────
+      # ── 6. Wait for completion ────────────────────────────────────────────
       - name: Wait for rollout to complete
         run: |
           kubectl rollout status deployment/homelab-docs -n platform --timeout=300s
 
-      # ── 6. Cleanup — always remove kubeconfig from runner disk ────────────
+      # ── 7. Cleanup ────────────────────────────────────────────────────────
       - name: Remove kubeconfig
         if: always()
         run: rm -f $HOME/.kube/config
