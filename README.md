@@ -49,80 +49,10 @@ To provide complete architectural clarity without visual clutter, the platform i
 ### 3. Declarative GitOps & Secret Lifecycle Pipeline
 *How code changes flow automatically from Git into production without configuration drift:*
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 60, 'rankSpacing': 85}}}%%
-flowchart LR
-
-    %% ── GLOBAL COLOUR SYSTEM ─────────────────────────────────────
-    classDef vcsStyle      fill:#E8EAF6,stroke:#3949AB,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef controlStyle  fill:#E3F2FD,stroke:#1565C0,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef secretStyle   fill:#EDE7F6,stroke:#512DA8,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef gateStyle     fill:#F3E5F5,stroke:#512DA8,stroke-width:2px,color:#1A1A1A,font-size:13px;
-    classDef platformStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef appsStyle     fill:#FFF8E1,stroke:#F9A825,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef liveStyle     fill:#F3E5F5,stroke:#6A1B9A,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-
-    %% ── SOURCE OF TRUTH ──────────────────────────────────────────
-    subgraph VCS["Version Control System"]
-        GitRepo["📦 GitHub Repository
-vsingh55 / homelab-ops
-Encrypted Secrets · Declarative Manifests"]
-    end
-    class GitRepo vcsStyle;
-
-    %% ── IN-CLUSTER GITOPS ENGINE ─────────────────────────────────
-    subgraph ClusterGitOps["In-Cluster GitOps Engine — Flux CD v2"]
-        direction TB
-        SourceCtrl["📡 Source Controller
-Polls Git Every 10 min
-Detects & Fetches New Commits"]
-        KustCtrl["⚙️ Kustomize Controller
-Dependency Chaining
-Ordered Reconciliation"]
-        SOPS["🔐 SOPS + Age Decryption
-In-Memory Secret Hydration
-Zero Plaintext on Disk"]
-    end
-    class SourceCtrl,KustCtrl controlStyle;
-    class SOPS secretStyle;
-
-    %% ── DEPLOYMENT STAGES ────────────────────────────────────────
-    subgraph DeploymentStages["Deterministic Deployment Order"]
-        direction TB
-        StagePlatform["1️⃣ Platform Foundation
-cloudflared · CloudNativePG
-Storage Classes · Monitoring"]
-        HealthGate{"✅ Health Gate
-All platform pods
-must be Ready"}
-        StageApps["2️⃣ Application Fleet
-dependsOn: platform checked
-n8n · Paperless · BookOrbit · Miniflux"]
-    end
-    class StagePlatform platformStyle;
-    class HealthGate gateStyle;
-    class StageApps appsStyle;
-
-    %% ── LIVE CLUSTER STATE ───────────────────────────────────────
-    subgraph ClusterState["Active Production State"]
-        LivePods["🚀 Healthy Running Workloads
-Self-Healing · Zero Config Drift
-Continuous Reconciliation Loop"]
-    end
-    class LivePods liveStyle;
-
-    %% ── PIPELINE FLOW ────────────────────────────────────────────
-    GitRepo       -- "Pull: New Commit Detected" --> SourceCtrl
-    SourceCtrl    -- "Fetch Manifests"           --> KustCtrl
-    KustCtrl      -- "Decrypt Secrets"           --> SOPS
-    SOPS          -- "Apply Manifests"           --> StagePlatform
-    StagePlatform -- "Health Check"              --> HealthGate
-    HealthGate    == "Gate Passed"               ==> StageApps
-    StageApps     -- "Schedule Workloads"        --> LivePods
-    LivePods      -. "Drift Correction"          .-> KustCtrl
-```
+![Declarative GitOps & Secret Lifecycle Pipeline](images/v.2.1.0/gitops-pipeline.png)
 
 ---
+
 
 ## 📖 The Engineering Story: From Bare Metal to Sovereign GitOps
 
