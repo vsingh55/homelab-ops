@@ -71,6 +71,7 @@ Residential internet connections rarely provide static public IP addresses and a
 Operating infrastructure through manual `kubectl apply` commands or ad-hoc scripts leads to configuration drift and operational opacity.
 
 The modern platform runs on pure **GitOps Continuous Delivery** powered by **Flux CD v2**:
+
 * The cluster continuously synchronizes its desired state from this Git repository.
 * Workload reconciliation is deterministically ordered: platform foundations (storage classes, operators, ingress daemons) must report healthy before application workloads are scheduled (`apps` depends on `platform`).
 * Sensitive tokens and database passwords are encrypted declaratively using **Mozilla SOPS + Age**. Because secrets remain encrypted in Git, they can be safely reviewed in pull requests, while the in-cluster Flux decryptor hydrates them into memory without leaving plaintext traces on physical disks.
@@ -78,6 +79,7 @@ The modern platform runs on pure **GitOps Continuous Delivery** powered by **Flu
 
 ### Act IV: Storage Economics & Stateful High Availability
 Single-node virtualization often stumbles when high-IOPS database queries compete with heavy background disk writes:
+
 * **Storage Tiering:** Fast NVMe storage is dedicated strictly to the OS, K3s state, and PostgreSQL data files. Multi-terabyte document indexing (Paperless-ngx) and audio/book streaming libraries are routed directly to the high-capacity 1TB SATA mechanical disk.
 * **Database Modernization:** Rather than deploying fragile, static database pods, relational data is managed by the **CloudNativePG Operator**. The operator provides automated PostgreSQL lifecycle management, health monitoring, self-healing failover, and Write-Ahead Log (WAL) archiving.
 
@@ -85,6 +87,7 @@ Single-node virtualization often stumbles when high-IOPS database queries compet
 A monitoring system running inside the cluster it is supposed to monitor cannot alert you when the cluster itself dies. Furthermore, local backups are vulnerable if the physical host suffers hardware failure.
 
 To achieve enterprise-grade resilience, the architecture integrates **Oracle Cloud Infrastructure (OCI)** and **Google Cloud Platform (GCP)** support instances:
+
 * **Out-of-Band Health Probes:** An independent cloud VM in OCI Mumbai runs **Uptime Kuma**, continuously polling public endpoints (`https://docs.vijaysingh.cloud`, `https://hooks.vijaysingh.cloud`) over the public internet and dispatching alerts to Slack/Discord if homelab broadband or power fails.
 * **Remote State & Offsite Backup:** Terraform state is stored securely with remote locking in an OCI Object Storage S3-compatible backend, and nightly encrypted Restic backups are pushed offsite, fulfilling the **3-2-1 backup rule** (3 copies, 2 media types, 1 offsite).
 * **Multi-Cloud Compute Support:** Supporting cloud virtual machines across OCI and GCP provide compute targets for auxiliary services and remote operations.
@@ -161,9 +164,11 @@ pie title Mini PC 16GB RAM Allocation
 Following CNCF and enterprise platform standards, all architecture decisions and technical specifications are documented in the `docs/` hierarchy:
 
 ### 1. Architecture Decision Records (ADRs)
+
 * **[Architecture Decision Records (ADRs)](docs/adr/README.md)** — 16 formal Architecture Decision Records documenting every pivotal architectural decision (ADR-001 through ADR-016), following the Michael Nygard standard.
 
 ### 2. Execution Phases & Implementation Manuals
+
 * **[Phase 1: Architecture Baseline](docs/execution-phases/01-phase-1-architecture-baseline.md)** — Hardware allocation baseline and architectural blueprint alignment.
 * **[Phase 2: Codebase Pruning & Debt Elimination](docs/execution-phases/02-phase-2-codebase-pruning.md)** — Purging idle lab planes and reclaiming 7.5GB RAM.
 * **[Phase 3: OCI Remote State Backend](docs/execution-phases/03-phase-3-oci-remote-state.md)** — Migrating Terraform state to Oracle Cloud S3-compatible object storage.
@@ -173,6 +178,7 @@ Following CNCF and enterprise platform standards, all architecture decisions and
 * **[Phase 7: Application Fleet Deployment](docs/execution-phases/07-phase-7-application-fleet-deployment.md)** — Onboarding CloudNativePG, Paperless, and Uptime Kuma monitoring.
 
 ### 3. Engineering Guides & Post-Mortems
+
 * **[Proxmox Bare-Metal Setup](docs/02-proxmox-setup.md)** & **[Proxmox Recovery Guide](docs/99-proxmox-recovery-guide.md)**
 * **[Terraform Modularization](docs/10-terraform-modularization.md)** & **[Secret Hydration Patterns](docs/12-secret-management-hydration.md)**
 * **[K3s Optimization & Security](docs/14-k3s-optimization-and-security.md.md)** & **[WAN Debugging Post-Mortem](docs/08-debugging-wan-connectivity.md)**
@@ -216,9 +222,10 @@ kubectl logs -n cloudflared -l app.kubernetes.io/name=cloudflared --tail=50
 ## Engineering Leadership & Contacts
 
 **Vijay Singh** — DevOps & Platform Engineer  
+
 * **GitHub:** [@vsingh55](https://github.com/vsingh55)  
 * **Documentation Portal:** [https://docs.vijaysingh.cloud](https://docs.vijaysingh.cloud)  
-* **Homelab Command Center:** [https://home.vijaysingh.cloud](https://home.vijaysingh.cloud)  
+* **Homelab Command Center:** [https://hub.vijaysingh.cloud](https://hub.vijaysingh.cloud)  
 * **System Status & Uptime:** [https://status.vijaysingh.cloud](https://status.vijaysingh.cloud)  
 
 ---
