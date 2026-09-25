@@ -35,106 +35,14 @@ To provide complete architectural clarity without visual clutter, the platform i
 ### 1. Global Multi-Cloud & Network Ingress Topology
 *How external traffic, edge security, multi-cloud support, and the secure administrative mesh are organized:*
 
-**🖼️ Version 1**
-
 ![Global Network Topology v1](images/v.2.1.0/global-network-topology.png)
-
-**🖼️ Version 2**
-
-![Global Network Topology v2](images/v.2.1.0/global-network-topology-v2.png)
 
 ---
 
 ### 2. Sovereign Bare-Metal & Cluster Architecture
 *How physical hardware, hypervisor resource fencing, and tiered storage are partitioned:*
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 50, 'rankSpacing': 70}}}%%
-flowchart TD
-
-    %% ── GLOBAL COLOUR SYSTEM ─────────────────────────────────────
-    classDef hostStyle     fill:#E8EAF6,stroke:#3949AB,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef ingressStyle  fill:#FFF3E0,stroke:#F57C00,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef platformStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef appsStyle     fill:#FFF8E1,stroke:#F9A825,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef nvmeStyle     fill:#E1F5FE,stroke:#0277BD,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-    classDef hddStyle      fill:#EFEBE9,stroke:#4E342E,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
-
-    %% ── PHYSICAL HOST ─────────────────────────────────────────────
-    subgraph BareMetal["Physical Node — Intel Core i5 Mini PC — 16 GB DDR4 RAM"]
-
-        subgraph Hypervisor["Proxmox VE 8 — Type-1 Hypervisor"]
-
-            HostReserved["🖥️ Proxmox Host OS & Kernel
-3.5 GB RAM Reserved
-ZFS/ext4 Caches · vzdump Backups"]
-
-            subgraph VM500["k3s-prod — VM 500 — 12 GB RAM · 4 vCPUs"]
-
-                subgraph NS_Ingress["Namespace: cloudflared"]
-                    direction LR
-                    CF_Pod["🚪 cloudflared QUIC Tunnel Daemon
-Anycast · Outbound-Only · Zero Open Ports"]
-                end
-
-                subgraph NS_Platform["Namespace: platform"]
-                    direction LR
-                    CNPG["🐘 CloudNativePG
-HA PostgreSQL · WAL Archiving"]
-                    Telemetry["📊 Prometheus + Grafana
-Cluster Telemetry"]
-                    Watch["🔔 kwatch
-Crash Notifier"]
-                    Dashboard["🏠 Homepage Portal
-Command Center"]
-                end
-
-                subgraph NS_Apps["Namespace: apps"]
-                    direction LR
-                    n8n["⚡ n8n
-Automation Engine"]
-                    Paperless["📄 Paperless-ngx
-OCR · Document Archive"]
-                    BookOrbit["📚 BookOrbit
-Digital Library"]
-                    Audio["🎧 Audiobookshelf
-Audio / Podcast Streaming"]
-                    RSS["📰 Miniflux
-RSS Reader · Go+PG"]
-                    Linkding["🔖 Linkding
-Bookmark Manager"]
-                    Wger["💪 wger / ryot
-Fitness & Health"]
-                end
-
-            end
-        end
-
-        subgraph StorageLayer["Dual-Tier Storage Architecture"]
-            direction LR
-            NVMe["⚡ Tier 1 · NVMe SSD — 256 GB
-Proxmox OS + K3s Root Disk
-CloudNativePG High-IOPS DB"]
-            HDD["💾 Tier 2 · SATA HDD — 1 TB
-Paperless · Books · Audio
-VM Backup Snapshots"]
-        end
-
-    end
-
-    %% ── FLOWS ─────────────────────────────────────────────────────
-    CF_Pod -- "Routes Public Traffic" --> NS_Platform
-    CF_Pod -- "Routes Public Traffic" --> NS_Apps
-    VM500  -- "High-IOPS Reads/Writes" --> NVMe
-    VM500  -- "Bulk Storage I/O"       --> HDD
-
-    class HostReserved hostStyle;
-    class CF_Pod ingressStyle;
-    class CNPG,Telemetry,Watch,Dashboard platformStyle;
-    class n8n,Paperless,BookOrbit,Audio,RSS,Linkding,Wger appsStyle;
-    class NVMe nvmeStyle;
-    class HDD hddStyle;
-```
+![Sovereign Bare-Metal & Cluster Architecture](images/v.2.1.0/bare-metal-cluster-architecture.png)
 
 ---
 
