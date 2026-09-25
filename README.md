@@ -36,43 +36,68 @@ To provide complete architectural clarity without visual clutter, the platform i
 *How external traffic, edge security, multi-cloud support, and the secure administrative mesh are organized:*
 
 ```mermaid
-flowchart TD
+flowchart TB
+    %% ==========================================
+    %% 1. STYLE DEFINTIONS (For GitHub Visuals)
+    %% ==========================================
+    classDef edgeStyle fill:#FFF3E0,stroke:#FF9800,stroke-width:2px,color:#000,font-weight:bold;
+    classDef cloudStyle fill:#ECEFF1,stroke:#607D8B,stroke-width:2px,color:#000;
+    classDef ociStyle fill:#FBE9E7,stroke:#FF5722,stroke-width:2px,color:#000;
+    classDef gcpStyle fill:#E3F2FD,stroke:#2196F3,stroke-width:2px,color:#000;
+    classDef infraStyle fill:#F3E5F5,stroke:#9C27B0,stroke-width:2px,color:#000;
+    classDef adminStyle fill:#E8F5E9,stroke:#4CAF50,stroke-width:2px,color:#000;
+
+    %% ==========================================
+    %% 2. DIAGRAM NODES & SUBGRAPHS
+    %% ==========================================
+    
     subgraph Edge["1. Edge Ingress & Content Delivery"]
         direction LR
-        Users["🌐 Public Traffic & Webhooks\n(GitHub, Devices, Users)"]
-        CF["🛡️ Cloudflare Zero Trust Edge\n(Anycast Ingress • WAF & DDoS • <15ms Latency)"]
+        Users["🌐 Public Traffic & Webhooks<br>(GitHub, Devices, Users)"]
+        CF["🛡️ Cloudflare Zero Trust Edge<br>(Anycast Ingress • WAF & DDoS • &lt;15ms Latency)"]
     end
+    class Users,CF edgeStyle;
 
     subgraph CloudSupport["2. Multi-Cloud Support Plane (OCI & GCP)"]
-        direction LR
-        OCI["☁️ Oracle Cloud (Mumbai)\n• Uptime Kuma Health Probes\n• Terraform S3 Remote State Backend\n• Offsite Encrypted Backup Vault"]
-        GCP["☁️ Google Cloud Platform\n• Secondary Support Compute VM\n• Automated Image Delivery (GHCR)"]
+        direction TB
+        OCI["☁️ Oracle Cloud (Mumbai)<br>• Uptime Kuma Health Probes<br>• Terraform S3 Remote State Backend<br>• Offsite Encrypted Backup Vault"]
+        GCP["☁️ Google Cloud Platform<br>• Secondary Support Compute VM<br>• Automated Image Delivery (GHCR)"]
     end
+    class OCI ociStyle;
+    class GCP gcpStyle;
 
     subgraph OnPrem["3. Sovereign Bare-Metal Infrastructure (Mumbai)"]
         direction TB
-        PVE["🖥️ Proxmox VE 8 Hypervisor (Bare Metal Mini PC)"]
-        K3S["☸️ k3s-prod Kubernetes Cluster (VM 500)\n• Ingress Tunnel Connector (cloudflared)\n• Platform Operators & Stateful Workloads"]
+        PVE["🖥️ Proxmox VE 8 Hypervisor<br>(Bare Metal Mini PC)"]
+        K3S["☸️ k3s-prod Kubernetes Cluster (VM 500)<br>• Ingress Tunnel Connector (cloudflared)<br>• Platform Operators & Stateful Workloads"]
     end
+    class PVE,K3S infraStyle;
 
     subgraph Admin["4. Zero-Trust Administrative Mesh"]
+        direction LR
         Workstation["💻 Engineer Workstation"]
-        Tailscale["🔒 Tailscale Encrypted WireGuard Mesh\n(Direct Host & Cluster Access • Zero Bastions)"]
+        Tailscale["🔒 Tailscale Encrypted WireGuard Mesh<br>(Direct Host & Cluster Access • Zero Bastions)"]
     end
+    class Workstation,Tailscale adminStyle;
 
-    %% Network flows
+    %% ==========================================
+    %% 3. NETWORK FLOWS & ARROWS
+    %% ==========================================
+    
+    %% Main Ingress Traffic
     Users --> CF
-    CF <== "Encrypted QUIC Tunnel (Outbound Only • Zero Open Ports)" ==> K3S
+    CF <== "Encrypted QUIC Tunnel (Zero Open Ports)" ==> K3S
     
-    %% Support & Probes
-    OCI -. "Out-of-Band Endpoint Probing" .-> CF
-    K3S -. "Encrypted State & Backup Sync" .-> OCI
+    %% Support Connections
+    OCI -. "Out-of-Band Probing" .-> CF
+    K3S -. "State & Backup Sync" .-> OCI
     
-    %% Administration
+    %% Administration Mesh Connections
     Workstation ==> Tailscale
     Tailscale -. "Direct SSH / API" .-> PVE
     Tailscale -. "Direct kubectl (100.x.x.x)" .-> K3S
 
+    %% Local Architecture Flow
     PVE --> K3S
 ```
 
