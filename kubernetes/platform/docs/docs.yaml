@@ -42,6 +42,7 @@ data:
 
     markdown_extensions:
       - admonition
+      - md_in_html
       - pymdownx.details
       - pymdownx.superfences:
           custom_fences:
@@ -70,6 +71,8 @@ data:
           - "12. Secret Management": 12-secret-management-hydration.md
           - "13. Debugging Boot Failure": 13-debugging-boot-failure.md
           - "14. K3s Optimization & Security": 14-k3s-optimization-and-security.md.md
+      - "Architecture Decisions (ADRs)":
+          - "Enterprise ADR Register": process/architecture_decision_records.md
       - "Execution Phases":
           - "Phases Overview": execution-phases/README.md
           - "Phase 1: Action Guide": execution-phases/01-phase-1-action-guide.md
@@ -126,6 +129,8 @@ spec:
           cp -r /tmp/repo/images /tmp/repo/docs/images 2>/dev/null || true
           mkdir -p /tmp/repo/docs/execution-phases
           cp /extra-phases/* /tmp/repo/docs/execution-phases/ 2>/dev/null || true
+          mkdir -p /tmp/repo/docs/process
+          cp -r /tmp/repo/process/* /tmp/repo/docs/process/ 2>/dev/null || true
           if [ ! -f /tmp/repo/docs/index.md ]; then
             cp /tmp/repo/README.md /tmp/repo/docs/index.md
           fi
