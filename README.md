@@ -36,67 +36,74 @@ To provide complete architectural clarity without visual clutter, the platform i
 *How external traffic, edge security, multi-cloud support, and the secure administrative mesh are organized:*
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 60, 'rankSpacing': 80}}}%%
-flowchart TB
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 55, 'rankSpacing': 70}}}%%
+flowchart LR
 
     %% ── GLOBAL COLOUR SYSTEM ─────────────────────────────────────
-    %% edge / CDN layer  → amber-orange
-    %% OCI cloud         → deep-orange / coral
-    %% GCP cloud         → blue
-    %% on-prem infra     → purple
-    %% admin / security  → green
-    classDef edgeStyle  fill:#FFF3E0,stroke:#F57C00,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef ociStyle   fill:#FBE9E7,stroke:#D84315,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef gcpStyle   fill:#E3F2FD,stroke:#1565C0,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef infraStyle fill:#F3E5F5,stroke:#6A1B9A,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef adminStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px;
+    %% edge / CDN    → amber-orange     on-prem infra  → purple
+    %% OCI cloud     → coral-red        admin mesh     → green
+    %% GCP cloud     → blue
+    classDef edgeStyle  fill:#FFF3E0,stroke:#F57C00,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef ociStyle   fill:#FBE9E7,stroke:#D84315,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef gcpStyle   fill:#E3F2FD,stroke:#1565C0,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef infraStyle fill:#F3E5F5,stroke:#6A1B9A,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef adminStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
 
     %% ── LAYER 1 · PUBLIC EDGE ─────────────────────────────────────
     subgraph Edge["Layer 1 — Edge Ingress & Content Delivery"]
-        direction LR
-        Users["**🌐 Public Traffic & Webhooks**
-        GitHub · Devices · Users"]
-        CF["**🛡️ Cloudflare Zero Trust Edge**
-        Anycast Ingress · WAF & DDoS Shield · <15 ms Latency"]
+        direction TB
+        Users["🌐 Public Traffic & Webhooks
+GitHub · Devices · Users"]
+        CF["🛡️ Cloudflare Zero Trust Edge
+Anycast · WAF & DDoS · <15 ms Latency"]
     end
     class Users,CF edgeStyle;
 
     %% ── LAYER 2 · MULTI-CLOUD SUPPORT ────────────────────────────
     subgraph CloudSupport["Layer 2 — Multi-Cloud Support Plane"]
-        direction LR
-        OCI["**☁️ Oracle Cloud — Mumbai (Always Free)**
-        • Uptime Kuma Out-of-Band Health Probes
-        • Terraform S3 Remote State Backend
-        • Offsite Encrypted Restic Backup Vault"]
-        GCP["**☁️ Google Cloud Platform**
-        • Secondary Support Compute VM
-        • Container Image Delivery via GHCR"]
+        direction TB
+        OCI["☁️ Oracle Cloud — Mumbai
+Uptime Kuma Health Probes
+Terraform S3 Remote State
+Offsite Encrypted Backups"]
+        GCP["☁️ Google Cloud Platform
+Secondary Support Compute VM
+Container Images via GHCR"]
     end
     class OCI ociStyle;
     class GCP gcpStyle;
 
     %% ── LAYER 3 · SOVEREIGN ON-PREM ──────────────────────────────
-    subgraph OnPrem["Layer 3 — Sovereign Bare-Metal Infrastructure (Mumbai)"]
-        direction LR
-        PVE["**🖥️ Proxmox VE 8**
-        Type-1 Hypervisor · Bare-Metal Mini PC"]
-        K3S["**☸️ k3s-prod · Production Kubernetes (VM 500)**
-        12 GB RAM · 4 vCPUs
-        cloudflared Tunnel · Platform Operators · Stateful Workloads"]
+    subgraph OnPrem["Layer 3 — Sovereign Bare-Metal (Mumbai)"]
+        direction TB
+        PVE["🖥️ Proxmox VE 8
+Type-1 Hypervisor · Bare-Metal Mini PC"]
+        K3S["☸️ k3s-prod · Production Kubernetes
+12 GB RAM · 4 vCPUs
+cloudflared · Platform · Apps"]
     end
     class PVE,K3S infraStyle;
 
     %% ── LAYER 4 · ADMIN MESH ─────────────────────────────────────
-    subgraph Admin["Layer 4 — Zero-Trust Administrative Mesh"]
-        direction LR
-        Workstation["**💻 Engineer Workstation**
-        Laptop · Direct Execution Node"]
-        Tailscale["**🔒 Tailscale WireGuard Mesh**
-        Encrypted · No Bastions · 100.x.x.x Addressing"]
+    subgraph Admin["Layer 4 — Zero-Trust Admin Mesh"]
+        direction TB
+        Workstation["💻 Engineer Workstation
+Laptop · Direct Execution Node"]
+        Tailscale["🔒 Tailscale WireGuard Mesh
+Encrypted · No Bastions · 100.x.x.x"]
     end
     class Workstation,Tailscale adminStyle;
 
     %% ── NETWORK FLOWS ─────────────────────────────────────────────
+    Users       -- "HTTP / Webhook"                --> CF
+    CF          <== "QUIC Tunnel / Zero Open Ports" ==> K3S
+    OCI         -. "Out-of-Band Health Probing"    .-> CF
+    K3S         -. "State & Backup Sync"           .-> OCI
+    PVE         -- "Hosts VM 500"                  --> K3S
+    Workstation ==>                                    Tailscale
+    Tailscale   -. "Direct SSH / Proxmox API"      .-> PVE
+    Tailscale   -. "kubectl 100.x.x.x"             .-> K3S
+```───────────────
     Users        -- "HTTP / Webhook"                --> CF
     CF           <== "QUIC Tunnel · Zero Open Ports" ==> K3S
 
@@ -116,92 +123,82 @@ flowchart TB
 *How physical hardware, hypervisor resource fencing, and tiered storage are partitioned:*
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 55, 'rankSpacing': 75}}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 50, 'rankSpacing': 70}}}%%
 flowchart TD
 
-    %% ── GLOBAL COLOUR SYSTEM (mirrors Diagram 1) ─────────────────
-    %% host / hypervisor  → indigo-blue
-    %% ingress / edge     → amber-orange
-    %% platform namespace → green
-    %% apps namespace     → amber-yellow
-    %% NVMe storage       → light-blue
-    %% HDD storage        → brown-grey
-    classDef hostStyle     fill:#E8EAF6,stroke:#3949AB,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef ingressStyle  fill:#FFF3E0,stroke:#F57C00,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef platformStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef appsStyle     fill:#FFF8E1,stroke:#F9A825,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef nvmeStyle     fill:#E1F5FE,stroke:#0277BD,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef hddStyle      fill:#EFEBE9,stroke:#4E342E,stroke-width:3px,color:#1A1A1A,font-size:14px;
+    %% ── GLOBAL COLOUR SYSTEM ─────────────────────────────────────
+    classDef hostStyle     fill:#E8EAF6,stroke:#3949AB,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef ingressStyle  fill:#FFF3E0,stroke:#F57C00,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef platformStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef appsStyle     fill:#FFF8E1,stroke:#F9A825,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef nvmeStyle     fill:#E1F5FE,stroke:#0277BD,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef hddStyle      fill:#EFEBE9,stroke:#4E342E,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
 
     %% ── PHYSICAL HOST ─────────────────────────────────────────────
     subgraph BareMetal["Physical Node — Intel Core i5 Mini PC — 16 GB DDR4 RAM"]
 
         subgraph Hypervisor["Proxmox VE 8 — Type-1 Hypervisor"]
 
-            HostReserved["**🖥️ Proxmox Host OS & Kernel**
-            3.5 GB RAM Reserved
-            ZFS / ext4 Page Caches · vzdump Backup Compression"]
+            HostReserved["🖥️ Proxmox Host OS & Kernel
+3.5 GB RAM Reserved
+ZFS/ext4 Caches · vzdump Backups"]
 
-            subgraph VM500["k3s-prod — Production Kubernetes — VM 500 | 12 GB RAM · 4 vCPUs"]
+            subgraph VM500["k3s-prod — VM 500 — 12 GB RAM · 4 vCPUs"]
 
                 subgraph NS_Ingress["Namespace: cloudflared"]
                     direction LR
-                    CF_Pod["**🚪 cloudflared QUIC Tunnel Daemon**
-                    Anycast · Outbound-Only · Zero Open Ports"]
+                    CF_Pod["🚪 cloudflared QUIC Tunnel Daemon
+Anycast · Outbound-Only · Zero Open Ports"]
                 end
 
                 subgraph NS_Platform["Namespace: platform"]
                     direction LR
-                    CNPG["**🐘 CloudNativePG**
-                    HA PostgreSQL Operator
-                    Self-Healing · WAL Archiving"]
-                    Telemetry["**📊 Prometheus + Grafana**
-                    Cluster-Wide Telemetry"]
-                    Watch["**🔔 kwatch**
-                    Instant Crash Notifier
-                    Discord / Slack Alerts"]
-                    Dashboard["**🏠 Homepage Portal**
-                    Command Center Dashboard"]
+                    CNPG["🐘 CloudNativePG
+HA PostgreSQL · WAL Archiving"]
+                    Telemetry["📊 Prometheus + Grafana
+Cluster Telemetry"]
+                    Watch["🔔 kwatch
+Crash Notifier"]
+                    Dashboard["🏠 Homepage Portal
+Command Center"]
                 end
 
                 subgraph NS_Apps["Namespace: apps"]
                     direction LR
-                    n8n["**⚡ n8n**
-                    Automation Engine"]
-                    Paperless["**📄 Paperless-ngx**
-                    OCR · Document Archive"]
-                    BookOrbit["**📚 BookOrbit**
-                    Digital Library"]
-                    Audio["**🎧 Audiobookshelf**
-                    Audio / Podcast Streaming"]
-                    RSS["**📰 Miniflux**
-                    RSS Reader · Go + PG"]
-                    Linkding["**🔖 Linkding**
-                    Bookmark Manager"]
-                    Wger["**💪 wger / ryot**
-                    Fitness & Health Tracking"]
+                    n8n["⚡ n8n
+Automation Engine"]
+                    Paperless["📄 Paperless-ngx
+OCR · Document Archive"]
+                    BookOrbit["📚 BookOrbit
+Digital Library"]
+                    Audio["🎧 Audiobookshelf
+Audio / Podcast Streaming"]
+                    RSS["📰 Miniflux
+RSS Reader · Go+PG"]
+                    Linkding["🔖 Linkding
+Bookmark Manager"]
+                    Wger["💪 wger / ryot
+Fitness & Health"]
                 end
 
             end
         end
 
-        %% ── DUAL-TIER STORAGE ────────────────────────────────────
         subgraph StorageLayer["Dual-Tier Storage Architecture"]
             direction LR
-            NVMe["**⚡ Tier 1 · NVMe SSD — 256 GB**
-            Proxmox OS + K3s Root Disk
-            CloudNativePG High-IOPS DB Tables"]
-            HDD["**💾 Tier 2 · SATA HDD — 1 TB**
-            Paperless Document Archives
-            Book & Audio Streaming Library
-            VM Backup Snapshots"]
+            NVMe["⚡ Tier 1 · NVMe SSD — 256 GB
+Proxmox OS + K3s Root Disk
+CloudNativePG High-IOPS DB"]
+            HDD["💾 Tier 2 · SATA HDD — 1 TB
+Paperless · Books · Audio
+VM Backup Snapshots"]
         end
 
     end
 
     %% ── FLOWS ─────────────────────────────────────────────────────
-    CF_Pod -- "Routes Public Traffic"  --> NS_Platform
-    CF_Pod -- "Routes Public Traffic"  --> NS_Apps
+    CF_Pod -- "Routes Public Traffic" --> NS_Platform
+    CF_Pod -- "Routes Public Traffic" --> NS_Apps
     VM500  -- "High-IOPS Reads/Writes" --> NVMe
     VM500  -- "Bulk Storage I/O"       --> HDD
 
@@ -219,44 +216,38 @@ flowchart TD
 *How code changes flow automatically from Git into production without configuration drift:*
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 65, 'rankSpacing': 90}}}%%
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Inter, Segoe UI, sans-serif'}, 'flowchart': {'curve': 'basis', 'nodeSpacing': 60, 'rankSpacing': 85}}}%%
 flowchart LR
 
-    %% ── GLOBAL COLOUR SYSTEM (mirrors Diagram 1 & 2) ────────────
-    %% VCS / source       → indigo-blue
-    %% GitOps controllers → blue
-    %% SOPS / crypto      → purple  ← distinct security signal
-    %% platform stage     → green
-    %% apps stage         → amber-yellow
-    %% live state         → purple-infra (same as on-prem)
-    classDef vcsStyle      fill:#E8EAF6,stroke:#3949AB,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef controlStyle  fill:#E3F2FD,stroke:#1565C0,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef secretStyle   fill:#EDE7F6,stroke:#512DA8,stroke-width:3px,color:#1A1A1A,font-size:14px;
+    %% ── GLOBAL COLOUR SYSTEM ─────────────────────────────────────
+    classDef vcsStyle      fill:#E8EAF6,stroke:#3949AB,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef controlStyle  fill:#E3F2FD,stroke:#1565C0,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef secretStyle   fill:#EDE7F6,stroke:#512DA8,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
     classDef gateStyle     fill:#F3E5F5,stroke:#512DA8,stroke-width:2px,color:#1A1A1A,font-size:13px;
-    classDef platformStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef appsStyle     fill:#FFF8E1,stroke:#F9A825,stroke-width:3px,color:#1A1A1A,font-size:14px;
-    classDef liveStyle     fill:#F3E5F5,stroke:#6A1B9A,stroke-width:3px,color:#1A1A1A,font-size:14px;
+    classDef platformStyle fill:#E8F5E9,stroke:#2E7D32,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef appsStyle     fill:#FFF8E1,stroke:#F9A825,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
+    classDef liveStyle     fill:#F3E5F5,stroke:#6A1B9A,stroke-width:3px,color:#1A1A1A,font-size:14px,font-weight:bold;
 
     %% ── SOURCE OF TRUTH ──────────────────────────────────────────
     subgraph VCS["Version Control System"]
-        GitRepo["**📦 GitHub Repository**
-        vsingh55 / homelab-ops
-        Encrypted Secrets · Declarative Manifests"]
+        GitRepo["📦 GitHub Repository
+vsingh55 / homelab-ops
+Encrypted Secrets · Declarative Manifests"]
     end
     class GitRepo vcsStyle;
 
     %% ── IN-CLUSTER GITOPS ENGINE ─────────────────────────────────
     subgraph ClusterGitOps["In-Cluster GitOps Engine — Flux CD v2"]
         direction TB
-        SourceCtrl["**📡 Source Controller**
-        Polls Git Every 10 min
-        Detects & Fetches New Commits"]
-        KustCtrl["**⚙️ Kustomize Controller**
-        Dependency Chaining
-        Ordered Reconciliation"]
-        SOPS["**🔐 SOPS + Age Decryption**
-        In-Memory Secret Hydration
-        Zero Plaintext on Disk"]
+        SourceCtrl["📡 Source Controller
+Polls Git Every 10 min
+Detects & Fetches New Commits"]
+        KustCtrl["⚙️ Kustomize Controller
+Dependency Chaining
+Ordered Reconciliation"]
+        SOPS["🔐 SOPS + Age Decryption
+In-Memory Secret Hydration
+Zero Plaintext on Disk"]
     end
     class SourceCtrl,KustCtrl controlStyle;
     class SOPS secretStyle;
@@ -264,15 +255,15 @@ flowchart LR
     %% ── DEPLOYMENT STAGES ────────────────────────────────────────
     subgraph DeploymentStages["Deterministic Deployment Order"]
         direction TB
-        StagePlatform["**1️⃣ Platform Foundation**
-        cloudflared · CloudNativePG
-        Storage Classes · Monitoring"]
+        StagePlatform["1️⃣ Platform Foundation
+cloudflared · CloudNativePG
+Storage Classes · Monitoring"]
         HealthGate{"✅ Health Gate
-        All platform pods
-        must be Ready"}
-        StageApps["**2️⃣ Application Fleet**
-        dependsOn: platform ✓
-        n8n · Paperless · BookOrbit · Miniflux · …"]
+All platform pods
+must be Ready"}
+        StageApps["2️⃣ Application Fleet
+dependsOn: platform checked
+n8n · Paperless · BookOrbit · Miniflux"]
     end
     class StagePlatform platformStyle;
     class HealthGate gateStyle;
@@ -280,21 +271,21 @@ flowchart LR
 
     %% ── LIVE CLUSTER STATE ───────────────────────────────────────
     subgraph ClusterState["Active Production State"]
-        LivePods["**🚀 Healthy Running Workloads**
-        Self-Healing · Zero Config Drift
-        Continuous Reconciliation Loop"]
+        LivePods["🚀 Healthy Running Workloads
+Self-Healing · Zero Config Drift
+Continuous Reconciliation Loop"]
     end
     class LivePods liveStyle;
 
     %% ── PIPELINE FLOW ────────────────────────────────────────────
-    GitRepo       -- "Pull: New Commit Detected"   --> SourceCtrl
-    SourceCtrl    -- "Fetch Manifests"             --> KustCtrl
-    KustCtrl      -- "Decrypt Secrets"             --> SOPS
-    SOPS          -- "Apply Manifests"             --> StagePlatform
-    StagePlatform -- "Health Check"                --> HealthGate
-    HealthGate    == "Gate Passed"                 ==> StageApps
-    StageApps     -- "Schedule Workloads"          --> LivePods
-    LivePods      -. "Continuous Drift Correction" .-> KustCtrl
+    GitRepo       -- "Pull: New Commit Detected" --> SourceCtrl
+    SourceCtrl    -- "Fetch Manifests"           --> KustCtrl
+    KustCtrl      -- "Decrypt Secrets"           --> SOPS
+    SOPS          -- "Apply Manifests"           --> StagePlatform
+    StagePlatform -- "Health Check"              --> HealthGate
+    HealthGate    == "Gate Passed"               ==> StageApps
+    StageApps     -- "Schedule Workloads"        --> LivePods
+    LivePods      -. "Drift Correction"          .-> KustCtrl
 ```
 
 ---
