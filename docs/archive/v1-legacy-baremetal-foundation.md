@@ -24,7 +24,7 @@ In the initial iteration of the homelab, the primary objective was establishing 
 
 ## 2. Legacy Architecture Topology
 
-![v1 Architecture](../images/v.1.0.0/HomeLab-Ops%20V1.0.0.svg)
+![v1 Architecture](../images/v.1.0.0/architecture.png)
 
 ---
 
