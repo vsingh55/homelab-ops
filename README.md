@@ -159,29 +159,35 @@ pie title Mini PC 16GB RAM Allocation
 
 ---
 
-## Standard Engineering Documentation & ADRs
+## 📚 Standard Engineering Documentation & Enterprise Handbook
 
-Following CNCF and enterprise platform standards, all architecture decisions and technical specifications are documented in the `docs/` hierarchy:
+Following CNCF and enterprise platform standards, all architecture specifications, flagship project case studies, and incident post-mortems are documented in the `docs/` hierarchy:
 
-### 1. Architecture Decision Records (ADRs)
+### 1. Production System Architecture (Single Source of Truth)
+* **[01. System Architecture Overview](docs/architecture/01-system-overview.md)** — High-level multi-cloud hybrid topology, design goals, and component boundaries.
+* **[02. Hardware & Virtualization](docs/architecture/02-hardware-and-virtualization.md)** — Bare-metal Mini PC specifications and Proxmox VE 8 memory fencing.
+* **[03. Kubernetes & K3s Cluster](docs/architecture/03-kubernetes-k3s-cluster.md)** — Single-node production K3s cluster architecture and namespaces.
+* **[04. Zero-Trust Networking](docs/architecture/04-zero-trust-networking.md)** — Cloudflare Zero Trust Anycast Tunnels and Tailscale administrative mesh.
+* **[05. Dual-Tier Storage Strategy](docs/architecture/05-dual-tier-storage.md)** — Partitioning high-IOPS NVMe flash from bulk mechanical SATA storage.
 
-* **[Architecture Decision Records (ADRs)](docs/adr/README.md)** — 16 formal Architecture Decision Records documenting every pivotal architectural decision (ADR-001 through ADR-016), following the Michael Nygard standard.
+### 2. Featured Projects & Case Studies (Resume Showcase)
+* **[Case Study: Zero-Trust Hybrid Ingress Engine](docs/projects/01-zero-trust-ingress.md)** — CGNAT traversal, Anycast edge routing, WAF, and <15ms latency.
+* **[Case Study: Declarative GitOps & In-Git Secrets](docs/projects/02-gitops-and-sops.md)** — Continuous delivery via Flux CD v2 and Mozilla SOPS + Age encryption.
+* **[Case Study: Stateful PostgreSQL Operator on Bare-Metal](docs/projects/03-cloudnativepg-ha.md)** — CloudNativePG high-availability operator, automated failover, and WAL archiving.
+* **[Case Study: Multi-Cloud Resilience & Out-of-Band DR](docs/projects/04-multicloud-observability-dr.md)** — OCI Mumbai & GCP support compute, Uptime Kuma external probes, and 3-2-1 backup replication.
 
-### 2. Execution Phases & Implementation Manuals
+### 3. Architecture Decision Records (ADRs)
+* **[Comprehensive ADR Register](docs/adr/README.md)** — 16 formal Architecture Decision Records documenting every pivotal architectural decision (ADR-001 through ADR-016), following the Michael Nygard standard.
 
-* **[Phase 1: Architecture Baseline](docs/execution-phases/01-phase-1-architecture-baseline.md)** — Hardware allocation baseline and architectural blueprint alignment.
-* **[Phase 2: Codebase Pruning & Debt Elimination](docs/execution-phases/02-phase-2-codebase-pruning.md)** — Purging idle lab planes and reclaiming 7.5GB RAM.
-* **[Phase 3: OCI Remote State Backend](docs/execution-phases/03-phase-3-oci-remote-state.md)** — Migrating Terraform state to Oracle Cloud S3-compatible object storage.
-* **[Phase 4: Proxmox Host Consolidation](docs/execution-phases/04-phase-4-proxmox-consolidation-k3s-resizing.md)** — Resizing `k3s-prod` to 12GB RAM and configuring SATA drive mounts.
-* **[Phase 5: Cloudflare Ingress Modernization](docs/execution-phases/05-phase-5-gcp-decommissioning-cloudflare-ingress.md)** — Terminating paid cloud relays and deploying zero-latency edge tunnels.
-* **[Phase 6: GitOps Bootstrap & SOPS Secrets](docs/execution-phases/06-phase-6-gitops-bootstrap-sops.md)** — Bootstrapping Flux CD v2 and configuring Age asymmetric encryption.
-* **[Phase 7: Application Fleet Deployment](docs/execution-phases/07-phase-7-application-fleet-deployment.md)** — Onboarding CloudNativePG, Paperless, and Uptime Kuma monitoring.
+### 4. Operations & Runbooks
+* **[Backup & Disaster Recovery Runbook](docs/runbooks/01-backup-and-disaster-recovery.md)** — Procedures for 3-2-1 backup verification and bare-metal disaster recovery.
+* **[Day-2 Cluster Operations Runbook](docs/runbooks/02-cluster-operations.md)** — SOPS secret rotation, manual GitOps reconciliation, and host maintenance.
 
-### 3. Engineering Guides & Post-Mortems
-
-* **[Proxmox Bare-Metal Setup](docs/02-proxmox-setup.md)** & **[Proxmox Recovery Guide](docs/99-proxmox-recovery-guide.md)**
-* **[Terraform Modularization](docs/10-terraform-modularization.md)** & **[Secret Hydration Patterns](docs/12-secret-management-hydration.md)**
-* **[K3s Optimization & Security](docs/14-k3s-optimization-and-security.md.md)** & **[WAN Debugging Post-Mortem](docs/08-debugging-wan-connectivity.md)**
+### 5. Historical Archive & Incident Post-Mortems (v1.0 & v2.0 Milestones)
+* **[Engineering Archive Overview](docs/archive/README.md)** — Historical milestones, early technical challenges, and iterative migrations leading to v3.0.
+* **[Bare-Metal Boot Failure Post-Mortem](docs/archive/post-mortems/01-debugging-boot-failure.md)** & **[WAN Connectivity Post-Mortem](docs/archive/post-mortems/02-debugging-wan-connectivity.md)**
+* **[Ansible Automation Journey](docs/archive/post-mortems/04-ansible-automation-journey.md)** & **[Terraform Modularization](docs/archive/post-mortems/05-terraform-modularization.md)**
+* **[Hybrid Cloud Automation Journal (n8n)](docs/archive/post-mortems/07-hybrid-cloud-automation-n8n.md)** & **[Self-Healing Watchdog](docs/archive/post-mortems/08-self-healing-watchdog.md)**
 
 ---
 

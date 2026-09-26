@@ -56,21 +56,17 @@ data:
 
     nav:
       - "Overview": index.md
-      - "Architecture & Engineering":
-          - "01. Architecture Topology": 01-architecture.md
-          - "02. Proxmox Setup": 02-proxmox-setup.md
-          - "03. Backup & Disaster Recovery": 03-backup-dr.md
-          - "04. Infra Provisioning": 04-infrastructure-provisioning.md
-          - "05. Infrastructure Challenges": 05-infrastructure-challenges.md
-          - "06. Remote Ops Transformation": 06-remote-ops-transformation.md
-          - "07. Ansible Automation Journey": 07-ansible-automation-journey.md
-          - "08. Debugging WAN Connectivity": 08-debugging-wan-connectivity.md
-          - "09. Application Observability": 09-application-layer-observability.md
-          - "10. Terraform Modularization": 10-terraform-modularization.md
-          - "11. Comprehensive Backups": 11-comprehensive-backups.md
-          - "12. Secret Management": 12-secret-management-hydration.md
-          - "13. Debugging Boot Failure": 13-debugging-boot-failure.md
-          - "14. K3s Optimization & Security": 14-k3s-optimization-and-security.md.md
+      - "System Architecture":
+          - "01. System Overview": architecture/01-system-overview.md
+          - "02. Hardware & Virtualization": architecture/02-hardware-and-virtualization.md
+          - "03. Kubernetes & K3s Cluster": architecture/03-kubernetes-k3s-cluster.md
+          - "04. Zero-Trust Networking": architecture/04-zero-trust-networking.md
+          - "05. Dual-Tier Storage": architecture/05-dual-tier-storage.md
+      - "Featured Projects (Case Studies)":
+          - "01. Zero-Trust Hybrid Ingress": projects/01-zero-trust-ingress.md
+          - "02. GitOps & In-Git Secrets": projects/02-gitops-and-sops.md
+          - "03. Stateful PostgreSQL HA": projects/03-cloudnativepg-ha.md
+          - "04. Multi-Cloud Resilience & DR": projects/04-multicloud-observability-dr.md
       - "Architecture Decisions (ADRs)":
           - "Enterprise ADR Register": adr/README.md
       - "Execution Phases":
@@ -84,10 +80,21 @@ data:
           - "Phase 6: GitOps Bootstrap & SOPS": execution-phases/06-phase-6-gitops-bootstrap-sops.md
           - "Phase 7: Application Fleet Deployment": execution-phases/07-phase-7-application-fleet-deployment.md
           - "Full Implementation Plan": execution-phases/ImplementationPlan.md
-      - "Engineering Journals":
-          - "Hybrid Network": journal/project-1-hybrid-network.md
-          - "Hybrid Cloud Automation (n8n)": journal/project-hybrid-cloud-automation.md
-          - "Self Healing Architecture": journal/project-self-healing-architecture.md
+      - "Operations & Runbooks":
+          - "Backup & Disaster Recovery": runbooks/01-backup-and-disaster-recovery.md
+          - "Day-2 Cluster Operations": runbooks/02-cluster-operations.md
+      - "Engineering Archive (v1 & v2)":
+          - "Archive Overview": archive/README.md
+          - "Milestone v1.0 (Bare Metal & LXC)": archive/v1-legacy-baremetal-foundation.md
+          - "Milestone v2.0 (Hybrid Cloud Relay)": archive/v2-legacy-hybrid-cloud-relay.md
+          - "Incident: Boot Failure Recovery": archive/post-mortems/01-debugging-boot-failure.md
+          - "Incident: WAN Connectivity": archive/post-mortems/02-debugging-wan-connectivity.md
+          - "Challenges: Early Infrastructure": archive/post-mortems/03-infrastructure-challenges.md
+          - "Journey: Ansible Automation Fleet": archive/post-mortems/04-ansible-automation-journey.md
+          - "Journey: Terraform Modularization": archive/post-mortems/05-terraform-modularization.md
+          - "Deep-Dive: In-Memory Secret Hydration": archive/post-mortems/06-legacy-secret-hydration.md
+          - "Journal: Hybrid Cloud Automation (n8n)": archive/post-mortems/07-hybrid-cloud-automation-n8n.md
+          - "Journal: Self-Healing VPN Watchdog": archive/post-mortems/08-self-healing-watchdog.md
 ---
 apiVersion: apps/v1
 kind: Deployment
