@@ -41,4 +41,4 @@ To overcome the Carrier-Grade NAT (CGNAT) barrier without exposing residential p
 2. **Intermediate Bastion Overhead:** Running `ops-center` as an intermediate SSH jump host and MinIO state server consumed 2GB RAM, 2 vCPUs, and 20GB NVMe storage.
 3. **Cross-Continental Latency:** Ingress routing added unnecessary latency hops compared to edge Anycast routing.
 
-*These pain points led to ADR-006 (Cloudflare Zero Trust Ingress), ADR-011 (OCI Mumbai Always Free Support), and ADR-015 (Decommissioning of ops-center in favor of Direct Operations).*
+*These pain points led to ADR-006 (Cloudflare Zero Trust Ingress), ADR-011 (OCI Multi-Cloud Hybrid Support Architecture), and ADR-015 (Decommissioning of ops-center in favor of Direct Operations).*
