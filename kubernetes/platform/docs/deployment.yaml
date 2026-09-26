@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homelab-docs
+  namespace: platform
+  labels:
+    app.kubernetes.io/name: homelab-docs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homelab-docs
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homelab-docs
+    spec:
+      volumes:
+      - name: shared-site
+        emptyDir: {}
+      - name: config-volume
+        configMap:
+          name: mkdocs-config
+      initContainers:
+      - name: git-clone-and-build
+        image: squidfunk/mkdocs-material:latest
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          set -e
+          echo "Cloning repository..."
+          git clone --depth 1 https://github.com/vsingh55/homelab-ops.git /tmp/repo
+          cd /tmp/repo
+          if [ -f /tmp/repo/kubernetes/platform/docs/mkdocs.yml ]; then
+            echo "Using in-repository mkdocs.yml..."
+            cp /tmp/repo/kubernetes/platform/docs/mkdocs.yml /tmp/repo/mkdocs.yml
+          elif [ -f /config/mkdocs.yml ]; then
+            echo "Falling back to ConfigMap mkdocs.yml..."
+            cp /config/mkdocs.yml /tmp/repo/mkdocs.yml
+          fi
+          cp -r /tmp/repo/images /tmp/repo/docs/images 2>/dev/null || true
+          if [ ! -f /tmp/repo/docs/index.md ]; then
+            cp /tmp/repo/README.md /tmp/repo/docs/index.md
+          fi
+          echo "Building static MkDocs site..."
+          mkdocs build -d /site
+          echo "Build complete. Static assets ready in /site."
+        volumeMounts:
+        - name: shared-site
+          mountPath: /site
+        - name: config-volume
+          mountPath: /config
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            cpu: 20m
+            memory: 16Mi
+          limits:
+            cpu: 100m
+            memory: 64Mi
+        volumeMounts:
+        - name: shared-site
+          mountPath: /usr/share/nginx/html

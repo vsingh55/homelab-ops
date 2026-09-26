@@ -170,7 +170,7 @@ Following CNCF and enterprise platform standards, all architecture specification
 - **[04. Zero-Trust Networking](docs/architecture/04-zero-trust-networking.md)** — Cloudflare Zero Trust Anycast Tunnels and Tailscale administrative mesh.
 - **[05. Dual-Tier Storage Strategy](docs/architecture/05-dual-tier-storage.md)** — Partitioning high-IOPS NVMe flash from bulk mechanical SATA storage.
 
-### 2. Featured Projects & Case Studies (Resume Showcase)
+### 2. Featured Projects & Case Studies 
 - **[Case Study: Zero-Trust Hybrid Ingress Engine](docs/projects/01-zero-trust-ingress.md)** — CGNAT traversal, Anycast edge routing, WAF, and <15ms latency.
 - **[Case Study: Declarative GitOps & In-Git Secrets](docs/projects/02-gitops-and-sops.md)** — Continuous delivery via Flux CD v2 and Mozilla SOPS + Age encryption.
 - **[Case Study: Stateful PostgreSQL Operator on Bare-Metal](docs/projects/03-cloudnativepg-ha.md)** — CloudNativePG high-availability operator, automated failover, and WAL archiving.

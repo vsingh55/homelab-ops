@@ -5,6 +5,6 @@ resources:
   - cloudflared/cloudflared.yaml
   - homepage/homepage.yaml
   - monitoring/grafana-telemetry-ingress.yaml
-  - docs/docs.yaml
+  - docs
   - postgres-operator
   - kwatch
