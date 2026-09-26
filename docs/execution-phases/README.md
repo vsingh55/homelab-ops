@@ -1,9 +1,9 @@
 # Homelab Modernization & Hardware Optimization Execution Master Index
 
-> **Architecture Standard:** Sovereign Cloud Architecture (v3.0.0)  
-> **Hardware Target:** 16GB RAM Mini PC (Intel Core i5, 256GB NVMe SSD, 1TB SATA mechanical HDD)  
-> **Author / Role:** Principal Architect / Homelab Platform Team  
-> **Repository:** `https://github.com/vsingh55/homelab-ops`  
+> **Architecture Standard:** Sovereign Cloud Architecture (v3.0.0) 
+> **Hardware Target:** 16GB RAM Mini PC (Intel Core i5, 256GB NVMe SSD, 1TB SATA mechanical HDD) 
+> **Author / Role:** Principal Architect / Homelab Platform Team 
+> **Repository:** `https://github.com/vsingh55/homelab-ops` 
 > **Baseline References:** [`blueprint.md`](file:///home/vsc/devlopment/myGH/homelab-ops/blueprint.md), [`current vs future.md`](file:///home/vsc/devlopment/myGH/homelab-ops/current%20vs%20future.md), and [`process/architecture_decision_records.md`](file:///home/vsc/devlopment/myGH/homelab-ops/process/architecture_decision_records.md).
 
 ---

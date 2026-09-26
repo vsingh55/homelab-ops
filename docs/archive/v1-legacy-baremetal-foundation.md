@@ -1,8 +1,8 @@
 # Milestone v1.0: The Bare-Metal Proxmox Foundation (Legacy)
 
-> **Status:** Historical Milestone (Superseded by Sovereign Cloud v3.0)  
-> **Original Timeframe:** Milestone v1.0 Architecture  
-> **Hardware:** Intel Core i5 Mini PC (16GB RAM, 256GB SSD, 1TB HDD)  
+> **Status:** Historical Milestone (Superseded by Sovereign Cloud v3.0) 
+> **Original Timeframe:** Milestone v1.0 Architecture 
+> **Hardware:** Intel Core i5 Mini PC (16GB RAM, 256GB SSD, 1TB HDD) 
 
 ---
 
@@ -11,13 +11,13 @@
 In the initial phase of the homelab, the objective was establishing a virtualization layer on bare-metal hardware and experimenting with logical zoning.
 
 ### The Initial Resource Budget
-* **Host Hypervisor:** Proxmox VE installed directly on bare metal.
-* **Storage Configuration:**
-  - `local-lvm` (NVMe SSD): Allocated for base OS and container storage.
-  - `HDD-Storage` (1TB SATA mechanical drive): Configured for ISO images and backup storage.
-* **Early Logical Zoning:**
-  - **Zone A (Production):** Early experiments using lightweight LXC containers for gateway, DNS, and IAM services.
-  - **Zone B (Academy):** Ephemeral virtual machines dedicated to "Kubernetes The Hard Way" certification labs.
+- **Host Hypervisor:** Proxmox VE installed directly on bare metal.
+- **Storage Configuration:**
+- `local-lvm` (NVMe SSD): Allocated for base OS and container storage.
+- `HDD-Storage` (1TB SATA mechanical drive): Configured for ISO images and backup storage.
+- **Early Logical Zoning:**
+- **Zone A (Production):** Early experiments using lightweight LXC containers for gateway, DNS, and IAM services.
+- **Zone B (Academy):** Ephemeral virtual machines dedicated to "Kubernetes The Hard Way" certification labs.
 
 ---
 

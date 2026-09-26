@@ -1,8 +1,8 @@
 # Phase 4 Execution Guide: Proxmox Virtual Machine Consolidation & K3s-Prod 12GB Resizing
 
-> **Phase Identifier:** PHASE-04  
-> **Target Components:** Proxmox VE 9.x Hypervisor (`192.168.1.3` / Tailscale `100.108.178.93`), `k3s-prod` (VM 500)  
-> **Status:** Ready for Execution  
+> **Phase Identifier:** PHASE-04 
+> **Target Components:** Proxmox VE 9.x Hypervisor (`192.168.1.3` / Tailscale `100.108.178.93`), `k3s-prod` (VM 500) 
+> **Status:** Ready for Execution 
 > **Prerequisites:** Phase 3 Completed ([03-phase-3-oci-remote-state.md](file:///home/vsc/devlopment/myGH/homelab-ops/process/execution-phases/03-phase-3-oci-remote-state.md)) (Terraform state verified in OCI)
 
 ---
@@ -37,24 +37,24 @@ With the certification completed and `ops-center` state moved to OCI:
 
 ```mermaid
 flowchart TD
-    subgraph Proxmox_Host["Proxmox VE 9.x (16GB Physical RAM)"]
-        subgraph Destroyed_VMs["Permanently Destroyed (Reclaimed)"]
-            LXC100["LXC 100: gateway (512MB)"]
-            VM200["VM 200: jumpbox (1GB)"]
-            VM210["VM 210: server (2GB)"]
-            VM220["VM 220: node-0 (2GB)"]
-            VM221["VM 221: node-1 (2GB)"]
-            VM900["VM 900: ops-center (2GB)"]
-        end
+ subgraph Proxmox_Host["Proxmox VE 9.x (16GB Physical RAM)"]
+ subgraph Destroyed_VMs["Permanently Destroyed (Reclaimed)"]
+ LXC100["LXC 100: gateway (512MB)"]
+ VM200["VM 200: jumpbox (1GB)"]
+ VM210["VM 210: server (2GB)"]
+ VM220["VM 220: node-0 (2GB)"]
+ VM221["VM 221: node-1 (2GB)"]
+ VM900["VM 900: ops-center (2GB)"]
+ end
 
-        subgraph Consolidated_Prod["Consolidated Production Engine"]
-            VM500["VM 500: k3s-prod<br/>• 12 GB RAM<br/>• 4 vCPUs<br/>• 50GB NVMe OS<br/>• 800GB SATA HDD Data Mount"]
-        end
+ subgraph Consolidated_Prod["Consolidated Production Engine"]
+ VM500["VM 500: k3s-prod<br/>• 12 GB RAM<br/>• 4 vCPUs<br/>• 50GB NVMe OS<br/>• 800GB SATA HDD Data Mount"]
+ end
 
-        subgraph Host_Reserve["Hypervisor Reserve"]
-            PVE["Proxmox Host OS (~3.5GB RAM)<br/>• vzdump Engine<br/>• ZFS / ext4 ARC Caches"]
-        end
-    end
+ subgraph Host_Reserve["Hypervisor Reserve"]
+ PVE["Proxmox Host OS (~3.5GB RAM)<br/>• vzdump Engine<br/>• ZFS / ext4 ARC Caches"]
+ end
+ end
 ```
 
 ![Sovereign Bare-Metal & Cluster Architecture](../../images/v.3.0.0/bare-metal-cluster-architecture.png)
@@ -105,8 +105,8 @@ ssh root@192.168.1.3 "pct destroy 100 --purge 2>/dev/null || true"
 
 # 2. Stop and destroy Academy Zone VMs (200, 210, 220, 221)
 for vmid in 200 210 220 221; do
-  ssh root@192.168.1.3 "qm stop $vmid 2>/dev/null || true"
-  ssh root@192.168.1.3 "qm destroy $vmid --purge --skiplock 2>/dev/null || true"
+ ssh root@192.168.1.3 "qm stop $vmid 2>/dev/null || true"
+ ssh root@192.168.1.3 "qm destroy $vmid --purge --skiplock 2>/dev/null || true"
 done
 
 # 3. Stop and destroy legacy ops-center VM (900) ONLY AFTER Step 4.2 verification
@@ -119,14 +119,14 @@ ssh root@192.168.1.3 "qm destroy 900 --purge --skiplock 2>/dev/null || true"
 In [configuration/inventory/group_vars/all/vars.yml](file:///home/vsc/devlopment/myGH/homelab-ops/configuration/inventory/group_vars/all/vars.yml), update the `k3s_prod` specifications:
 
 ```yaml
-  # Zone P: Production
-  k3s_prod:
-    vmid: 500
-    ip: "192.168.1.30"
-    cores: 4
-    memory: 12288
-    disk_size: "50G"
-    onboot: true
+# Zone P: Production
+ k3s_prod:
+ vmid: 500
+ ip: "192.168.1.30"
+ cores: 4
+ memory: 12288
+ disk_size: "50G"
+ onboot: true
 ```
 
 ### Step 4.5: Apply Hardware Resize via Terraform

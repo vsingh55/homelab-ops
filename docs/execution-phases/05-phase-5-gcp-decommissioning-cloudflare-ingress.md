@@ -1,8 +1,8 @@
 # Phase 5 Execution Guide: Cloudflare Ingress, GCP Detachment & GHCR Migration
 
-> **Phase Identifier:** PHASE-05  
-> **Target Components:** `kubernetes/platform/cloudflared/`, Cloudflare Zero Trust, GitHub Container Registry (`ghcr.io`), `infrastructure/gcp/` (detached)  
-> **Status:** Ready for Execution  
+> **Phase Identifier:** PHASE-05 
+> **Target Components:** `kubernetes/platform/cloudflared/`, Cloudflare Zero Trust, GitHub Container Registry (`ghcr.io`), `infrastructure/gcp/` (detached) 
+> **Status:** Ready for Execution 
 > **Prerequisites:** Phase 4 Completed ([04-phase-4-proxmox-consolidation-k3s-resizing.md](file:///home/vsc/devlopment/myGH/homelab-ops/process/execution-phases/04-phase-4-proxmox-consolidation-k3s-resizing.md)), Cloudflare Authoritative DNS for `vijaysingh.cloud`
 
 ---
@@ -32,15 +32,15 @@ With Cloudflare Tunnels:
 
 ```mermaid
 flowchart LR
-    subgraph Legacy_Flow["Legacy High-Latency Flow (~500ms)"]
-        V1["Visitor in India"] -->|220ms| GCP["GCP us-east1 (USA)"]
-        GCP -->|220ms WireGuard| PVE1["Home Proxmox"]
-    end
+ subgraph Legacy_Flow["Legacy High-Latency Flow (~500ms)"]
+ V1["Visitor in India"] -->|220ms| GCP["GCP us-east1 (USA)"]
+ GCP -->|220ms WireGuard| PVE1["Home Proxmox"]
+ end
 
-    subgraph Modern_Flow["Modern Cloudflare Flow (<15ms)"]
-        V2["Visitor in India"] -->|"<15ms"| CF["Cloudflare India Edge (Mumbai/Delhi)"]
-        CF -->|Encrypted Outbound Stream| Pod["cloudflared in k3s-prod"]
-    end
+ subgraph Modern_Flow["Modern Cloudflare Flow (<15ms)"]
+ V2["Visitor in India"] -->|"<15ms"| CF["Cloudflare India Edge (Mumbai/Delhi)"]
+ CF -->|Encrypted Outbound Stream| Pod["cloudflared in k3s-prod"]
+ end
 ```
 
 ![Global Multi-Cloud & Network Ingress Topology](../../images/v.3.0.0/global-network-topology.png)
@@ -51,10 +51,10 @@ flowchart LR
 
 1. **Cloudflare Tunnel Deployment:** `kubernetes/platform/cloudflared/` deployment and token Secret.
 2. **DNS & Public Hostname Mapping:**
-   - `docs.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
-   - `hooks.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
-   - `dash.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80` (Protected by Zero Trust Access)
-   *(Note: Prieya's website is published separately via GitHub Pages / free tier hosting).*
+- `docs.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
+- `hooks.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
+- `dash.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80` (Protected by Zero Trust Access)
+*(Note: Prieya's website is published separately via GitHub Pages / free tier hosting).*
 3. **GCP Gateway Detachment:** WireGuard routing deactivated on GCP VM; instance retained for future compute tasks.
 4. **CI/CD Pipeline Update:** GitHub Actions workflows configured to build and push container images to `ghcr.io/${{ github.repository_owner }}/...`.
 
@@ -77,56 +77,56 @@ Create the platform manifest in [kubernetes/platform/cloudflared/cloudflared.yam
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: cloudflared
+ name: cloudflared
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: tunnel-token
-  namespace: cloudflared
+ name: tunnel-token
+ namespace: cloudflared
 type: Opaque
 stringData:
-  token: "<YOUR_CLOUDFLARE_TUNNEL_TOKEN>"
+ token: "<YOUR_CLOUDFLARE_TUNNEL_TOKEN>"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudflared
-  namespace: cloudflared
-  labels:
-    app: cloudflared
+ name: cloudflared
+ namespace: cloudflared
+ labels:
+ app: cloudflared
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: cloudflared
-  template:
-    metadata:
-      labels:
-        app: cloudflared
-    spec:
-      containers:
-      - name: cloudflared
-        image: cloudflare/cloudflared:latest
-        args:
-        - tunnel
-        - --no-autoupdate
-        - run
-        - --token
-        - $(TUNNEL_TOKEN)
-        env:
-        - name: TUNNEL_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: tunnel-token
-              key: token
-        resources:
-          limits:
-            cpu: 300m
-            memory: 128Mi
-          requests:
-            cpu: 50m
-            memory: 64Mi
+ replicas: 1
+ selector:
+ matchLabels:
+ app: cloudflared
+ template:
+ metadata:
+ labels:
+ app: cloudflared
+ spec:
+ containers:
+- name: cloudflared
+ image: cloudflare/cloudflared:latest
+ args:
+- tunnel
+- --no-autoupdate
+- run
+- --token
+- $(TUNNEL_TOKEN)
+ env:
+- name: TUNNEL_TOKEN
+ valueFrom:
+ secretKeyRef:
+ name: tunnel-token
+ key: token
+ resources:
+ limits:
+ cpu: 300m
+ memory: 128Mi
+ requests:
+ cpu: 50m
+ memory: 64Mi
 ```
 
 Apply the deployment to `k3s-prod`:
@@ -140,7 +140,6 @@ Under **Public Hostnames** in the Tunnel configuration:
 2. `hooks.vijaysingh.cloud` $\to$ Service: `http://traefik.kube-system.svc.cluster.local:80`
 3. `dash.vijaysingh.cloud` $\to$ Service: `http://traefik.kube-system.svc.cluster.local:80`
 
-*(Note: `preiya.vijaysingh.cloud` is hosted separately via free tier GitHub Pages / Cloudflare Pages).*
 
 ### Step 5.4: Detach GCP Gateway & Retain Clean Free VM
 Once the Cloudflare Tunnel is connected and verified:
@@ -152,19 +151,19 @@ Once the Cloudflare Tunnel is connected and verified:
 Update your GitHub Actions CI workflows (e.g. `.github/workflows/paperless-ci.yaml`) to authenticate with `ghcr.io` natively:
 
 ```yaml
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+- name: Log in to GitHub Container Registry
+ uses: docker/login-action@v3
+ with:
+ registry: ghcr.io
+ username: ${{ github.actor }}
+ password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and push container image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./apps/paperless-custom
-        push: true
-        tags: ghcr.io/vsingh55/paperless-custom:latest
+- name: Build and push container image
+ uses: docker/build-push-action@v5
+ with:
+ context: ./apps/paperless-custom
+ push: true
+ tags: ghcr.io/vsingh55/paperless-custom:latest
 ```
 
 ---
@@ -181,7 +180,7 @@ kubectl -n cloudflared logs deployment/cloudflared | grep "Registered tunnel con
 ### Check 2: Audit Response Latency via curl
 ```bash
 curl -w "DNS: %{time_namelookup}s | Connect: %{time_connect}s | TTFB: %{time_starttransfer}s | Total: %{time_total}s\n" \
-  -o /dev/null -s https://hooks.vijaysingh.cloud
+-o /dev/null -s https://hooks.vijaysingh.cloud
 ```
 *Expected Output:* `Total: < 0.050s` (<50ms total response time).
 

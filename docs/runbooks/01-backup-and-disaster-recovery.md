@@ -1,9 +1,9 @@
 # Runbook: Backup & Disaster Recovery Operations
 
-> **Classification:** Production Operations Runbook  
-> **Recovery Target (RTO):** < 45 Minutes  
-> **Data Loss Target (RPO):** < 24 Hours (Nightly Snapshots)  
-> **Scope:** Bare-Metal Proxmox Host, K3s Production VM, Stateful Databases  
+> **Classification:** Production Operations Runbook 
+> **Recovery Target (RTO):** < 45 Minutes 
+> **Data Loss Target (RPO):** < 24 Hours (Nightly Snapshots) 
+> **Scope:** Bare-Metal Proxmox Host, K3s Production VM, Stateful Databases 
 
 ---
 
@@ -77,8 +77,8 @@ If the physical Mini PC suffers a catastrophic hardware failure:
 2. **Install Proxmox VE 8:** Install base Proxmox VE 8 from USB ISO onto primary NVMe disk.
 3. **Mount Storage Pools:** Formatted secondary drive mounted to `/mnt/hdd`.
 4. **Restore Remote Backups:** Fetch latest `vma.zst` snapshot archive from OCI Object Storage using Restic:
-   ```bash
-   restic -r s3:<OCI_S3_ENDPOINT>/restic-repo restore latest --target /mnt/hdd/dump/
-   ```
+ ```bash
+ restic -r s3:<OCI_S3_ENDPOINT>/restic-repo restore latest --target /mnt/hdd/dump/
+ ```
 5. **Restore & Boot VM 500:** Run `qmrestore` and power on `k3s-prod`.
 6. **Verify Cloudflare Ingress:** As soon as `k3s-prod` powers on, `cloudflared` automatically reconnects to the Anycast edge, restoring public traffic without DNS propagation delays.

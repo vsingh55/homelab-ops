@@ -1,8 +1,8 @@
 # Phase 3 Execution Guide: Off-Site State Backend Migration to OCI Always Free
 
-> **Phase Identifier:** PHASE-03  
-> **Target Components:** `infrastructure/on-prem/backend.tf`, Oracle Cloud (OCI) Mumbai (`ap-mumbai-1`)  
-> **Status:** Ready for Execution  
+> **Phase Identifier:** PHASE-03 
+> **Target Components:** `infrastructure/on-prem/backend.tf`, Oracle Cloud (OCI) Mumbai (`ap-mumbai-1`) 
+> **Status:** Ready for Execution 
 > **Prerequisites:** Phase 2 Completed ([02-phase-2-codebase-pruning.md](file:///home/vsc/devlopment/myGH/homelab-ops/process/execution-phases/02-phase-2-codebase-pruning.md)), Active OCI Tenancy in `ap-mumbai-1`
 
 ---
@@ -36,20 +36,20 @@ Previously, Terraform state was stored in a Dockerized MinIO container running o
 
 ```mermaid
 flowchart LR
-    subgraph Local_Laptop["Engineer Laptop"]
-        TF["Terraform CLI"]
-        EnvCreds["AWS_ACCESS_KEY_ID<br/>AWS_SECRET_ACCESS_KEY"]
-    end
+ subgraph Local_Laptop["Engineer Laptop"]
+ TF["Terraform CLI"]
+ EnvCreds["AWS_ACCESS_KEY_ID<br/>AWS_SECRET_ACCESS_KEY"]
+ end
 
-    subgraph OCI_Cloud["Oracle Cloud Mumbai (ap-mumbai-1) - ₹0.00"]
-        Bucket["Object Storage Bucket:<br/>homelab-terraform-state"]
-        StateLock["Native State Versioning & Lock"]
-        Budget["₹1 Budget Alarm"]
-    end
+ subgraph OCI_Cloud["Oracle Cloud Mumbai (ap-mumbai-1) - ₹0.00"]
+ Bucket["Object Storage Bucket:<br/>homelab-terraform-state"]
+ StateLock["Native State Versioning & Lock"]
+ Budget["₹1 Budget Alarm"]
+ end
 
-    TF -->|"HTTPS S3 API (Port 443)"| Bucket
-    Bucket --- StateLock
-    Bucket --- Budget
+ TF -->|"HTTPS S3 API (Port 443)"| Bucket
+ Bucket --- StateLock
+ Bucket --- Budget
 ```
 
 1. **OCI Bucket:** `homelab-terraform-state` (Standard tier, Private, Versioning enabled).
@@ -77,19 +77,19 @@ terraform state pull > ~/homelab-backups/terraform-state/terraform.tfstate.minio
 1. Log in to the **Oracle Cloud Console** (`cloud.oracle.com`).
 2. Navigate to: **Identity & Security -> Users -> User Details -> Customer Secret Keys**.
 3. Click **Generate Secret Key**:
-   - Name: `homelab-terraform-key`
-   - Copy the generated **Secret Key** immediately (it will not be shown again).
-   - Copy the **Access Key** string displayed in the keys table.
+- Name: `homelab-terraform-key`
+- Copy the generated **Secret Key** immediately (it will not be shown again).
+- Copy the **Access Key** string displayed in the keys table.
 
 ### Step 3.3: Create the OCI Object Storage Bucket
 1. Navigate to: **Storage -> Object Storage & Archive Storage -> Buckets**.
 2. Select Compartment: `root` (or your homelab compartment).
 3. Ensure Region is **India West (Mumbai)** (`ap-mumbai-1`).
 4. Click **Create Bucket**:
-   - Bucket Name: `homelab-terraform-state`
-   - Default Storage Tier: `Standard`
-   - Encryption: `Encrypt using Oracle-managed keys`
-   - Object Versioning: `Enabled` (Crucial for state history and rollback)
+- Bucket Name: `homelab-terraform-state`
+- Default Storage Tier: `Standard`
+- Encryption: `Encrypt using Oracle-managed keys`
+- Object Versioning: `Enabled` (Crucial for state history and rollback)
 5. Identify your **Object Storage Namespace** (displayed on the bucket details page, e.g. `ax7b9q...`).
 
 ### Step 3.4: Configure `infrastructure/on-prem/backend.tf`
@@ -97,18 +97,18 @@ Create or update [infrastructure/on-prem/backend.tf](file:///home/vsc/devlopment
 
 ```hcl
 terraform {
-  backend "s3" {
-    bucket                      = "homelab-terraform-state"
-    key                         = "on-prem/terraform.tfstate"
-    region                      = "ap-mumbai-1"
-    endpoint                    = "https://<OCI_NAMESPACE>.compat.objectstorage.ap-mumbai-1.oraclecloud.com"
-    skip_region_validation      = true
-    skip_credentials_validation = true
-    skip_requesting_account_id  = true
-    skip_s3_checksum            = true
-    skip_metadata_api_check     = true
-    use_path_style              = true
-  }
+ backend "s3" {
+ bucket = "homelab-terraform-state"
+ key = "on-prem/terraform.tfstate"
+ region = "ap-mumbai-1"
+ endpoint = "https://<OCI_NAMESPACE>.compat.objectstorage.ap-mumbai-1.oraclecloud.com"
+ skip_region_validation = true
+ skip_credentials_validation = true
+ skip_requesting_account_id = true
+ skip_s3_checksum = true
+ skip_metadata_api_check = true
+ use_path_style = true
+ }
 }
 ```
 *(Replace `<OCI_NAMESPACE>` with your actual OCI namespace).*
@@ -130,7 +130,7 @@ terraform init -migrate-state
 When prompted:
 ```
 Do you want to copy existing state to the new backend?
-  Enter a value: yes
+ Enter a value: yes
 ```
 
 ---

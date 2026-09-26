@@ -1,8 +1,8 @@
 # Case Study: Multi-Cloud Resilience, Out-of-Band Observability & 3-2-1 DR
 
-> **Domain:** Multi-Cloud Architecture / SRE / Disaster Recovery / FinOps  
-> **Key Technologies:** Oracle Cloud (OCI Mumbai), Google Cloud (GCP), Uptime Kuma, Restic, Terraform S3  
-> **Target Roles:** Cloud Architect, Site Reliability Engineer, FinOps Specialist  
+> **Domain:** Multi-Cloud Architecture / SRE / Disaster Recovery / FinOps 
+> **Key Technologies:** Oracle Cloud (OCI Mumbai), Google Cloud (GCP), Uptime Kuma, Restic, Terraform S3 
+> **Target Roles:** Cloud Architect, Site Reliability Engineer, FinOps Specialist 
 
 ---
 
@@ -26,37 +26,37 @@ This project engineered a **Multi-Cloud Hybrid Support Architecture** leveraging
 
 ```mermaid
 flowchart TD
-    subgraph MultiCloud["1. Multi-Cloud Support Plane"]
-        direction TB
-        
-        subgraph OCI_Mumbai["Oracle Cloud Infrastructure (Mumbai Region)"]
-            Kuma["🦝 Uptime Kuma Out-of-Band Monitor\n(Independent Cloud Compute VM)"]
-            S3_State["🪣 OCI Object Storage: terraform-state\n(S3-Compatible Remote State Backend)"]
-            S3_Backup["🪣 OCI Object Storage: restic-repo\n(Encrypted Offsite Backup Repository)"]
-        end
+ subgraph MultiCloud["1. Multi-Cloud Support Plane"]
+ direction TB
+ 
+ subgraph OCI_Mumbai["Oracle Cloud Infrastructure (Mumbai Region)"]
+ Kuma[" Uptime Kuma Out-of-Band Monitor\n(Independent Cloud Compute VM)"]
+ S3_State[" OCI Object Storage: terraform-state\n(S3-Compatible Remote State Backend)"]
+ S3_Backup[" OCI Object Storage: restic-repo\n(Encrypted Offsite Backup Repository)"]
+ end
 
-        subgraph GCP_Cloud["Google Cloud Platform"]
-            GCP_VM["☁️ Secondary Support Compute VM\n(Operational Automation & Container Registry)"]
-        end
-    end
+ subgraph GCP_Cloud["Google Cloud Platform"]
+ GCP_VM["️ Secondary Support Compute VM\n(Operational Automation & Container Registry)"]
+ end
+ end
 
-    subgraph Alerting["2. Incident Notification Dispatch"]
-        Slack["💬 Slack / Discord Webhook Alerting"]
-    end
+ subgraph Alerting["2. Incident Notification Dispatch"]
+ Slack[" Slack / Discord Webhook Alerting"]
+ end
 
-    subgraph OnPremSovereign["3. On-Premise Sovereign Infrastructure"]
-        Host["🏢 Bare-Metal Proxmox Host"]
-        Cluster["☸️ Production K3s Cluster"]
-        PublicRoutes["🌐 Public Endpoints\n(docs, hooks, home.vijaysingh.cloud)"]
-    end
+ subgraph OnPremSovereign["3. On-Premise Sovereign Infrastructure"]
+ Host[" Bare-Metal Proxmox Host"]
+ Cluster["️ Production K3s Cluster"]
+ PublicRoutes[" Public Endpoints\n(docs, hooks, home.vijaysingh.cloud)"]
+ end
 
-    %% Probing and Alerts
-    Kuma -->|HTTP Probes Over Public Internet| PublicRoutes
-    Kuma -.->|Heartbeat Timeout Failure| Slack
-    
-    %% State and Backups
-    Host -.->|Nightly Encrypted Restic Push| S3_Backup
-    Host -.->|Terraform State Locking| S3_State
+ %% Probing and Alerts
+ Kuma -->|HTTP Probes Over Public Internet| PublicRoutes
+ Kuma -.->|Heartbeat Timeout Failure| Slack
+ 
+ %% State and Backups
+ Host -.->|Nightly Encrypted Restic Push| S3_Backup
+ Host -.->|Terraform State Locking| S3_State
 ```
 
 ---
@@ -65,18 +65,19 @@ flowchart TD
 
 ### 1. Independent Out-of-Band Health Probing (Uptime Kuma on OCI)
 An independent cloud compute instance in OCI Mumbai runs **Uptime Kuma** in a dedicated Docker runtime:
-* Probes all public endpoints (`docs.vijaysingh.cloud`, `hooks.vijaysingh.cloud`, `home.vijaysingh.cloud`) over the public internet every 60 seconds.
-* Pings home hypervisor heartbeat endpoints over the Tailscale mesh overlay.
-* If response status drops or latency exceeds SLA boundaries, Uptime Kuma immediately dispatches high-priority alerts to Discord and Slack webhooks independently of local hardware status.
+
+- Probes all public endpoints (`docs.vijaysingh.cloud`, `hooks.vijaysingh.cloud`, `home.vijaysingh.cloud`) over the public internet every 60 seconds.
+- Pings home hypervisor heartbeat endpoints over the Tailscale mesh overlay.
+- If response status drops or latency exceeds SLA boundaries, Uptime Kuma immediately dispatches high-priority alerts to Discord and Slack webhooks independently of local hardware status.
 
 ### 2. Off-Site Terraform Remote State Backend (S3 API)
-* Terraform state files are decoupled from local workstations and stored in an OCI Object Storage bucket using standard S3 compatibility.
-* State locking prevents race conditions and accidental concurrent state writes.
+- Terraform state files are decoupled from local workstations and stored in an OCI Object Storage bucket using standard S3 compatibility.
+- State locking prevents race conditions and accidental concurrent state writes.
 
 ### 3. True 3-2-1 Disaster Recovery (Encrypted Restic Sync)
-* **Nightly Snapshot:** Proxmox creates ZSTD-compressed VM snapshots on the local 1TB SATA drive.
-* **Encrypted Cloud Sync:** A systemd-automated Restic pipeline encrypts snapshot dumps with AES-256 and synchronizes them to OCI Object Storage.
-* **Result:** The system satisfies the gold-standard 3-2-1 rule: 3 copies of data, across 2 different physical media types (NVMe + SATA), with 1 copy stored in a geographically independent cloud datacenter.
+- **Nightly Snapshot:** Proxmox creates ZSTD-compressed VM snapshots on the local 1TB SATA drive.
+- **Encrypted Cloud Sync:** A systemd-automated Restic pipeline encrypts snapshot dumps with AES-256 and synchronizes them to OCI Object Storage.
+- **Result:** The system satisfies the gold-standard 3-2-1 rule: 3 copies of data, across 2 different physical media types (NVMe + SATA), with 1 copy stored in a geographically independent cloud datacenter.
 
 ---
 

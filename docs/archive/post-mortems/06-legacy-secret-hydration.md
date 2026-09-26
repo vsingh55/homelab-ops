@@ -3,9 +3,9 @@
 **Scope:** Security & Automation Integration
 ## 1. The Problem: "Terraform vs. Git"
 As I scaled the infrastructure, I encountered a classic DevOps conflict:
-1.  **Terraform** requires variables (API keys, passwords) in plain text files (`terraform.tfvars`) to execute.
-2.  **Git** (GitHub) must **never** store these plain text files to avoid leaking secrets.
-3.  **Ansible Vault** was my chosen encryption standard, but Terraform cannot read Ansible Vault files natively.
+1. **Terraform** requires variables (API keys, passwords) in plain text files (`terraform.tfvars`) to execute.
+2. **Git** (GitHub) must **never** store these plain text files to avoid leaking secrets.
+3. **Ansible Vault** was my chosen encryption standard, but Terraform cannot read Ansible Vault files natively.
 
 **The "Split-Brain" Risk:**
 Initially, I manually created `terraform.tfvars` on the Ops-Center. This led to "Configuration Drift," where my local development environment had different settings than the production node, and critical configurations were not version-controlled.
@@ -15,35 +15,35 @@ Initially, I manually created `terraform.tfvars` on the Ops-Center. This led to 
 Before building a custom solution, I evaluated several industry-standard approaches:
 
 ### Option A: Environment Variables (`export TF_VAR_variable`)
-* **Pros:** Native to Terraform; secure (no files on disk).
-* **Cons:** Tedious to manage for 20+ variables. I would need to maintain a massive `export` script that sits outside of version control.
-* **Verdict:** **Rejected** due to poor developer experience.
+- **Pros:** Native to Terraform; secure (no files on disk).
+- **Cons:** Tedious to manage for 20+ variables. I would need to maintain a massive `export` script that sits outside of version control.
+- **Verdict:** **Rejected** due to poor developer experience.
 
 ### Option B: External Secret Managers (HashiCorp Vault / GCP Secret Manager)
-* **Pros:** The Enterprise Gold Standard; dynamic secrets; audit logging.
-* **Cons:** Significant overhead. Running a dedicated HashiCorp Vault cluster for a homelab is overkill (high resource usage). GCP Secret Manager introduces a cloud dependency for my on-prem "air-gapped" cluster.
-* **Verdict:** **Rejected** due to unnecessary complexity and cost.
+- **Pros:** The Enterprise Gold Standard; dynamic secrets; audit logging.
+- **Cons:** Significant overhead. Running a dedicated HashiCorp Vault cluster for a homelab is overkill (high resource usage). GCP Secret Manager introduces a cloud dependency for my on-prem "air-gapped" cluster.
+- **Verdict:** **Rejected** due to unnecessary complexity and cost.
 
 ### Option C: The "Hydration Pattern" (Ansible Vault + Templates)
-* **Pros:**
-    * **Offline Capable:** Works perfectly in my hybrid/air-gapped setup.
-    * **Unified Tooling:** Leverages Ansible, which I am already using for configuration management.
-    * **GitOps Friendly:** Encrypted secrets live in the Git repo (`vault.yml`), acting as a secure "Source of Truth."
-* **Verdict:** **Selected** as the most efficient and robust solution for this architecture.
+- **Pros:**
+- **Offline Capable:** Works perfectly in my hybrid/air-gapped setup.
+- **Unified Tooling:** Leverages Ansible, which I am already using for configuration management.
+- **GitOps Friendly:** Encrypted secrets live in the Git repo (`vault.yml`), acting as a secure "Source of Truth."
+- **Verdict:** **Selected** as the most efficient and robust solution for this architecture.
 
 ## 3. The Solution: "Vault Hydration"
 I implemented an automated bridge that treats `terraform.tfvars` as a **build artifact**, not a source file.
 
 ### Architecture
-* **Source of Truth (Public):** `group_vars/all.yml` (Regions, IPs, non-sensitive config).
-* **Source of Truth (Secret):** `group_vars/production/vault.yml` (API Keys, Passwords).
-* **The Template:** `terraform.tfvars.j2` (A Jinja2 template mapping Ansible vars to Terraform syntax).
-* **The Automation:** A playbook [hydrate_infra.yml](../configuration/playbooks/hydrate_infra.yml) that merges the Source of Truth into the Template just-in-time.
+- **Source of Truth (Public):** `group_vars/all.yml` (Regions, IPs, non-sensitive config).
+- **Source of Truth (Secret):** `group_vars/production/vault.yml` (API Keys, Passwords).
+- **The Template:** `terraform.tfvars.j2` (A Jinja2 template mapping Ansible vars to Terraform syntax).
+- **The Automation:** A playbook [hydrate_infra.yml](../configuration/playbooks/hydrate_infra.yml) that merges the Source of Truth into the Template just-in-time.
 
 ### Workflow
-1.  **Define:** I update variables in Ansible (`all.yml` or `vault.yml`).
-2.  **Hydrate:** I run `ansible-playbook playbooks/hydrate_infra.yml`.
-3.  **Deploy:** Terraform reads the freshly generated `terraform.tfvars` files.
+1. **Define:** I update variables in Ansible (`all.yml` or `vault.yml`).
+2. **Hydrate:** I run `ansible-playbook playbooks/hydrate_infra.yml`.
+3. **Deploy:** Terraform reads the freshly generated `terraform.tfvars` files.
 ![workflow of hydration](../images/v.2.0.0/P1.hybrid-network/secret-hydration-flow.png)
 
 ## 4. Implementation Details
@@ -67,7 +67,7 @@ proxmox_api_token_secret: "f43b..."
 
 ```sh
 # Generated by Ansible
-region       = "{{ gcp_region }}"
+region = "{{ gcp_region }}"
 token_secret = "{{ proxmox_api_token_secret }}"
 ```
 

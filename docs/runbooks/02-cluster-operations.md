@@ -1,7 +1,7 @@
 # Runbook: Day-2 Cluster Operations & Maintenance
 
-> **Classification:** Production Operations Runbook  
-> **Scope:** Flux CD v2 GitOps, Mozilla SOPS, Secret Management, Cluster Upgrades  
+> **Classification:** Production Operations Runbook 
+> **Scope:** Flux CD v2 GitOps, Mozilla SOPS, Secret Management, Cluster Upgrades 
 
 ---
 
@@ -13,8 +13,8 @@ All sensitive credentials (API tokens, passwords, private keys) are encrypted in
 ```bash
 # Generate a standard Kubernetes secret manifest
 kubectl create secret generic my-secret \
-  --from-literal=api-key="super-secret-value" \
-  --dry-run=client -o yaml > kubernetes/apps/my-app/secret.yaml
+--from-literal=api-key="super-secret-value" \
+--dry-run=client -o yaml > kubernetes/apps/my-app/secret.yaml
 
 # Encrypt in place using SOPS (uses .sops.yaml rules)
 sops --encrypt --in-place kubernetes/apps/my-app/secret.yaml

@@ -1,9 +1,9 @@
 # Phase 1 Execution & Action Guide: Baseline Architecture Synchronization
 
-> **Phase Identifier:** PHASE-01-ACTION-GUIDE  
-> **Target Baseline:** [`process/blueprint.md`](../blueprint.md), [`process/current vs future.md`](../current%20vs%20future.md), [`process/architecture_decision_records.md`](../architecture_decision_records.md)  
-> **Status:** Active Execution  
-> **Target Audience:** DevOps Engineer / Homelab Architect  
+> **Phase Identifier:** PHASE-01-ACTION-GUIDE 
+> **Target Baseline:** [`process/blueprint.md`](../blueprint.md), [`process/current vs future.md`](../current%20vs%20future.md), [`process/architecture_decision_records.md`](../architecture_decision_records.md) 
+> **Status:** Active Execution 
+> **Target Audience:** DevOps Engineer / Homelab Architect 
 
 ---
 
@@ -28,11 +28,11 @@ Before proceeding, you must align on these 5 foundational decisions:
 
 | # | Decision | Legacy State (v1.0) | Production State (v3.0 Implemented) | Impact / Rationale | Status |
 |---|---|---|---|---|---|
-| **D1** | **Purge Academy Zone** | 5 VMs/LXCs (`gateway`, `jumpbox`, `server`, `node-0`, `node-1`) consuming ~7.5GB RAM | Completely eliminated from Proxmox and codebase | CKA/CKS certification complete; reclaimed **~7.5GB RAM** on host. | ✅ Implemented |
-| **D2** | **Decommission `ops-center`** | 2GB RAM KVM VM hosting MinIO & SSH bastion | Eliminated; Terraform state migrated to **OCI Always Free Mumbai S3** | Reclaimed **2GB RAM, 2 vCPUs, 20GB NVMe, and 250GB HDD** virtual disk. | ✅ Implemented |
-| **D3** | **Resize `k3s-prod`** | 8GB RAM, 2 vCPUs, 30GB disk | Resized to **12GB RAM, 4 vCPUs**, with direct **1TB SATA HDD** mount | Provides >60% memory headroom (~7.5GB free buffer) for media and OCR apps. | ✅ Implemented |
-| **D4** | **Laptop Direct Control** | Dual-hop SSH proxy via `ops-center` | **Direct execution from Laptop** via Tailscale mesh (`100.x.x.x`) | Eliminated proxy latency, removed bastion single point of failure. | ✅ Implemented |
-| **D5** | **Cloudflare Edge Ingress** | GCP `e2-micro` VM in South Carolina via WireGuard (~500ms latency, ~$10/mo) | **Cloudflare Zero Trust Tunnels (`cloudflared`)** via Indian Anycast PoPs | Dropped latency to **<15ms**, eliminated recurring cloud cost, zero open ports. | ✅ Implemented |
+| **D1** | **Purge Academy Zone** | 5 VMs/LXCs (`gateway`, `jumpbox`, `server`, `node-0`, `node-1`) consuming ~7.5GB RAM | Completely eliminated from Proxmox and codebase | CKA/CKS certification complete; reclaimed **~7.5GB RAM** on host. | Implemented |
+| **D2** | **Decommission `ops-center`** | 2GB RAM KVM VM hosting MinIO & SSH bastion | Eliminated; Terraform state migrated to **OCI Always Free Mumbai S3** | Reclaimed **2GB RAM, 2 vCPUs, 20GB NVMe, and 250GB HDD** virtual disk. | Implemented |
+| **D3** | **Resize `k3s-prod`** | 8GB RAM, 2 vCPUs, 30GB disk | Resized to **12GB RAM, 4 vCPUs**, with direct **1TB SATA HDD** mount | Provides >60% memory headroom (~7.5GB free buffer) for media and OCR apps. | Implemented |
+| **D4** | **Laptop Direct Control** | Dual-hop SSH proxy via `ops-center` | **Direct execution from Laptop** via Tailscale mesh (`100.x.x.x`) | Eliminated proxy latency, removed bastion single point of failure. | Implemented |
+| **D5** | **Cloudflare Edge Ingress** | GCP `e2-micro` VM in South Carolina via WireGuard (~500ms latency, ~$10/mo) | **Cloudflare Zero Trust Tunnels (`cloudflared`)** via Indian Anycast PoPs | Dropped latency to **<15ms**, eliminated recurring cloud cost, zero open ports. | Implemented |
 
 ---
 
@@ -74,32 +74,32 @@ print(">>> RAM BUDGET AUDIT PASSED! <<<")
 Before moving to Phase 2 (code pruning) and Phase 3 (remote state), verify your external toolchains:
 
 1. **Tailscale Connection to Proxmox VE:**
-   ```bash
-   # Verify Tailscale IP of Proxmox VE (100.108.178.93) is reachable
-   curl -k -s -o /dev/null -w "%{http_code}\n" https://100.108.178.93:8006/api2/json
-   # Expected output: 200 or 401 (API is reachable)
-   ```
+ ```bash
+# Verify Tailscale IP of Proxmox VE (100.108.178.93) is reachable
+ curl -k -s -o /dev/null -w "%{http_code}\n" https://100.108.178.93:8006/api2/json
+# Expected output: 200 or 401 (API is reachable)
+ ```
 
 2. **SSH Direct Access to `k3s-prod`:**
-   ```bash
-   # Test direct SSH reachability
-   ssh -o ConnectTimeout=5 -o BatchMode=yes devops@192.168.1.30 "uname -a"
-   ```
+ ```bash
+# Test direct SSH reachability
+ ssh -o ConnectTimeout=5 -o BatchMode=yes devops@192.168.1.30 "uname -a"
+ ```
 
 3. **Oracle Cloud Infrastructure (OCI) Tenancy Readiness (for Phase 3):**
-   - **Customer Secret Key:** In OCI User Profile -> Customer Secret Keys, you generated an Access Key & Secret Key.
-     - **Save them now:** Store the Access Key and Secret Key in your password manager or temporary local file (`PRIVATE.txt`, which is git-ignored). OCI will NEVER show the secret key again once closed.
-     - **Tenancy Namespace:** Look up your Object Storage Namespace (Profile -> Tenancy -> Object Storage Namespace).
-     - **Future Usage (Phase 3 & Phase 7):** These credentials will be encrypted into `ansible-vault` to hydrate `backend.conf` for Terraform S3 state and configure nightly Restic backups.
+- **Customer Secret Key:** In OCI User Profile -> Customer Secret Keys, you generated an Access Key & Secret Key.
+- **Save them now:** Store the Access Key and Secret Key in your password manager or temporary local file (`PRIVATE.txt`, which is git-ignored). OCI will NEVER show the secret key again once closed.
+- **Tenancy Namespace:** Look up your Object Storage Namespace (Profile -> Tenancy -> Object Storage Namespace).
+- **Future Usage (Phase 3 & Phase 7):** These credentials will be encrypted into `ansible-vault` to hydrate `backend.conf` for Terraform S3 state and configure nightly Restic backups.
 
 4. **Cloudflare & Hostinger Domain Status (Verified from Console):**
-   - **Registrar (Hostinger):** `vijaysingh.cloud` is registered and its custom nameservers are already pointed to Cloudflare:
-     - `harleigh.ns.cloudflare.com`
-     - `lynn.ns.cloudflare.com`
-   - **Authoritative DNS (Cloudflare):** Cloudflare is actively managing DNS for `vijaysingh.cloud`.
-     - **Active Live Sites (Do Not Touch):** `vijaysingh.cloud` and `www` (Cloudflare Pages), `pf` (Netlify), `blogs` (Hashnode), and `gh.showcase` (GitHub Pages). These are completely independent and will continue running untouched!
-     - **Legacy Homelab Records:** `hooks.vijaysingh.cloud` and `pdf.vijaysingh.cloud` currently point to the GCP VM (`35.237.62.156`).
-     - **Action for Phase 1:** **Do nothing right now.** Your DNS is already in the optimal state. In **Phase 5**, we will replace the legacy GCP A records with Cloudflare Tunnel CNAMEs and add new homelab subdomains (`docs`, `preiya`, `dash`).
+- **Registrar (Hostinger):** `vijaysingh.cloud` is registered and its custom nameservers are already pointed to Cloudflare:
+- `harleigh.ns.cloudflare.com`
+- `lynn.ns.cloudflare.com`
+- **Authoritative DNS (Cloudflare):** Cloudflare is actively managing DNS for `vijaysingh.cloud`.
+- **Active Live Sites (Do Not Touch):** `vijaysingh.cloud` and `www` (Cloudflare Pages), `pf` (Netlify), `blogs` (Hashnode), and `gh.showcase` (GitHub Pages). These are completely independent and will continue running untouched!
+- **Legacy Homelab Records:** `hooks.vijaysingh.cloud` and `pdf.vijaysingh.cloud` currently point to the GCP VM (`35.237.62.156`).
+- **Action for Phase 1:** **Do nothing right now.** Your DNS is already in the optimal state. In **Phase 5**, we will replace the legacy GCP A records with Cloudflare Tunnel CNAMEs and add new homelab subdomains (`docs`, `dash`).
 
 ---
 

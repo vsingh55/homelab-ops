@@ -1,8 +1,8 @@
 # 05. Dual-Tier Storage Architecture
 
-> **Target Standard:** Hardware Storage Tiering & 3-2-1 Backup Topology  
-> **Physical Media:** 256GB M.2 NVMe SSD + 1TB 2.5" SATA HDD  
-> **Cloud Tier:** Oracle Cloud Infrastructure (OCI) S3-Compatible Object Storage  
+> **Target Standard:** Hardware Storage Tiering & 3-2-1 Backup Topology 
+> **Physical Media:** 256GB M.2 NVMe SSD + 1TB 2.5" SATA HDD 
+> **Cloud Tier:** Oracle Cloud Infrastructure (OCI) S3-Compatible Object Storage 
 
 ---
 
@@ -14,28 +14,28 @@ To resolve this on a single Mini PC, the storage architecture enforces a **3-Tie
 
 ```mermaid
 flowchart TD
-    subgraph Tier1["Tier 1: Hot Flash Storage (256GB NVMe SSD)"]
-        direction TB
-        NVMe_OS["Proxmox Host OS (~20GB)"]
-        NVMe_Root["k3s-prod VM Root Disk (50GB)"]
-        NVMe_DB["CloudNativePG PostgreSQL Tables & WAL"]
-    end
+ subgraph Tier1["Tier 1: Hot Flash Storage (256GB NVMe SSD)"]
+ direction TB
+ NVMe_OS["Proxmox Host OS (~20GB)"]
+ NVMe_Root["k3s-prod VM Root Disk (50GB)"]
+ NVMe_DB["CloudNativePG PostgreSQL Tables & WAL"]
+ end
 
-    subgraph Tier2["Tier 2: Cold Mechanical Storage (1TB SATA HDD)"]
-        direction TB
-        HDD_Docs["Paperless-ngx Ingested Documents & Search Index"]
-        HDD_Media["BookOrbit E-Books & Audiobookshelf Media"]
-        HDD_Snapshots["Proxmox vzdump VM Backups (ZSTD Compressed)"]
-    end
+ subgraph Tier2["Tier 2: Cold Mechanical Storage (1TB SATA HDD)"]
+ direction TB
+ HDD_Docs["Paperless-ngx Ingested Documents & Search Index"]
+ HDD_Media["BookOrbit E-Books & Audiobookshelf Media"]
+ HDD_Snapshots["Proxmox vzdump VM Backups (ZSTD Compressed)"]
+ end
 
-    subgraph Tier3["Tier 3: Offsite Disaster Recovery (OCI Mumbai S3)"]
-        direction TB
-        OCI_State["Terraform Remote State Backend (S3 + Locking)"]
-        OCI_Restic["Nightly Encrypted Restic Snapshots"]
-    end
+ subgraph Tier3["Tier 3: Offsite Disaster Recovery (OCI Mumbai S3)"]
+ direction TB
+ OCI_State["Terraform Remote State Backend (S3 + Locking)"]
+ OCI_Restic["Nightly Encrypted Restic Snapshots"]
+ end
 
-    Tier1 -->|Local Backup Job| Tier2
-    Tier2 -->|Nightly Encrypted Sync| Tier3
+ Tier1 -->|Local Backup Job| Tier2
+ Tier2 -->|Nightly Encrypted Sync| Tier3
 ```
 
 ---
@@ -53,6 +53,7 @@ flowchart TD
 ## 3. The 3-2-1 Backup Strategy
 
 The platform adheres to the enterprise **3-2-1 Backup Standard**:
-* **3 Copies of Data:** Production database + Local Proxmox backup dump + Cloud encrypted snapshot.
-* **2 Different Media Types:** High-speed NVMe flash drive + Mechanical SATA hard drive.
-* **1 Copy Offsite:** Replicated nightly to Oracle Cloud Infrastructure (OCI) in Mumbai, guaranteeing survival even in the event of physical host destruction, theft, or fire.
+
+- **3 Copies of Data:** Production database + Local Proxmox backup dump + Cloud encrypted snapshot.
+- **2 Different Media Types:** High-speed NVMe flash drive + Mechanical SATA hard drive.
+- **1 Copy Offsite:** Replicated nightly to Oracle Cloud Infrastructure (OCI) in Mumbai, guaranteeing survival even in the event of physical host destruction, theft, or fire.

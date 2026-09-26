@@ -5,14 +5,15 @@ As of December 2025, the infrastructure code has been refactored from a monolith
 
 ## 1. The "Why" (The Challenge)
 Initially, all VM definitions were hardcoded in a single `main.tf`. This created:
-* **Code Duplication:** Defining `node-0`, `node-1`, and `server` required copying the same `proxmox_vm_qemu` block 3 times.
-* **Rigidity:** Adding a secondary disk to just *one* VM (like `ops-center`) required hacking the main resource block or creating a separate one.
+
+- **Code Duplication:** Defining `node-0`, `node-1`, and `server` required copying the same `proxmox_vm_qemu` block 3 times.
+- **Rigidity:** Adding a secondary disk to just *one* VM (like `ops-center`) required hacking the main resource block or creating a separate one.
 
 ## 2. The Solution: Modules
 I refactored the codebase into a `modules/` directory structure:
 
-* **`modules/compute/vm`**: A generic blueprint for any Ubuntu VM.
-* **`modules/compute/lxc`**: A generic blueprint for containers.
+- **`modules/compute/vm`**: A generic blueprint for any Ubuntu VM.
+- **`modules/compute/lxc`**: A generic blueprint for containers.
 
 **Key Technical Feature: Dynamic Blocks**
 To support the `ops-center` needing a 250GB Backup HDD while other nodes did not, I implemented a `dynamic` block in the module:
@@ -20,13 +21,13 @@ To support the `ops-center` needing a 250GB Backup HDD while other nodes did not
 ```hcl
 # modules/compute/vm/main.tf
 dynamic "scsi1" {
-  for_each = var.data_disk_size != "0G" ? [1] : []
-  content {
-    disk {
-      storage = var.data_disk_storage
-      size    = var.data_disk_size
-    }
-  }
+ for_each = var.data_disk_size != "0G" ? [1] : []
+ content {
+ disk {
+ storage = var.data_disk_storage
+ size = var.data_disk_size
+ }
+ }
 }
 ```
 ## 3. Engineering Challenges & Solutions
@@ -62,21 +63,21 @@ The new structure isolates logic (how a VM is created) from configuration (what 
 
 ```bash
 infrastructure/
-├── demo_files/             # Files that are ignored, bring your own credentials and reemove .example extention
-│   ├── backend.conf.example 
-│   └── terraform.tfvars.example
+├── demo_files/ # Files that are ignored, bring your own credentials and reemove .example extention
+│ ├── backend.conf.example 
+│ └── terraform.tfvars.example
 ├── modules/
-│   └── compute/
-│       ├── vm/             # Generic QEMU VM Logic
-│       │   ├── main.tf     # Resource definition (proxmox_vm_qemu)
-│       │   ├── variables.tf# Input interfaces
-│       │   └── outputs.tf  # IPs, IDs
-│       └── lxc/            # Generic LXC Container Logic
-├── main.tf                 # Calls the modules
-├── backend.conf            # ignored file
-├── backend.tf              # S3 State configuration
-├── variables.tf            # Global variables
-└── terraform.tfvars        # The "Inventory" of our infrastructure (ignored file)
+│ └── compute/
+│ ├── vm/ # Generic QEMU VM Logic
+│ │ ├── main.tf # Resource definition (proxmox_vm_qemu)
+│ │ ├── variables.tf# Input interfaces
+│ │ └── outputs.tf # IPs, IDs
+│ └── lxc/ # Generic LXC Container Logic
+├── main.tf # Calls the modules
+├── backend.conf # ignored file
+├── backend.tf # S3 State configuration
+├── variables.tf # Global variables
+└── terraform.tfvars # The "Inventory" of our infrastructure (ignored file)
 ```
 ## Module Details
 **1. Compute VM Module (modules/compute/vm)** 
@@ -92,20 +93,20 @@ This module handles the complexity of Proxmox VM creation, including:
 **Usage Example (in root main.tf):**
 ```hcl
 module "k8s_cluster" {
-  source   = "./modules/compute/vm"
-  for_each = var.k8s_nodes  # Iterates through inventory
+ source = "./modules/compute/vm"
+ for_each = var.k8s_nodes # Iterates through inventory
 
-  vm_name     = each.key
-  vmid        = each.value.vmid
-  target_node = var.target_node
-  # ...
+ vm_name = each.key
+ vmid = each.value.vmid
+ target_node = var.target_node
+# ...
 }
 ```
 ## State Management (S3 Backend)
 We migrated from local terraform.tfstate files to a Remote S3 Backend hosted on our internal MinIO server.
 
 ### How to Apply Changes
-**Authentication:**  Ensure AWS secrets are loaded (via .zshrc / .bashrc or export).
+**Authentication:** Ensure AWS secrets are loaded (via .zshrc / .bashrc or export).
 
 ```Bash
 export AWS_ACCESS_KEY_ID="your_key"

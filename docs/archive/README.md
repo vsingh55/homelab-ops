@@ -1,23 +1,23 @@
 # Historical Engineering Archive (v1.0 & v2.0 Milestones)
 
-> **Status:** Historical Reference & Engineering Post-Mortems  
+> **Status:** Historical Reference & Engineering Post-Mortems 
 > **Notice:** The documents in this section record the engineering evolution, technical challenges, and iterative migrations leading up to the current **Sovereign Cloud Platform (v3.0)**. For current production documentation, see [System Architecture](../architecture/01-system-overview.md).
 
 ---
 
-## 🏛️ The Evolutionary Milestones
+## ️ The Evolutionary Milestones
 
 Systems engineering is an iterative discipline. The current zero-trust GitOps architecture was forged by identifying the pain points, performance bottlenecks, and technical debt of earlier versions:
 
 ### Milestone 1: Bare-Metal Foundation (v1.0)
-* **[v1 Legacy Architecture: Bare-Metal & LXC Partitioning](v1-legacy-baremetal-foundation.md)** — Initial Proxmox VE virtualization, resource experiments, and early LXC container attempts.
+- **[v1 Legacy Architecture: Bare-Metal & LXC Partitioning](v1-legacy-baremetal-foundation.md)** — Initial Proxmox VE virtualization, resource experiments, and early LXC container attempts.
 
 ### Milestone 2: The Hybrid Cloud Bridge (v2.0)
-* **[v2 Legacy Hybrid Cloud Relay: GCP WireGuard Gateway](v2-legacy-hybrid-cloud-relay.md)** — Traversing CGNAT using a public cloud VM gateway, early MinIO remote state, and WireGuard site-to-site meshes.
+- **[v2 Legacy Hybrid Cloud Relay: GCP WireGuard Gateway](v2-legacy-hybrid-cloud-relay.md)** — Traversing CGNAT using a public cloud VM gateway, early MinIO remote state, and WireGuard site-to-site meshes.
 
 ---
 
-## 🛠️ Engineering Journals & Incident Post-Mortems
+## ️ Engineering Journals & Incident Post-Mortems
 
 A core philosophy of platform engineering is rigorous post-mortem documentation. These incident reports document real-world production outages, root causes, and corrective actions:
 

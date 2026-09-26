@@ -1,6 +1,6 @@
 # 08. Debugging WAN Connectivity Barrier
 
-**Severity:** P2 (High - Major Functionality Degraded)  
+**Severity:** P2 (High - Major Functionality Degraded) 
 **Affected System:** `ops-center` (Ansible Control Node)
 
 **Incident:** Ansible Automation failing from external networks (WAN) while operational on LAN.
@@ -10,8 +10,9 @@
 ## 1. The Incident
 **Observation:**
 While working from a remote location (Coffee Shop), the Ansible control plane (Laptop) failed to connect to the infrastructure.
-* `ops-center` (Management Node): `UNREACHABLE`
-* `k3s-prod` (Internal Node): `Connection closed by UNKNOWN port 65535`
+
+- `ops-center` (Management Node): `UNREACHABLE`
+- `k3s-prod` (Internal Node): `Connection closed by UNKNOWN port 65535`
 
 **Initial Hypothesis:**
 Tailscale mesh network failure or Firewall blocking the connection.

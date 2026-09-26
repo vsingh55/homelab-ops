@@ -1,8 +1,8 @@
 # Phase 2 Execution Guide: Codebase Pruning & Inventory Restructuring
 
-> **Phase Identifier:** PHASE-02  
-> **Target Components:** `infrastructure/on-prem/`, `configuration/inventory/`, `configuration/playbooks/`  
-> **Status:** Ready for Execution  
+> **Phase Identifier:** PHASE-02 
+> **Target Components:** `infrastructure/on-prem/`, `configuration/inventory/`, `configuration/playbooks/` 
+> **Status:** Ready for Execution 
 > **Prerequisites:** Phase 1 Completed ([01-phase-1-architecture-baseline.md](file:///home/vsc/devlopment/myGH/homelab-ops/process/execution-phases/01-phase-1-architecture-baseline.md))
 
 ---
@@ -33,17 +33,17 @@ At the conclusion of Phase 2, the Terraform infrastructure and Ansible configura
 ```
 Files Modified / Deleted in Phase 2:
 ├── infrastructure/on-prem/
-│   ├── main.tf                       [MODIFY: Remove gateway, k8s_cluster, ops_center modules]
-│   ├── variables.tf                  [MODIFY: Remove gateway_config, vms, ops_center_config]
-│   └── terraform.tfvars.example      [MODIFY: Remove Zone A and Zone M variables]
+│ ├── main.tf [MODIFY: Remove gateway, k8s_cluster, ops_center modules]
+│ ├── variables.tf [MODIFY: Remove gateway_config, vms, ops_center_config]
+│ └── terraform.tfvars.example [MODIFY: Remove Zone A and Zone M variables]
 ├── configuration/
-│   ├── inventory/
-│   │   ├── hosts.yml                 [MODIFY: Purge management, lab, gcp, vpn_clients groups]
-│   │   └── group_vars/
-│   │       ├── all/vars.yml          [MODIFY: Remove proxmox_vms lab blocks]
-│   │       └── hypervisor/vars.yml   [MODIFY: Purge ProxyCommand through ops-center]
-│   └── playbooks/
-│       └── manage_lab.yml            [DELETE: Obsolete lab power toggle playbook]
+│ ├── inventory/
+│ │ ├── hosts.yml [MODIFY: Purge management, lab, gcp, vpn_clients groups]
+│ │ └── group_vars/
+│ │ ├── all/vars.yml [MODIFY: Remove proxmox_vms lab blocks]
+│ │ └── hypervisor/vars.yml [MODIFY: Purge ProxyCommand through ops-center]
+│ └── playbooks/
+│ └── manage_lab.yml [DELETE: Obsolete lab power toggle playbook]
 ```
 
 ---
@@ -60,28 +60,28 @@ Modify [infrastructure/on-prem/main.tf](file:///home/vsc/devlopment/myGH/homelab
 
 # Zone P: PROD (Application Plane - K3s)
 module "k3s_prod" {
-  source = "./modules/compute/vm"
+ source = "./modules/compute/vm"
 
-  target_node   = var.target_node
-  vm_name       = "k3s-prod"
-  vmid          = var.k3s_prod_config.vmid
-  template_name = var.vm_template
+ target_node = var.target_node
+ vm_name = "k3s-prod"
+ vmid = var.k3s_prod_config.vmid
+ template_name = var.vm_template
 
-  cores         = var.k3s_prod_config.cores
-  memory        = var.k3s_prod_config.memory
-  disk_size     = var.k3s_prod_config.disk_size
-  
-  # 1TB SATA HDD Data Disk Attachment (Cold Tier for Media, Books, Backups)
-  data_disk_size    = "800G"
-  data_disk_storage = "backup-hdd"
-  
-  agent_enabled = 1
-  onboot        = var.k3s_prod_config.onboot
+ cores = var.k3s_prod_config.cores
+ memory = var.k3s_prod_config.memory
+ disk_size = var.k3s_prod_config.disk_size
+ 
+# 1TB SATA HDD Data Disk Attachment (Cold Tier for Media, Books, Backups)
+ data_disk_size = "800G"
+ data_disk_storage = "backup-hdd"
+ 
+ agent_enabled = 1
+ onboot = var.k3s_prod_config.onboot
 
-  ci_user    = var.ci_user
-  ssh_key    = var.ssh_key
-  ip_address = var.k3s_prod_config.ip
-  gateway_ip = "192.168.1.1" # Physical Router IP
+ ci_user = var.ci_user
+ ssh_key = var.ssh_key
+ ip_address = var.k3s_prod_config.ip
+ gateway_ip = "192.168.1.1" # Physical Router IP
 }
 ```
 
@@ -100,24 +100,24 @@ Simplify [configuration/inventory/hosts.yml](file:///home/vsc/devlopment/myGH/ho
 
 ```yaml
 all:
-  children:
-    # -----------------------------------
-    # INFRASTRUCTURE (The Hypervisor)
-    # -----------------------------------
-    hypervisor:
-      hosts:
-        pve:
-          ansible_host: 192.168.1.3
-          ansible_user: root
+ children:
+# -----------------------------------
+# INFRASTRUCTURE (The Hypervisor)
+# -----------------------------------
+ hypervisor:
+ hosts:
+ pve:
+ ansible_host: 192.168.1.3
+ ansible_user: root
 
-    # -----------------------------------
-    # ZONE PROD (Kubernetes Application Plane)
-    # -----------------------------------
-    production:
-      hosts:
-        k3s-prod:
-          ansible_host: 192.168.1.30
-          ansible_user: devops
+# -----------------------------------
+# ZONE PROD (Kubernetes Application Plane)
+# -----------------------------------
+ production:
+ hosts:
+ k3s-prod:
+ ansible_host: 192.168.1.30
+ ansible_user: devops
 ```
 
 ### Step 2.4: Clean `configuration/inventory/group_vars/hypervisor/vars.yml`
@@ -172,6 +172,6 @@ ansible -i inventory/hosts.yml -m ping all
 | `ansible -m ping pve` fails with permission denied | Root SSH key mismatch | Verify laptop's `~/.ssh/id_ed25519.pub` is present in Proxmox `/root/.ssh/authorized_keys` |
 
 - **Rollback Procedure:** If needed, revert code changes using Git:
-  ```bash
-  git checkout main -- infrastructure/on-prem/ configuration/
-  ```
+ ```bash
+ git checkout main -- infrastructure/on-prem/ configuration/
+ ```

@@ -1,8 +1,8 @@
 # Case Study: Declarative GitOps Continuous Delivery & In-Git Secrets
 
-> **Domain:** Platform Engineering / GitOps / Secret Management  
-> **Key Technologies:** Flux CD v2, Kustomize, Mozilla SOPS, Age Cryptography, GitHub  
-> **Target Roles:** Platform Engineer, Cloud Native Architect, DevOps Engineer  
+> **Domain:** Platform Engineering / GitOps / Secret Management 
+> **Key Technologies:** Flux CD v2, Kustomize, Mozilla SOPS, Age Cryptography, GitHub 
+> **Target Roles:** Platform Engineer, Cloud Native Architect, DevOps Engineer 
 
 ---
 
@@ -24,50 +24,22 @@ To maintain strict security without the operational overhead of an external secr
 
 ## 3. GitOps Delivery & Secret Decryption Pipeline
 
-```mermaid
-flowchart LR
-    subgraph GitRepo["1. GitHub Source of Truth"]
-        Code["Manifests & Overlays"]
-        EncSecret["secrets.enc.yaml\n(Age Encrypted)"]
-    end
-
-    subgraph FluxEngine["2. In-Cluster Flux CD v2 Engine"]
-        SourceCtrl["Source Controller\n(Polls Git Every 10m)"]
-        KustCtrl["Kustomize Controller\n(Dependency Chaining)"]
-        SOPS_Plugin["SOPS Decryptor\n(Age Private Key in k8s Secret)"]
-    end
-
-    subgraph StagedDeployment["3. Deterministic Deployment Stages"]
-        PlatformStage["Stage 1: Platform Foundation\n(Operators, Ingress, CRDs)"]
-        AppsStage["Stage 2: Application Fleet\n(dependsOn: platform)"]
-    end
-
-    subgraph Cluster["4. Running Cluster State"]
-        LivePods["Healthy Production Pods\n(Self-Healing State)"]
-    end
-
-    GitRepo --> SourceCtrl
-    SourceCtrl --> KustCtrl
-    KustCtrl --> SOPS_Plugin
-    SOPS_Plugin --> PlatformStage
-    PlatformStage ==>|Health Checks Pass| AppsStage
-    AppsStage --> LivePods
-    LivePods -. "Continuous Drift Correction" .-> KustCtrl
-```
+![GitOps Delivery Pipeline](../images/v.3.0.0/gitops-pipeline.png)
 
 ---
 
 ## 4. Key Architectural Implementations
 
 ### 1. In-Git Asymmetric Encryption (SOPS + Age)
-* Developers encrypt secrets locally using the public Age key (`.sops.yaml`).
-* Encrypted files (`*.enc.yaml`) are committed directly to Git. Git history contains only cryptographically secure ciphertext.
-* The Flux Kustomize controller holds the private Age key inside a protected Kubernetes secret (`sops-age`) and decrypts the secret directly into cluster memory during reconciliation.
+- Developers encrypt secrets locally using the public Age key (`.sops.yaml`).
+- Encrypted files (`*.enc.yaml`) are committed directly to Git. Git history contains only cryptographically secure ciphertext.
+- The Flux Kustomize controller holds the private Age key inside a protected Kubernetes secret (`sops-age`) and decrypts the secret directly into cluster memory during reconciliation.
 
 ### 2. Deterministic Stage Chaining (`dependsOn`)
 To prevent race conditions during cluster bootstrap or node recovery:
-* The `platform` Kustomization initializes CRDs, the CloudNativePG operator, and the `cloudflared` ingress daemon.
-* The `apps` Kustomization explicitly declares `dependsOn: platform`. Applications are never scheduled until all platform health probes report ready.
+
+- The `platform` Kustomization initializes CRDs, the CloudNativePG operator, and the `cloudflared` ingress daemon.
+- The `apps` Kustomization explicitly declares `dependsOn: platform`. Applications are never scheduled until all platform health probes report ready.
 
 ### 3. Automated Self-Healing (10-Minute Loop)
 If an unauthorized manual change or accidental deletion occurs in the cluster, Flux detects the difference within 10 minutes (or instantly upon webhook trigger) and automatically restores the cluster to the exact state committed to Git.

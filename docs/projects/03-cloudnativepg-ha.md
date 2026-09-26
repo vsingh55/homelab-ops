@@ -1,8 +1,8 @@
 # Case Study: Stateful High-Availability PostgreSQL Operator on Bare-Metal
 
-> **Domain:** Kubernetes Storage / Database Reliability / SRE  
-> **Key Technologies:** CloudNativePG Operator, PostgreSQL, WAL Archiving, Local Path NVMe  
-> **Target Roles:** Site Reliability Engineer, Database Architect, Platform Engineer  
+> **Domain:** Kubernetes Storage / Database Reliability / SRE 
+> **Key Technologies:** CloudNativePG Operator, PostgreSQL, WAL Archiving, Local Path NVMe 
+> **Target Roles:** Site Reliability Engineer, Database Architect, Platform Engineer 
 
 ---
 
@@ -26,37 +26,37 @@ This project deployed the enterprise **CloudNativePG Operator** to manage statef
 
 ```mermaid
 flowchart TD
-    subgraph OperatorControl["1. CloudNativePG Operator (Platform NS)"]
-        Controller["CloudNativePG Controller\n• Monitors Health Probes\n• Manages Failover & Rolling Updates\n• Coordinates WAL Archiving"]
-    end
+ subgraph OperatorControl["1. CloudNativePG Operator (Platform NS)"]
+ Controller["CloudNativePG Controller\n• Monitors Health Probes\n• Manages Failover & Rolling Updates\n• Coordinates WAL Archiving"]
+ end
 
-    subgraph ClusterInstances["2. PostgreSQL Cluster (Production)"]
-        direction LR
-        Primary["🐘 Primary PostgreSQL Instance\n(Read-Write Master)"]
-        Standby["🐘 Standby Replica Instance\n(Read-Only Hot Standby)"]
-        Pooler["🔄 PgBouncer Connection Pooler\n(High Concurrency Optimization)"]
-    end
+ subgraph ClusterInstances["2. PostgreSQL Cluster (Production)"]
+ direction LR
+ Primary[" Primary PostgreSQL Instance\n(Read-Write Master)"]
+ Standby[" Standby Replica Instance\n(Read-Only Hot Standby)"]
+ Pooler[" PgBouncer Connection Pooler\n(High Concurrency Optimization)"]
+ end
 
-    subgraph StorageLayer["3. Dedicated Storage Pinning"]
-        NVMe_Primary["⚡ NVMe Flash PV (Tier 1)\n(Low-latency WAL & Tables)"]
-        NVMe_Standby["⚡ NVMe Flash PV (Tier 1)\n(Synchronous Replication)"]
-    end
+ subgraph StorageLayer["3. Dedicated Storage Pinning"]
+ NVMe_Primary[" NVMe Flash PV (Tier 1)\n(Low-latency WAL & Tables)"]
+ NVMe_Standby[" NVMe Flash PV (Tier 1)\n(Synchronous Replication)"]
+ end
 
-    subgraph Applications["4. Production Consumer Workloads"]
-        n8n["n8n Automation Engine"]
-        Paperless["Paperless-ngx Index"]
-        Miniflux["Miniflux RSS"]
-    end
+ subgraph Applications["4. Production Consumer Workloads"]
+ n8n["n8n Automation Engine"]
+ Paperless["Paperless-ngx Index"]
+ Miniflux["Miniflux RSS"]
+ end
 
-    Controller -->|Manages Lifecycle| Primary
-    Controller -->|Manages Lifecycle| Standby
-    Primary <== Synchronous Streaming Replication ==> Standby
-    
-    Primary --- NVMe_Primary
-    Standby --- NVMe_Standby
-    
-    Applications --> Pooler
-    Pooler --> Primary
+ Controller -->|Manages Lifecycle| Primary
+ Controller -->|Manages Lifecycle| Standby
+ Primary <== Synchronous Streaming Replication ==> Standby
+ 
+ Primary --- NVMe_Primary
+ Standby --- NVMe_Standby
+ 
+ Applications --> Pooler
+ Pooler --> Primary
 ```
 
 ---

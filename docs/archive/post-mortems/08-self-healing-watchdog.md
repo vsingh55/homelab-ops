@@ -9,10 +9,10 @@ The system bridges the gap between containerized logic (K3s) and physical hardwa
 
 ## Key Features
 
-* **Custom Docker Image:** Built from scratch (`node:20-bullseye-slim`) to ensure Python 3 compatibility and unrestricted shell access.
-* **Host Networking Bypass:** Kubernetes Pod configured with `hostNetwork: true` to bypass overlay network isolation and communicate directly with local LAN resources.
-* **Identity-Based Access:** SSH Password authentication disabled. All automation uses a dedicated `ed25519` keypair managed via Kubernetes Secrets.
-* **Principle of Least Privilege:** Automation user (`devops`) is restricted via `sudoers` to only execute remediation commands (`df`, `docker prune`), preventing system-wide compromise.
+- **Custom Docker Image:** Built from scratch (`node:20-bullseye-slim`) to ensure Python 3 compatibility and unrestricted shell access.
+- **Host Networking Bypass:** Kubernetes Pod configured with `hostNetwork: true` to bypass overlay network isolation and communicate directly with local LAN resources.
+- **Identity-Based Access:** SSH Password authentication disabled. All automation uses a dedicated `ed25519` keypair managed via Kubernetes Secrets.
+- **Principle of Least Privilege:** Automation user (`devops`) is restricted via `sudoers` to only execute remediation commands (`df`, `docker prune`), preventing system-wide compromise.
 
 ## Components
 
@@ -23,7 +23,7 @@ The system bridges the gap between containerized logic (K3s) and physical hardwa
 | **Proxmox** | Infrastructure | Hosting K3s VMs, Target for Remediation Scripts |
 | **Python** | Logic Layer | Custom scripts (`remediate.py`) to parse system stats into JSON |
 
-## ⚙️ Setup & Deployment
+## ️ Setup & Deployment
 
 ### 1. Build Custom Image
 
@@ -40,11 +40,11 @@ The deployment uses `hostNetwork` to ensure reliable connectivity to the Proxmox
 
 ```yaml
 spec:
-  hostNetwork: true
-  dnsPolicy: ClusterFirstWithHostNet
-  containers:
-    - name: n8n
-      image: homelab/n8n-custom:v6
+ hostNetwork: true
+ dnsPolicy: ClusterFirstWithHostNet
+ containers:
+- name: n8n
+ image: homelab/n8n-custom:v6
 
 ```
 
@@ -62,8 +62,9 @@ kubectl create secret generic n8n-ssh-key --from-file=id_rsa=~/.ssh/n8n_master
 1. **Trigger:** Scheduled Cron (e.g., every hour) or Webhook.
 2. **Diagnose:** n8n executes Python script via SSH to check disk usage on Proxmox.
 3. **Decision:**
-* *If Usage < 80%:* Log status "Healthy".
-* *If Usage > 80%:* Trigger Remediation.
+
+- *If Usage < 80%:* Log status "Healthy".
+- *If Usage > 80%:* Trigger Remediation.
 
 
 4. **Remediation:** n8n executes `sudo docker system prune -f` on Proxmox to free space.
@@ -71,9 +72,9 @@ kubectl create secret generic n8n-ssh-key --from-file=id_rsa=~/.ssh/n8n_master
 
 ## Security Hardening
 
-* **Root Disabled:** Automation runs as `devops` user, not `root`.
-* **Sudo Restrictions:** `/etc/sudoers.d/n8n-automation` limits command scope.
-* **Network Allow-list:** Proxmox `hosts.allow` configured to trust only the Cluster Network.
+- **Root Disabled:** Automation runs as `devops` user, not `root`.
+- **Sudo Restrictions:** `/etc/sudoers.d/n8n-automation` limits command scope.
+- **Network Allow-list:** Proxmox `hosts.allow` configured to trust only the Cluster Network.
 
 ---
 

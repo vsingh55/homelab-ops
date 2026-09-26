@@ -1,8 +1,8 @@
 # Milestone v2.0: The Hybrid Cloud Relay Bridge (Legacy)
 
-> **Status:** Historical Milestone (Superseded by Sovereign Cloud v3.0)  
-> **Original Timeframe:** Milestone v2.0 Architecture  
-> **Key Technologies:** GCP Compute Engine, WireGuard Site-to-Site, MinIO on ops-center  
+> **Status:** Historical Milestone (Superseded by Sovereign Cloud v3.0) 
+> **Original Timeframe:** Milestone v2.0 Architecture 
+> **Key Technologies:** GCP Compute Engine, WireGuard Site-to-Site, MinIO on ops-center 
 
 ---
 
@@ -22,16 +22,16 @@ To overcome the Carrier-Grade NAT (CGNAT) barrier without exposing residential p
 ## 3. The Implementation Stages & Lessons Learned
 
 ### Stage 1: The "Direct Connect" Attempt (Naive)
-* **Design:** Port forwarding on residential router.
-* **Why Rejected:** Severe security risk. Exposing the private home network directly violated Zero Trust principles.
+- **Design:** Port forwarding on residential router.
+- **Why Rejected:** Severe security risk. Exposing the private home network directly violated Zero Trust principles.
 
 ### Stage 2: The "Split-Brain" Dynamic Cloud (Experimental)
-* **Design:** GCP Spot VM as a gateway + custom Bash watchdog scripts (`watchdog-vpn.sh`) to restart the VM and rewrite Ansible inventory with `sed` when preempted.
-* **Failure Modes:** DNS propagation delays caused webhook drops. Dynamic IP changes caused severe Ansible inventory drift.
+- **Design:** GCP Spot VM as a gateway + custom Bash watchdog scripts (`watchdog-vpn.sh`) to restart the VM and rewrite Ansible inventory with `sed` when preempted.
+- **Failure Modes:** DNS propagation delays caused webhook drops. Dynamic IP changes caused severe Ansible inventory drift.
 
 ### Stage 3: The Stable Cloud Gateway
-* **Design:** Standard VM with static IP in GCP Mumbai (`asia-south1`).
-* **Result:** Eliminated the circuit-breaker issue. If the homelab went down, the gateway served a clean 502 error instead of connection timeouts.
+- **Design:** Standard VM with static IP in GCP Mumbai (`asia-south1`).
+- **Result:** Eliminated the circuit-breaker issue. If the homelab went down, the gateway served a clean 502 error instead of connection timeouts.
 
 ---
 

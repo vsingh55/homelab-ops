@@ -1,16 +1,16 @@
 # Homelab-Ops: Sovereign Cloud Infrastructure & GitOps Platform
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Proxmox%20VE%208%20%7C%20K3s%20Kubernetes-orange?style=for-the-badge&logo=proxmox" alt="Platform" />
-  <img src="https://img.shields.io/badge/GitOps-Flux%20CD%20v2-blue?style=for-the-badge&logo=flux" alt="GitOps" />
-  <img src="https://img.shields.io/badge/Edge%20Ingress-Cloudflare%20Zero%20Trust-F38020?style=for-the-badge&logo=cloudflare" alt="Cloudflare" />
-  <img src="https://img.shields.io/badge/Secrets-SOPS%20%2B%20Age-green?style=for-the-badge&logo=gnupg" alt="SOPS" />
-  <img src="https://img.shields.io/badge/Database-CloudNativePG%20HA-336791?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Cloud%20Support-OCI%20%26%20GCP%20Hybrid-C74634?style=for-the-badge&logo=oracle" alt="Cloud Support" />
-  <img src="https://img.shields.io/badge/IaC-Terraform%20%2B%20Ansible-7B42BC?style=for-the-badge&logo=terraform" alt="Terraform" />
-  <img src="https://img.shields.io/badge/FinOps-Cost--Optimized%20Footprint-success?style=for-the-badge" alt="FinOps" />
-  <img src="https://img.shields.io/badge/Edge%20Latency-%3C15ms-brightgreen?style=for-the-badge" alt="Latency" />
-  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge" alt="License" />
+ <img src="https://img.shields.io/badge/Platform-Proxmox%20VE%208%20%7C%20K3s%20Kubernetes-orange?style=for-the-badge&logo=proxmox" alt="Platform" />
+ <img src="https://img.shields.io/badge/GitOps-Flux%20CD%20v2-blue?style=for-the-badge&logo=flux" alt="GitOps" />
+ <img src="https://img.shields.io/badge/Edge%20Ingress-Cloudflare%20Zero%20Trust-F38020?style=for-the-badge&logo=cloudflare" alt="Cloudflare" />
+ <img src="https://img.shields.io/badge/Secrets-SOPS%20%2B%20Age-green?style=for-the-badge&logo=gnupg" alt="SOPS" />
+ <img src="https://img.shields.io/badge/Database-CloudNativePG%20HA-336791?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+ <img src="https://img.shields.io/badge/Cloud%20Support-OCI%20%26%20GCP%20Hybrid-C74634?style=for-the-badge&logo=oracle" alt="Cloud Support" />
+ <img src="https://img.shields.io/badge/IaC-Terraform%20%2B%20Ansible-7B42BC?style=for-the-badge&logo=terraform" alt="Terraform" />
+ <img src="https://img.shields.io/badge/FinOps-Cost--Optimized%20Footprint-success?style=for-the-badge" alt="FinOps" />
+ <img src="https://img.shields.io/badge/Edge%20Latency-%3C15ms-brightgreen?style=for-the-badge" alt="Latency" />
+ <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge" alt="License" />
 </p>
 
 ---
@@ -64,33 +64,33 @@ To convert this single machine into an enterprise platform, **Proxmox VE 8** was
 ### Act II: Conquering the Network (Zero Trust Ingress)
 Residential internet connections rarely provide static public IP addresses and are almost universally bound behind **Carrier-Grade NAT (CGNAT)**, making traditional port-forwarding impossible or insecure.
 
-* **The Evolution:** Early iterations explored cloud gateway relays. While functional, routing cross-continental traffic introduced latency hops and incurred ongoing NAT maintenance.
-* **The Production Standard:** The platform upgraded to **Cloudflare Zero Trust Anycast Tunnels (`cloudflared`)**. Operating as an in-cluster deployment, `cloudflared` initiates outbound-only QUIC connections to Cloudflare's nearest edge data centers (Mumbai, Delhi, Chennai). Public webhooks and traffic terminate at the edge in **<15ms**, protected by Cloudflare WAF and DDoS mitigation, with **zero open inbound ports on the home firewall**.
+- **The Evolution:** Early iterations explored cloud gateway relays. While functional, routing cross-continental traffic introduced latency hops and incurred ongoing NAT maintenance.
+- **The Production Standard:** The platform upgraded to **Cloudflare Zero Trust Anycast Tunnels (`cloudflared`)**. Operating as an in-cluster deployment, `cloudflared` initiates outbound-only QUIC connections to Cloudflare's nearest edge data centers (Mumbai, Delhi, Chennai). Public webhooks and traffic terminate at the edge in **<15ms**, protected by Cloudflare WAF and DDoS mitigation, with **zero open inbound ports on the home firewall**.
 
 ### Act III: GitOps Continuous Delivery & In-Git Secrets
 Operating infrastructure through manual `kubectl apply` commands or ad-hoc scripts leads to configuration drift and operational opacity.
 
 The modern platform runs on pure **GitOps Continuous Delivery** powered by **Flux CD v2**:
 
-* The cluster continuously synchronizes its desired state from this Git repository.
-* Workload reconciliation is deterministically ordered: platform foundations (storage classes, operators, ingress daemons) must report healthy before application workloads are scheduled (`apps` depends on `platform`).
-* Sensitive tokens and database passwords are encrypted declaratively using **Mozilla SOPS + Age**. Because secrets remain encrypted in Git, they can be safely reviewed in pull requests, while the in-cluster Flux decryptor hydrates them into memory without leaving plaintext traces on physical disks.
-* **Zero-Trust Ephemeral CI/CD Automation:** Continuous integration workflows (such as automated documentation deployments) leverage **Zero-Trust Network Access (ZTNA)** via Tailscale. Instead of exposing Kubernetes API server ports to the public internet or maintaining static VPN credentials, cloud GitHub Actions runners authenticate dynamically using scoped OAuth clients (`tag:ci`), join an ephemeral WireGuard mesh, execute rolling updates, and self-terminate immediately upon job completion—ensuring zero permanent attack surfaces.
+- The cluster continuously synchronizes its desired state from this Git repository.
+- Workload reconciliation is deterministically ordered: platform foundations (storage classes, operators, ingress daemons) must report healthy before application workloads are scheduled (`apps` depends on `platform`).
+- Sensitive tokens and database passwords are encrypted declaratively using **Mozilla SOPS + Age**. Because secrets remain encrypted in Git, they can be safely reviewed in pull requests, while the in-cluster Flux decryptor hydrates them into memory without leaving plaintext traces on physical disks.
+- **Zero-Trust Ephemeral CI/CD Automation:** Continuous integration workflows (such as automated documentation deployments) leverage **Zero-Trust Network Access (ZTNA)** via Tailscale. Instead of exposing Kubernetes API server ports to the public internet or maintaining static VPN credentials, cloud GitHub Actions runners authenticate dynamically using scoped OAuth clients (`tag:ci`), join an ephemeral WireGuard mesh, execute rolling updates, and self-terminate immediately upon job completion—ensuring zero permanent attack surfaces.
 
 ### Act IV: Storage Economics & Stateful High Availability
 Single-node virtualization often stumbles when high-IOPS database queries compete with heavy background disk writes:
 
-* **Storage Tiering:** Fast NVMe storage is dedicated strictly to the OS, K3s state, and PostgreSQL data files. Multi-terabyte document indexing (Paperless-ngx) and audio/book streaming libraries are routed directly to the high-capacity 1TB SATA mechanical disk.
-* **Database Modernization:** Rather than deploying fragile, static database pods, relational data is managed by the **CloudNativePG Operator**. The operator provides automated PostgreSQL lifecycle management, health monitoring, self-healing failover, and Write-Ahead Log (WAL) archiving.
+- **Storage Tiering:** Fast NVMe storage is dedicated strictly to the OS, K3s state, and PostgreSQL data files. Multi-terabyte document indexing (Paperless-ngx) and audio/book streaming libraries are routed directly to the high-capacity 1TB SATA mechanical disk.
+- **Database Modernization:** Rather than deploying fragile, static database pods, relational data is managed by the **CloudNativePG Operator**. The operator provides automated PostgreSQL lifecycle management, health monitoring, self-healing failover, and Write-Ahead Log (WAL) archiving.
 
 ### Act V: Multi-Cloud Resilience (Oracle Cloud & Google Cloud Support)
 A monitoring system running inside the cluster it is supposed to monitor cannot alert you when the cluster itself dies. Furthermore, local backups are vulnerable if the physical host suffers hardware failure.
 
 To achieve enterprise-grade resilience, the architecture integrates **Oracle Cloud Infrastructure (OCI)** and **Google Cloud Platform (GCP)** support instances:
 
-* **Out-of-Band Health Probes:** An independent cloud VM in OCI Mumbai runs **Uptime Kuma**, continuously polling public endpoints (`https://docs.vijaysingh.cloud`, `https://hooks.vijaysingh.cloud`) over the public internet and dispatching alerts to Slack/Discord if homelab broadband or power fails.
-* **Remote State & Offsite Backup:** Terraform state is stored securely with remote locking in an OCI Object Storage S3-compatible backend, and nightly encrypted Restic backups are pushed offsite, fulfilling the **3-2-1 backup rule** (3 copies, 2 media types, 1 offsite).
-* **Multi-Cloud Compute Support:** Supporting cloud virtual machines across OCI and GCP provide compute targets for auxiliary services and remote operations.
+- **Out-of-Band Health Probes:** An independent cloud VM in OCI Mumbai runs **Uptime Kuma**, continuously polling public endpoints (`https://docs.vijaysingh.cloud`, `https://hooks.vijaysingh.cloud`) over the public internet and dispatching alerts to Slack/Discord if homelab broadband or power fails.
+- **Remote State & Offsite Backup:** Terraform state is stored securely with remote locking in an OCI Object Storage S3-compatible backend, and nightly encrypted Restic backups are pushed offsite, fulfilling the **3-2-1 backup rule** (3 copies, 2 media types, 1 offsite).
+- **Multi-Cloud Compute Support:** Supporting cloud virtual machines across OCI and GCP provide compute targets for auxiliary services and remote operations.
 
 ---
 
@@ -114,26 +114,26 @@ All services are containerized, declared in Git, and routed through Cloudflare Z
 
 ```
 Platform & Security
-├── cloudflared             # High-availability Anycast edge ingress tunnel
-├── postgres-operator       # CloudNativePG enterprise PostgreSQL lifecycle operator
-├── homepage                # Homelab Command Center (Live CPU/RAM & status portal)
-├── monitoring              # Prometheus metrics scraping & Grafana telemetry
-├── kwatch                  # Instant Discord/Slack notifier for crashed pods
-└── docs                    # MkDocs Material engineering handbook (docs.vijaysingh.cloud)
+├── cloudflared # High-availability Anycast edge ingress tunnel
+├── postgres-operator # CloudNativePG enterprise PostgreSQL lifecycle operator
+├── homepage # Homelab Command Center (Live CPU/RAM & status portal)
+├── monitoring # Prometheus metrics scraping & Grafana telemetry
+├── kwatch # Instant Discord/Slack notifier for crashed pods
+└── docs # MkDocs Material engineering handbook (docs.vijaysingh.cloud)
 
 Operations & Workflow Automation
-├── n8n                     # Hardened event-driven workflow automation engine
-└── pdf-generator           # Automated document compilation microservice
+├── n8n # Hardened event-driven workflow automation engine
+└── pdf-generator # Automated document compilation microservice
 
 Sovereign Documents & Media (1TB HDD Tier)
-├── paperless-ngx           # OCR document ingestion, tagging, and search archive
-├── bookorbit               # Multi-user digital book library & sync manager
-└── audiobookshelf          # Audiobook and podcast streaming server
+├── paperless-ngx # OCR document ingestion, tagging, and search archive
+├── bookorbit # Multi-user digital book library & sync manager
+└── audiobookshelf # Audiobook and podcast streaming server
 
 Productivity & Personal Health
-├── miniflux                # Ultra-fast, lightweight Go RSS reader
-├── linkding                # Bookmarking service with tag search
-└── ryot / wger             # Fitness analytics and workout tracking platform
+├── miniflux # Ultra-fast, lightweight Go RSS reader
+├── linkding # Bookmarking service with tag search
+└── ryot / wger # Fitness analytics and workout tracking platform
 ```
 
 ---
@@ -142,52 +142,52 @@ Productivity & Personal Health
 
 ```mermaid
 pie title Mini PC 16GB RAM Allocation
-    "k3s-prod Kubernetes Cluster" : 12
-    "Proxmox VE Base OS & ZFS/Caches" : 3.5
-    "Emergency Host Safety Buffer" : 0.5
+ "k3s-prod Kubernetes Cluster" : 12
+ "Proxmox VE Base OS & ZFS/Caches" : 3.5
+ "Emergency Host Safety Buffer" : 0.5
 ```
 
-* **Physical Node:** Intel Core i5 Mini PC (4 Cores / 8 Threads)
-* **Total Host RAM:** 16,384 MB (16 GB DDR4)
-* **Production Cluster Allocation (`k3s-prod` VM 500):**
-  - **Memory:** 12,288 MB (12 GB RAM) — gives >60% memory headroom for peak OCR ingestion and database queries.
-  - **Compute:** 4 vCPUs dedicated to Kubernetes scheduler.
-  - **Storage:** 50GB NVMe root disk + 1TB SATA HDD attached virtual disk.
-* **Proxmox VE Host OS Allocation:**
-  - **Memory:** 3,500 MB (3.5 GB RAM) reserved for Debian kernel, KVM hypervisor daemons, and `vzdump` backup compression.
-  - **Storage:** ~20GB NVMe root partition for hypervisor binaries and ISOs.
+- **Physical Node:** Intel Core i5 Mini PC (4 Cores / 8 Threads)
+- **Total Host RAM:** 16,384 MB (16 GB DDR4)
+- **Production Cluster Allocation (`k3s-prod` VM 500):**
+- **Memory:** 12,288 MB (12 GB RAM) — gives >60% memory headroom for peak OCR ingestion and database queries.
+- **Compute:** 4 vCPUs dedicated to Kubernetes scheduler.
+- **Storage:** 50GB NVMe root disk + 1TB SATA HDD attached virtual disk.
+- **Proxmox VE Host OS Allocation:**
+- **Memory:** 3,500 MB (3.5 GB RAM) reserved for Debian kernel, KVM hypervisor daemons, and `vzdump` backup compression.
+- **Storage:** ~20GB NVMe root partition for hypervisor binaries and ISOs.
 
 ---
 
-## 📚 Standard Engineering Documentation & Enterprise Handbook
+## Standard Engineering Documentation & Enterprise Handbook
 
 Following CNCF and enterprise platform standards, all architecture specifications, flagship project case studies, and incident post-mortems are documented in the `docs/` hierarchy:
 
 ### 1. Production System Architecture (Single Source of Truth)
-* **[01. System Architecture Overview](docs/architecture/01-system-overview.md)** — High-level multi-cloud hybrid topology, design goals, and component boundaries.
-* **[02. Hardware & Virtualization](docs/architecture/02-hardware-and-virtualization.md)** — Bare-metal Mini PC specifications and Proxmox VE 8 memory fencing.
-* **[03. Kubernetes & K3s Cluster](docs/architecture/03-kubernetes-k3s-cluster.md)** — Single-node production K3s cluster architecture and namespaces.
-* **[04. Zero-Trust Networking](docs/architecture/04-zero-trust-networking.md)** — Cloudflare Zero Trust Anycast Tunnels and Tailscale administrative mesh.
-* **[05. Dual-Tier Storage Strategy](docs/architecture/05-dual-tier-storage.md)** — Partitioning high-IOPS NVMe flash from bulk mechanical SATA storage.
+- **[01. System Architecture Overview](docs/architecture/01-system-overview.md)** — High-level multi-cloud hybrid topology, design goals, and component boundaries.
+- **[02. Hardware & Virtualization](docs/architecture/02-hardware-and-virtualization.md)** — Bare-metal Mini PC specifications and Proxmox VE 8 memory fencing.
+- **[03. Kubernetes & K3s Cluster](docs/architecture/03-kubernetes-k3s-cluster.md)** — Single-node production K3s cluster architecture and namespaces.
+- **[04. Zero-Trust Networking](docs/architecture/04-zero-trust-networking.md)** — Cloudflare Zero Trust Anycast Tunnels and Tailscale administrative mesh.
+- **[05. Dual-Tier Storage Strategy](docs/architecture/05-dual-tier-storage.md)** — Partitioning high-IOPS NVMe flash from bulk mechanical SATA storage.
 
 ### 2. Featured Projects & Case Studies (Resume Showcase)
-* **[Case Study: Zero-Trust Hybrid Ingress Engine](docs/projects/01-zero-trust-ingress.md)** — CGNAT traversal, Anycast edge routing, WAF, and <15ms latency.
-* **[Case Study: Declarative GitOps & In-Git Secrets](docs/projects/02-gitops-and-sops.md)** — Continuous delivery via Flux CD v2 and Mozilla SOPS + Age encryption.
-* **[Case Study: Stateful PostgreSQL Operator on Bare-Metal](docs/projects/03-cloudnativepg-ha.md)** — CloudNativePG high-availability operator, automated failover, and WAL archiving.
-* **[Case Study: Multi-Cloud Resilience & Out-of-Band DR](docs/projects/04-multicloud-observability-dr.md)** — OCI Mumbai & GCP support compute, Uptime Kuma external probes, and 3-2-1 backup replication.
+- **[Case Study: Zero-Trust Hybrid Ingress Engine](docs/projects/01-zero-trust-ingress.md)** — CGNAT traversal, Anycast edge routing, WAF, and <15ms latency.
+- **[Case Study: Declarative GitOps & In-Git Secrets](docs/projects/02-gitops-and-sops.md)** — Continuous delivery via Flux CD v2 and Mozilla SOPS + Age encryption.
+- **[Case Study: Stateful PostgreSQL Operator on Bare-Metal](docs/projects/03-cloudnativepg-ha.md)** — CloudNativePG high-availability operator, automated failover, and WAL archiving.
+- **[Case Study: Multi-Cloud Resilience & Out-of-Band DR](docs/projects/04-multicloud-observability-dr.md)** — OCI Mumbai & GCP support compute, Uptime Kuma external probes, and 3-2-1 backup replication.
 
 ### 3. Architecture Decision Records (ADRs)
-* **[Comprehensive ADR Register](docs/adr/README.md)** — 16 formal Architecture Decision Records documenting every pivotal architectural decision (ADR-001 through ADR-016), following the Michael Nygard standard.
+- **[Comprehensive ADR Register](docs/adr/README.md)** — 16 formal Architecture Decision Records documenting every pivotal architectural decision (ADR-001 through ADR-016), following the Michael Nygard standard.
 
 ### 4. Operations & Runbooks
-* **[Backup & Disaster Recovery Runbook](docs/runbooks/01-backup-and-disaster-recovery.md)** — Procedures for 3-2-1 backup verification and bare-metal disaster recovery.
-* **[Day-2 Cluster Operations Runbook](docs/runbooks/02-cluster-operations.md)** — SOPS secret rotation, manual GitOps reconciliation, and host maintenance.
+- **[Backup & Disaster Recovery Runbook](docs/runbooks/01-backup-and-disaster-recovery.md)** — Procedures for 3-2-1 backup verification and bare-metal disaster recovery.
+- **[Day-2 Cluster Operations Runbook](docs/runbooks/02-cluster-operations.md)** — SOPS secret rotation, manual GitOps reconciliation, and host maintenance.
 
 ### 5. Historical Archive & Incident Post-Mortems (v1.0 & v2.0 Milestones)
-* **[Engineering Archive Overview](docs/archive/README.md)** — Historical milestones, early technical challenges, and iterative migrations leading to v3.0.
-* **[Bare-Metal Boot Failure Post-Mortem](docs/archive/post-mortems/01-debugging-boot-failure.md)** & **[WAN Connectivity Post-Mortem](docs/archive/post-mortems/02-debugging-wan-connectivity.md)**
-* **[Ansible Automation Journey](docs/archive/post-mortems/04-ansible-automation-journey.md)** & **[Terraform Modularization](docs/archive/post-mortems/05-terraform-modularization.md)**
-* **[Hybrid Cloud Automation Journal (n8n)](docs/archive/post-mortems/07-hybrid-cloud-automation-n8n.md)** & **[Self-Healing Watchdog](docs/archive/post-mortems/08-self-healing-watchdog.md)**
+- **[Engineering Archive Overview](docs/archive/README.md)** — Historical milestones, early technical challenges, and iterative migrations leading to v3.0.
+- **[Bare-Metal Boot Failure Post-Mortem](docs/archive/post-mortems/01-debugging-boot-failure.md)** & **[WAN Connectivity Post-Mortem](docs/archive/post-mortems/02-debugging-wan-connectivity.md)**
+- **[Ansible Automation Journey](docs/archive/post-mortems/04-ansible-automation-journey.md)** & **[Terraform Modularization](docs/archive/post-mortems/05-terraform-modularization.md)**
+- **[Hybrid Cloud Automation Journal (n8n)](docs/archive/post-mortems/07-hybrid-cloud-automation-n8n.md)** & **[Self-Healing Watchdog](docs/archive/post-mortems/08-self-healing-watchdog.md)**
 
 ---
 
@@ -227,15 +227,15 @@ kubectl logs -n cloudflared -l app.kubernetes.io/name=cloudflared --tail=50
 
 ## Engineering Leadership & Contacts
 
-**Vijay Singh** — DevOps & Platform Engineer  
+**Vijay Singh** — DevOps & Platform Engineer 
 
-* **GitHub:** [@vsingh55](https://github.com/vsingh55)  
-* **Documentation Portal:** [https://docs.vijaysingh.cloud](https://docs.vijaysingh.cloud)  
-* **Homelab Command Center:** [https://hub.vijaysingh.cloud](https://hub.vijaysingh.cloud)  
-* **System Status & Uptime:** [https://status.vijaysingh.cloud](https://status.vijaysingh.cloud)  
+- **GitHub:** [@vsingh55](https://github.com/vsingh55) 
+- **Documentation Portal:** [https://docs.vijaysingh.cloud](https://docs.vijaysingh.cloud) 
+- **Homelab Command Center:** [https://hub.vijaysingh.cloud](https://hub.vijaysingh.cloud) 
+- **System Status & Uptime:** [https://status.vijaysingh.cloud](https://status.vijaysingh.cloud) 
 
 ---
 
 <p align="center">
-  <sub>Engineered with precision, operational discipline, and pride in sovereign platform engineering.</sub>
+ <sub>Engineered with precision, operational discipline, and pride in sovereign platform engineering.</sub>
 </p>

@@ -1,8 +1,8 @@
 # Phase 6 Execution Guide: Flux CD v2 GitOps Engine Bootstrapping & Mozilla SOPS (Age) Secret Management
 
-> **Phase Identifier:** PHASE-06  
-> **Target Components:** `kubernetes/bootstrap/`, `kubernetes/platform/`, `kubernetes/apps/`, `.sops.yaml`, Flux CD v2 Controllers  
-> **Status:** Ready for Execution  
+> **Phase Identifier:** PHASE-06 
+> **Target Components:** `kubernetes/bootstrap/`, `kubernetes/platform/`, `kubernetes/apps/`, `.sops.yaml`, Flux CD v2 Controllers 
+> **Status:** Ready for Execution 
 > **Prerequisites:** Phase 5 Completed ([05-phase-5-gcp-decommissioning-cloudflare-ingress.md](file:///home/vsc/devlopment/myGH/homelab-ops/process/execution-phases/05-phase-5-gcp-decommissioning-cloudflare-ingress.md)), GitHub Personal Access Token (PAT) with repo permissions
 
 ---
@@ -35,23 +35,23 @@ On our 16GB Mini PC running 9 applications and 2 websites:
 
 ```mermaid
 flowchart TD
-    subgraph Git_Repository["GitHub: homelab-ops (main)"]
-        SecretEnc["secret.enc.yaml<br/>(Encrypted via Age Public Key)"]
-        Manifests["Kustomize App Overlays"]
-    end
+ subgraph Git_Repository["GitHub: homelab-ops (main)"]
+ SecretEnc["secret.enc.yaml<br/>(Encrypted via Age Public Key)"]
+ Manifests["Kustomize App Overlays"]
+ end
 
-    subgraph K3s_Prod["k3s-prod (VM 500)"]
-        FluxEngine["Flux CD v2 Controller<br/>(~120MB RAM)"]
-        AgeKey["Secret: sops-age<br/>(Age Private Key)"]
-        Decrypted["Decrypted In-Memory<br/>Native K8s Secret"]
-        Pod["Application Pod (e.g. n8n, DB)"]
-    end
+ subgraph K3s_Prod["k3s-prod (VM 500)"]
+ FluxEngine["Flux CD v2 Controller<br/>(~120MB RAM)"]
+ AgeKey["Secret: sops-age<br/>(Age Private Key)"]
+ Decrypted["Decrypted In-Memory<br/>Native K8s Secret"]
+ Pod["Application Pod (e.g. n8n, DB)"]
+ end
 
-    Manifests -->|Git Pull Every 1m| FluxEngine
-    SecretEnc -->|Git Pull| FluxEngine
-    AgeKey -->|Decrypts In-Memory| FluxEngine
-    FluxEngine -->|Applies State| Decrypted
-    Decrypted -->|Mounted as Volume / Env| Pod
+ Manifests -->|Git Pull Every 1m| FluxEngine
+ SecretEnc -->|Git Pull| FluxEngine
+ AgeKey -->|Decrypts In-Memory| FluxEngine
+ FluxEngine -->|Applies State| Decrypted
+ Decrypted -->|Mounted as Volume / Env| Pod
 ```
 
 ![Declarative GitOps & Secret Lifecycle Pipeline](../../images/v.3.0.0/gitops-pipeline.png)
@@ -62,8 +62,8 @@ flowchart TD
 
 1. **`.sops.yaml` (Repository Root):** Defines the creation rules mapping Age public keys to Kubernetes YAML files.
 2. **`kubernetes/bootstrap/`:**
-   - `flux-system/`: Flux CD core controllers and `gotk-sync.yaml`.
-   - `root.yaml`: Root Kustomization pointing to platform and apps directories.
+- `flux-system/`: Flux CD core controllers and `gotk-sync.yaml`.
+- `root.yaml`: Root Kustomization pointing to platform and apps directories.
 3. **`kubernetes/platform/kustomization.yaml`:** Orchestrates cluster-wide platform infrastructure (`cloudflared`, `traefik`, `cloudnative-pg`, `monitoring`).
 4. **`kubernetes/apps/kustomization.yaml`:** Orchestrates all 9 application workloads and 2 websites.
 
@@ -98,9 +98,9 @@ Create [.sops.yaml](file:///home/vsc/devlopment/myGH/homelab-ops/.sops.yaml) in 
 
 ```yaml
 creation_rules:
-  - path_regex: kubernetes/.*\.enc\.yaml$
-    encrypted_regex: "^(data|stringData)$"
-    age: "<YOUR_AGE_PUBLIC_KEY_HERE_age1...>"
+- path_regex: kubernetes/.*\.enc\.yaml$
+ encrypted_regex: "^(data|stringData)$"
+ age: "<YOUR_AGE_PUBLIC_KEY_HERE_age1...>"
 ```
 
 ### Step 6.4: Load Age Private Key into `k3s-prod`
@@ -112,8 +112,8 @@ kubectl create namespace flux-system --dry-run=client -o yaml | kubectl apply -f
 
 # Inject Age secret key
 cat ~/.config/sops/age/keys.txt | kubectl -n flux-system create secret generic sops-age \
-  --from-file=age.agekey=/dev/stdin \
-  --dry-run=client -o yaml | kubectl apply -f -
+--from-file=age.agekey=/dev/stdin \
+--dry-run=client -o yaml | kubectl apply -f -
 ```
 
 ### Step 6.5: Bootstrap Flux CD v2 via GitHub
@@ -123,11 +123,11 @@ Run `flux bootstrap` targeting the repository:
 export GITHUB_TOKEN="<YOUR_GITHUB_PAT>"
 
 flux bootstrap github \
-  --owner=vsingh55 \
-  --repository=homelab-ops \
-  --branch=main \
-  --path=kubernetes/bootstrap \
-  --personal
+--owner=vsingh55 \
+--repository=homelab-ops \
+--branch=main \
+--path=kubernetes/bootstrap \
+--personal
 ```
 *Flux will commit its manifests to `kubernetes/bootstrap/flux-system/` and establish its reconciliation webhook.*
 
@@ -138,19 +138,19 @@ In [kubernetes/bootstrap/apps.yaml](file:///home/vsc/devlopment/myGH/homelab-ops
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: apps
-  namespace: flux-system
+ name: apps
+ namespace: flux-system
 spec:
-  interval: 10m0s
-  path: ./kubernetes/apps
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
+ interval: 10m0s
+ path: ./kubernetes/apps
+ prune: true
+ sourceRef:
+ kind: GitRepository
+ name: flux-system
+ decryption:
+ provider: sops
+ secretRef:
+ name: sops-age
 ```
 
 ### Step 6.7: Encrypt a Sample Secret
@@ -162,11 +162,11 @@ cat <<EOF > test-secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: test-secret
-  namespace: default
+ name: test-secret
+ namespace: default
 type: Opaque
 stringData:
-  db-password: "SuperSecretPassword123"
+ db-password: "SuperSecretPassword123"
 EOF
 
 # 2. Encrypt in-place using SOPS
@@ -182,7 +182,7 @@ mv test-secret.yaml kubernetes/apps/test-secret.enc.yaml
 ```bash
 flux check
 ```
-*Expected Output:* `✔ all checks passed` across `source-controller`, `kustomize-controller`, and `helm-controller`.
+*Expected Output:* ` all checks passed` across `source-controller`, `kustomize-controller`, and `helm-controller`.
 
 ### Check 2: Verify Kustomization Sync Status
 ```bash
@@ -190,9 +190,9 @@ flux get kustomizations
 ```
 *Expected Output:*
 ```
-NAME           REVISION        SUSPENDED  READY  MESSAGE
-flux-system    main@sha1:...   False      True   Applied revision: main@sha1:...
-apps           main@sha1:...   False      True   Applied revision: main@sha1:...
+NAME REVISION SUSPENDED READY MESSAGE
+flux-system main@sha1:... False True Applied revision: main@sha1:...
+apps main@sha1:... False True Applied revision: main@sha1:...
 ```
 
 ### Check 3: Verify In-Cluster In-Memory Decryption

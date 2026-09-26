@@ -1,8 +1,8 @@
 # Case Study: Zero-Trust Hybrid Ingress Engine & CGNAT Traversal
 
-> **Domain:** Platform Engineering / Cloud Networking / Security  
-> **Key Technologies:** Cloudflare Zero Trust, `cloudflared`, Traefik, QUIC, Anycast DNS  
-> **Target Roles:** DevOps Engineer, Platform Engineer, Site Reliability Engineer  
+> **Domain:** Platform Engineering / Cloud Networking / Security 
+> **Key Technologies:** Cloudflare Zero Trust, `cloudflared`, Traefik, QUIC, Anycast DNS 
+> **Target Roles:** DevOps Engineer, Platform Engineer, Site Reliability Engineer 
 
 ---
 
@@ -26,30 +26,7 @@ When exposing on-premise workloads to public users and automated webhooks, engin
 
 ## 3. Architecture & Traffic Flow
 
-```mermaid
-flowchart LR
-    subgraph PublicEdge["1. Cloudflare Anycast Edge"]
-        Client["Public Webhook / User"]
-        WAF["Edge WAF & DDoS Shield"]
-        EdgePoP["Edge Node (Mumbai / Delhi / Chennai)"]
-    end
-
-    subgraph EncryptedTunnel["2. Zero-Trust Tunnel"]
-        QUIC["Outbound QUIC Tunnel\n(Multiplexed Streams • Zero Open Ports)"]
-    end
-
-    subgraph InternalCluster["3. On-Premise K3s Cluster"]
-        Daemon["cloudflared Daemon (Platform NS)"]
-        Traefik["Traefik Ingress Controller"]
-        Workloads["Target Service (n8n, Docs, Portal)"]
-    end
-
-    Client -->|HTTPS| EdgePoP
-    EdgePoP --> WAF
-    WAF <== QUIC ==> Daemon
-    Daemon --> Traefik
-    Traefik --> Workloads
-```
+![Zero-Trust Ingress Architecture](../images/v.3.0.0/global-network-topology.png)
 
 ---
 
@@ -60,8 +37,9 @@ The in-cluster `cloudflared` daemon establishes outbound-only UDP connections (p
 
 ### 2. High-Availability Traefik Mapping
 Rather than creating separate tunnel ingress rules for every internal service, the tunnel routes all subdomain traffic directly to the in-cluster Traefik Ingress controller:
-* `*.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
-* Traefik performs internal host routing, path matching, and header propagation.
+
+- `*.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
+- Traefik performs internal host routing, path matching, and header propagation.
 
 ### 3. Edge DDoS Mitigation & SSL Lifecycle
 SSL/TLS certificates are generated and terminated at the Cloudflare edge. Cloudflare's automated Web Application Firewall (WAF) mitigates Layer 7 attacks, HTTP floods, and malformed payloads before they reach the on-premise hardware.

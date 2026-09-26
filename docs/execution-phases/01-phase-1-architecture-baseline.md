@@ -1,8 +1,8 @@
 # Phase 1 Execution Guide: Baseline Architecture Documentation & Decision Records Synchronization
 
-> **Phase Identifier:** PHASE-01  
-> **Target Baseline:** [`blueprint.md`](file:///home/vsc/devlopment/myGH/homelab-ops/blueprint.md), [`current vs future.md`](file:///home/vsc/devlopment/myGH/homelab-ops/current%20vs%20future.md), [`process/architecture_decision_records.md`](file:///home/vsc/devlopment/myGH/homelab-ops/process/architecture_decision_records.md)  
-> **Status:** Completed & Synchronized  
+> **Phase Identifier:** PHASE-01 
+> **Target Baseline:** [`blueprint.md`](file:///home/vsc/devlopment/myGH/homelab-ops/blueprint.md), [`current vs future.md`](file:///home/vsc/devlopment/myGH/homelab-ops/current%20vs%20future.md), [`process/architecture_decision_records.md`](file:///home/vsc/devlopment/myGH/homelab-ops/process/architecture_decision_records.md) 
+> **Status:** Completed & Synchronized 
 > **Prerequisites:** None (Documentation & Architecture phase)
 
 ---
@@ -37,21 +37,21 @@ Architecture Decision Records (ADRs) capture the context, alternatives considere
 
 ```mermaid
 flowchart TD
-    subgraph Docs_Phase["Phase 1 Documentation Deliverables"]
-        BP["blueprint.md<br/>(Master Lean Architecture v2.0)"]
-        CF["current vs future.md<br/>(Comparative Transition Matrix)"]
-        ADR["process/architecture_decision_records.md<br/>(ADR-015 & ADR-016 Formalization)"]
-    end
+ subgraph Docs_Phase["Phase 1 Documentation Deliverables"]
+ BP["blueprint.md<br/>(Master Lean Architecture v2.0)"]
+ CF["current vs future.md<br/>(Comparative Transition Matrix)"]
+ ADR["process/architecture_decision_records.md<br/>(ADR-015 & ADR-016 Formalization)"]
+ end
 
-    subgraph Core_Decisions["Formalized Decisions"]
-        D1["Academy Zone Purged (~7.5GB RAM Reclaimed)"]
-        D2["ops-center Decommissioned (2GB RAM Reclaimed)"]
-        D3["k3s-prod Resized to 12GB RAM / 4 vCPUs"]
-        D4["Laptop Direct Control via Tailscale"]
-        D5["Terraform State to OCI Mumbai S3"]
-    end
+ subgraph Core_Decisions["Formalized Decisions"]
+ D1["Academy Zone Purged (~7.5GB RAM Reclaimed)"]
+ D2["ops-center Decommissioned (2GB RAM Reclaimed)"]
+ D3["k3s-prod Resized to 12GB RAM / 4 vCPUs"]
+ D4["Laptop Direct Control via Tailscale"]
+ D5["Terraform State to OCI Mumbai S3"]
+ end
 
-    Docs_Phase --> Core_Decisions
+ Docs_Phase --> Core_Decisions
 ```
 
 ### 1. `blueprint.md` (Lean Sovereign Cloud v2.0)
@@ -79,14 +79,14 @@ To verify that Phase 1 documentation is 100% synchronized and free of conflictin
 ### Audit 1: Search for Obsolete ArgoCD References
 ```bash
 grep -rn "ArgoCD" /home/vsc/devlopment/myGH/homelab-ops/blueprint.md \
-  /home/vsc/devlopment/myGH/homelab-ops/"current vs future.md"
+ /home/vsc/devlopment/myGH/homelab-ops/"current vs future.md"
 ```
 *Expected Result:* Zero matches. All documentation must mandate Flux CD v2.
 
 ### Audit 2: Search for Obsolete Keycloak References
 ```bash
 grep -rn "Keycloak" /home/vsc/devlopment/myGH/homelab-ops/blueprint.md \
-  /home/vsc/devlopment/myGH/homelab-ops/"current vs future.md"
+ /home/vsc/devlopment/myGH/homelab-ops/"current vs future.md"
 ```
 *Expected Result:* Zero matches. All authentication must mandate Cloudflare Zero Trust Access (Google SSO).
 
