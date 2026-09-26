@@ -50,15 +50,31 @@ for file in $staged_files; do
 
     # 4. Check for Cloud Secret Keys
     if git diff --cached "$file" | grep -qiE "^\+[^+].*AWS_SECRET_ACCESS_KEY.*="; then
-        echo "❌ [SECURITY ERROR] $file appears to contain an AWS Secret Access Key!"
+        echo "[SECURITY ERROR] $file appears to contain an AWS Secret Access Key!"
+        errors=$((errors + 1))
+    fi
+
+    # 5. Check for plaintext database connection strings (postgres://user:PASS@host)
+    if git diff --cached "$file" | grep -qE "^\+[^+].*(postgres|mysql|mongodb)://[a-zA-Z0-9_]+:[^@{$'\"]{4,}@"; then  # pragma: allowlist secret
+        echo "[SECURITY ERROR] $file contains a plaintext database connection string with credentials!"
+        echo "   Use a Kubernetes secretKeyRef or SOPS-encrypted secret instead."
         errors=$((errors + 1))
     fi
 done
 
+# 6. detect-secrets baseline check (if baseline exists and detect-secrets is available)
+if [ -f ".secrets.baseline" ] && command -v detect-secrets &>/dev/null; then
+    if ! detect-secrets-hook --baseline .secrets.baseline $(git diff --cached --name-only --diff-filter=ACM) 2>/dev/null; then
+        echo "[SECURITY ERROR] detect-secrets found a potential new secret not in the approved baseline."
+        echo "   Run 'detect-secrets scan > .secrets.baseline' and review the new entry."
+        errors=$((errors + 1))
+    fi
+fi
+
 if [ $errors -gt 0 ]; then
     echo ""
-    echo "🚨 Commit aborted: Found $errors sensitive credential violation(s)."
-    echo "💡 Encrypt secrets with Mozilla SOPS ('sops --encrypt --in-place <file.yaml>') before committing."
+    echo "[ABORTED] Commit blocked: Found $errors sensitive credential violation(s)."
+    echo "[HINT] Encrypt secrets with SOPS: sops --encrypt --in-place <file.yaml>"
     exit 1
 fi
 
