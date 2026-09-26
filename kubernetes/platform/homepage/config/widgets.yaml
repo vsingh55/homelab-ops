@@ -1,0 +1,13 @@
+- greeting:
+    text_size: xl
+    text: "Sovereign Cloud Homelab"
+- kubernetes:
+    cluster:
+      show: true
+      cpu: true
+      memory: true
+      showNodes: true
+    nodes:
+      show: true
+      cpu: true
+      memory: true

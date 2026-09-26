@@ -1,0 +1,20 @@
+title: "Vijay Singh | Homelab Command Center"
+theme: dark
+color: slate
+headerStyle: clean
+layout:
+  Operations & Automation:
+    style: row
+    columns: 2
+  Sovereign Media & Documents:
+    style: row
+    columns: 3
+  Productivity & Health:
+    style: row
+    columns: 3
+  Platform & Observability:
+    style: row
+    columns: 3
+  Infrastructure & Management:
+    style: row
+    columns: 2

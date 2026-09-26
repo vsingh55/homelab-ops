@@ -1,0 +1,71 @@
+- Operations & Automation:
+    - n8n Workflow Automation:
+        icon: n8n.png
+        href: https://hooks.vijaysingh.cloud
+        description: "Event-driven workflow orchestration & self-healing automation"
+        ping: https://hooks.vijaysingh.cloud
+    - PDF Document Generator:
+        icon: python.png
+        href: https://pdf.vijaysingh.cloud
+        description: "Automated document compilation & Python microservice"
+        ping: https://pdf.vijaysingh.cloud
+
+- Sovereign Media & Documents:
+    - Paperless-ngx Archive:
+        icon: paperless-ngx.png
+        href: https://docs-ocr.vijaysingh.cloud
+        description: "OCR document scanning, tagging & searchable PDF archive"
+        ping: https://docs-ocr.vijaysingh.cloud
+    - BookOrbit Library:
+        icon: book.png
+        href: https://books.vijaysingh.cloud
+        description: "Multi-user digital book & PDF library with sync"
+        ping: https://books.vijaysingh.cloud
+    - Audiobookshelf Streaming:
+        icon: audiobookshelf.png
+        href: https://audio.vijaysingh.cloud
+        description: "Self-hosted audiobook & podcast streaming server"
+        ping: https://audio.vijaysingh.cloud
+
+- Productivity & Health:
+    - Miniflux RSS Reader:
+        icon: miniflux.png
+        href: https://rss.vijaysingh.cloud
+        description: "Lightweight Go RSS reader with AI-curated digest pipeline"
+        ping: https://rss.vijaysingh.cloud
+    - Linkding Bookmarks:
+        icon: linkding.png
+        href: https://links.vijaysingh.cloud
+        description: "Minimalist, searchable bookmark manager"
+        ping: https://links.vijaysingh.cloud
+    - Ryot Health & Fitness:
+        icon: heartbeat.png
+        href: https://health.vijaysingh.cloud
+        description: "Workout tracking, fitness analytics & self-hosted health platform"
+        ping: https://health.vijaysingh.cloud
+
+- Platform & Observability:
+    - Architecture & Engineering Docs:
+        icon: book-open-page-variant.png
+        href: https://docs.vijaysingh.cloud
+        description: "Engineering handbook, ADRs, post-mortems & execution phases"
+        ping: https://docs.vijaysingh.cloud
+    - Cluster Telemetry (Grafana):
+        icon: grafana.png
+        href: https://telemetry.vijaysingh.cloud
+        description: "Full-stack cluster observability, Prometheus metrics & telemetry"
+        ping: https://telemetry.vijaysingh.cloud
+    - Uptime Kuma Status Portal:
+        icon: uptime-kuma.png
+        href: https://status.vijaysingh.cloud
+        description: "Out-of-band availability monitors on OCI Mumbai"
+
+- Infrastructure & Management:
+    - Homelab GitOps Repository:
+        icon: github.png
+        href: https://github.com/vsingh55/homelab-ops
+        description: "Infrastructure as Code (Terraform, Ansible, K8s GitOps)"
+    - Cloudflare Zero Trust Edge:
+        icon: cloudflare.png
+        href: https://one.dash.cloudflare.com
+        description: "Anycast edge routing, DDoS shield & QUIC tunnel connectors"

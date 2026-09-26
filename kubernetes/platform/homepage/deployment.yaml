@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+  namespace: platform
+  labels:
+    app.kubernetes.io/name: homepage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homepage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homepage
+    spec:
+      serviceAccountName: homepage
+      volumes:
+        - name: config-storage
+          emptyDir: {}
+        - name: config-source
+          configMap:
+            name: homepage-config
+      initContainers:
+        - name: copy-config
+          image: busybox:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cp /config-source/* /app/config/
+              mkdir -p /app/config/logs
+          volumeMounts:
+            - name: config-storage
+              mountPath: /app/config
+            - name: config-source
+              mountPath: /config-source
+      containers:
+        - name: homepage
+          image: ghcr.io/gethomepage/homepage:latest
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: "hub.vijaysingh.cloud,localhost:3000,127.0.0.1:3000"
+          ports:
+            - containerPort: 3000
+              name: http
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          volumeMounts:
+            - name: config-storage
+              mountPath: /app/config

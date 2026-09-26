@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - cloudflared/cloudflared.yaml
-  - homepage/homepage.yaml
+  - homepage
   - monitoring/grafana-telemetry-ingress.yaml
   - docs
   - postgres-operator
