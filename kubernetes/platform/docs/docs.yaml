@@ -81,6 +81,7 @@ data:
       - "Operations & Runbooks":
           - "Backup & Disaster Recovery": runbooks/01-backup-and-disaster-recovery.md
           - "Day-2 Cluster Operations": runbooks/02-cluster-operations.md
+          - "Incident Response & Triage": runbooks/03-incident-response-and-triage.md
       - "Engineering Archive (v1 & v2)":
           - "Archive Overview": archive/README.md
           - "Milestone v1.0 (Bare Metal & LXC)": archive/v1-legacy-baremetal-foundation.md

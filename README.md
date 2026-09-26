@@ -182,6 +182,7 @@ Following CNCF and enterprise platform standards, all architecture specification
 ### 4. Operations & Runbooks
 - **[Backup & Disaster Recovery Runbook](docs/runbooks/01-backup-and-disaster-recovery.md)** — Procedures for 3-2-1 backup verification and bare-metal disaster recovery.
 - **[Day-2 Cluster Operations Runbook](docs/runbooks/02-cluster-operations.md)** — SOPS secret rotation, manual GitOps reconciliation, and host maintenance.
+- **[Incident Response & Triage Playbook](docs/runbooks/03-incident-response-and-triage.md)** — Emergency diagnostic workflows, P0–P3 severity triage, and automated failover playbooks.
 
 ### 5. Infrastructure Modernization & Execution Phases
 - **[Execution Master Index](docs/execution-phases/README.md)** — Comprehensive 7-phase execution records detailing the migration from legacy multi-bastion lab to single-node sovereign cloud.
