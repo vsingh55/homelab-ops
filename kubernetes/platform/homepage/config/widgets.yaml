@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=none
+# yaml-language-server: $schema=https://json.schemastore.org/any.json
 - greeting:
     text_size: xl
     text: "Sovereign Cloud Homelab"

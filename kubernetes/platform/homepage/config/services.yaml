@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=none
+# yaml-language-server: $schema=https://json.schemastore.org/any.json
 - Operations & Automation:
     - n8n Workflow Automation:
         icon: n8n.png
