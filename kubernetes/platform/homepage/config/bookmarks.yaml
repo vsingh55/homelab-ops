@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=none
 - Quick Access:
     - GitHub Profile:
         - icon: github.png

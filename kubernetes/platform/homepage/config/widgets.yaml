@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=none
 - greeting:
     text_size: xl
     text: "Sovereign Cloud Homelab"

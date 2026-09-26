@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=none
 - Operations & Automation:
     - n8n Workflow Automation:
         icon: n8n.png
