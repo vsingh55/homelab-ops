@@ -183,7 +183,14 @@ Following CNCF and enterprise platform standards, all architecture specification
 - **[Backup & Disaster Recovery Runbook](docs/runbooks/01-backup-and-disaster-recovery.md)** — Procedures for 3-2-1 backup verification and bare-metal disaster recovery.
 - **[Day-2 Cluster Operations Runbook](docs/runbooks/02-cluster-operations.md)** — SOPS secret rotation, manual GitOps reconciliation, and host maintenance.
 
-### 5. Historical Archive & Incident Post-Mortems (v1.0 & v2.0 Milestones)
+### 5. Infrastructure Modernization & Execution Phases
+- **[Execution Master Index](docs/execution-phases/README.md)** — Comprehensive 7-phase execution records detailing the migration from legacy multi-bastion lab to single-node sovereign cloud.
+- **[01. Architecture Baseline](docs/execution-phases/01-architecture-baseline.md)** & **[02. Codebase Pruning](docs/execution-phases/02-codebase-pruning.md)**
+- **[03. Remote State Migration](docs/execution-phases/03-remote-state-migration.md)** & **[04. Hypervisor Consolidation](docs/execution-phases/04-proxmox-consolidation.md)**
+- **[05. Edge Ingress & Registry](docs/execution-phases/05-edge-ingress-and-registry.md)** & **[06. GitOps & SOPS Secrets](docs/execution-phases/06-gitops-bootstrap-sops.md)**
+- **[07. Fleet Deployment & ChatOps](docs/execution-phases/07-application-fleet-deployment.md)**
+
+### 6. Historical Archive & Incident Post-Mortems (v1.0 & v2.0 Milestones)
 - **[Engineering Archive Overview](docs/archive/README.md)** — Historical milestones, early technical challenges, and iterative migrations leading to v3.0.
 - **[Bare-Metal Boot Failure Post-Mortem](docs/archive/post-mortems/01-debugging-boot-failure.md)** & **[WAN Connectivity Post-Mortem](docs/archive/post-mortems/02-debugging-wan-connectivity.md)**
 - **[Ansible Automation Journey](docs/archive/post-mortems/04-ansible-automation-journey.md)** & **[Terraform Modularization](docs/archive/post-mortems/05-terraform-modularization.md)**
@@ -220,7 +227,7 @@ ssh root@100.108.178.93
 ssh devops@192.168.1.30
 
 # Inspect active Cloudflare tunnel connections
-kubectl logs -n cloudflared -l app.kubernetes.io/name=cloudflared --tail=50
+kubectl logs -n platform -l app.kubernetes.io/name=cloudflared --tail=50
 ```
 
 ---
