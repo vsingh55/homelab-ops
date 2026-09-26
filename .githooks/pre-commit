@@ -26,13 +26,13 @@ for file in $staged_files; do
     fi
 
     # 1. Check for Age Private Keys
-    if git diff --cached "$file" | grep -q "AGE-SECRET-KEY-1"; then
+    if git diff --cached "$file" | grep -qE "^\+[^+].*AGE-SECRET-KEY-1"; then
         echo "❌ [SECURITY ERROR] $file contains an Age private key (AGE-SECRET-KEY-1)!"
         errors=$((errors + 1))
     fi
 
     # 2. Check for SSH/TLS Private Keys
-    if git diff --cached "$file" | grep -qE "BEGIN (RSA|OPENSSH|EC|DSA|PGP)? PRIVATE KEY"; then
+    if git diff --cached "$file" | grep -qE "^\+[^+].*BEGIN (RSA|OPENSSH|EC|DSA|PGP)? PRIVATE KEY"; then
         echo "❌ [SECURITY ERROR] $file contains an unencrypted private key!"
         errors=$((errors + 1))
     fi
@@ -49,7 +49,7 @@ for file in $staged_files; do
     fi
 
     # 4. Check for Cloud Secret Keys
-    if git diff --cached "$file" | grep -qiE "AWS_SECRET_ACCESS_KEY.*="; then
+    if git diff --cached "$file" | grep -qiE "^\+[^+].*AWS_SECRET_ACCESS_KEY.*="; then
         echo "❌ [SECURITY ERROR] $file appears to contain an AWS Secret Access Key!"
         errors=$((errors + 1))
     fi

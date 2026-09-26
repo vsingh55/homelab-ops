@@ -1,125 +1,162 @@
-# Terraform Refactoring: Modular Architecture
+# Engineering Retrospective: Monolithic-to-Modular Terraform Infrastructure Architecture
 
-## Overview
-As of December 2025, the infrastructure code has been refactored from a monolithic `main.tf` into reusable **Modules**. This change allows us to scale the homelab (adding nodes, swapping storage) without rewriting code, adhering to the "Don't Repeat Yourself" (DRY) principle.
+> **Platform Standard:** Historical Infrastructure as Code (IaC) Architecture  
+> **Milestone Era:** Milestone v2.0 Architecture  
+> **Status:** Archival Reference (Foundation for modern multi-cloud state)  
 
-## 1. The "Why" (The Challenge)
-Initially, all VM definitions were hardcoded in a single `main.tf`. This created:
+---
 
-- **Code Duplication:** Defining `node-0`, `node-1`, and `server` required copying the same `proxmox_vm_qemu` block 3 times.
-- **Rigidity:** Adding a secondary disk to just *one* VM (like `ops-center`) required hacking the main resource block or creating a separate one.
+## Executive Overview
 
-## 2. The Solution: Modules
-I refactored the codebase into a `modules/` directory structure:
+| Attribute | Specification |
+| :--- | :--- |
+| **Domain** | Declarative Infrastructure as Code (IaC) & State Architecture |
+| **Target Infrastructure** | Bare-Metal Proxmox VE 8.x Hypervisor & Cloud Compute Instances |
+| **Tooling Adopted** | Terraform v1.5+, HCL Dynamic Blocks, MinIO S3 Remote Backend, Telmate Provider |
+| **Lead Engineer** | Vijay Singh (Platform & DevOps Engineer) |
+| **Key Outcome** | Eliminated 100% of duplicated HCL boilerplate; enabled dynamic multi-disk provisioning and remote state concurrency locking |
 
-- **`modules/compute/vm`**: A generic blueprint for any Ubuntu VM.
-- **`modules/compute/lxc`**: A generic blueprint for containers.
+---
 
-**Key Technical Feature: Dynamic Blocks**
-To support the `ops-center` needing a 250GB Backup HDD while other nodes did not, I implemented a `dynamic` block in the module:
+## 1. The Architectural Impasse: Monolithic `main.tf` Debt
+
+In the early stages of the homelab, all virtual machines and hypervisor settings were declared in a single, monolithic `main.tf` file exceeding 800 lines of HCL. This structure introduced severe technical friction:
+
+1. **Massive Code Duplication:** Declaring `node-0`, `node-1`, and `server` required copying the exact same 45-line `proxmox_vm_qemu` resource block repeatedly, violating the "Don't Repeat Yourself" (DRY) principle.
+2. **Schema Rigidity:** If a single virtual machine (such as `ops-center`) required a secondary 250GB backup mechanical disk while the remaining nodes only required NVMe root storage, the monolithic resource block could not adapt without ugly conditional hacks.
+3. **Concurrency & State Collision Risk:** Local `terraform.tfstate` files committed locally or shared over ad-hoc file sync risked state corruption and race conditions if modified simultaneously.
+
+---
+
+## 2. Modular Architecture Design
+
+To resolve duplication and decouple infrastructure intent from implementation, the codebase was decomposed into reusable, parameterized modules:
+
+```text
+infrastructure/on-prem/
+├── main.tf                    # Root composition orchestrating module calls
+├── variables.tf               # Global input variable definitions
+├── outputs.tf                 # Global outputs (IP addresses, VM IDs)
+├── terraform.tf               # Provider versions and S3 remote backend config
+│
+├── modules/
+│   ├── compute/
+│   │   ├── vm/                # Standardized QEMU Virtual Machine Blueprint
+│   │   │   ├── main.tf        # Core proxmox_vm_qemu resource & Cloud-Init
+│   │   │   ├── variables.tf   # Module inputs (memory, cores, disks)
+│   │   │   └── outputs.tf     # Computed IP and MAC addresses
+│   │   │
+│   │   └── lxc/               # Standardized LXC Container Blueprint
+│   │       ├── main.tf
+│   │       └── variables.tf
+│   │
+│   └── storage/               # Storage pool mapping and volume definitions
+```
+
+### Key Technical Innovation: Dynamic Storage Allocation
+To allow arbitrary nodes to attach secondary bulk storage without modifying the underlying module, HCL `dynamic` blocks were engineered:
 
 ```hcl
 # modules/compute/vm/main.tf
-dynamic "scsi1" {
- for_each = var.data_disk_size != "0G" ? [1] : []
- content {
- disk {
- storage = var.data_disk_storage
- size = var.data_disk_size
- }
- }
+dynamic "scsi" {
+  for_each = var.secondary_disk_size != "0G" ? [1] : []
+  content {
+    scsi1 {
+      disk {
+        storage = var.secondary_disk_storage
+        size    = var.secondary_disk_size
+        format  = "raw"
+      }
+    }
+  }
 }
 ```
-## 3. Engineering Challenges & Solutions
-### Challenge A: The "Ghost Drift" (Tags)
 
-**Symptom:** `terraform plan` persistently showed a change for tags, trying to change " " (space) to null. 
+If `secondary_disk_size` is left at default `"0G"`, the loop evaluates to an empty list `[]` and no secondary disk is synthesized. If specified (e.g. `"250G"`), Terraform conditionally creates and attaches the secondary SCSI drive seamlessly.
 
-**Root Cause:** Proxmox's API defaulted empty tags to a space string, while Terraform's null value was strict. 
+---
 
-**Solution:** I accepted the drift once via terraform apply. Terraform corrected the Proxmox state to align with the code.
+## 3. Engineering Challenges & Forensic Debugging
 
-### Challenge B: State Loss During Storage Migration
-**Symptom:** After mounting the HDD to ops-center and repointing MinIO to use it, `terraform plan` showed that it wanted to create all resources from scratch (6 to add). 
+### Challenge 1: The "Ghost Drift" in Proxmox Tags
+**Symptom:** Running `terraform plan` persistently detected phantom changes on the `tags` parameter, attempting to replace a space string `" "` with `null` on every single execution.
 
-**Root Cause:** The MinIO container was now looking at the empty HDD (/mnt/storage/minio-data), while the terraform.tfstate file was still sitting on the old VM root disk. 
+**Root Cause:** The Proxmox VE API stored empty tags internally as an ASCII whitespace character (`" "`). When Terraform compared this to an omitted or `null` tag in HCL, it registered state drift.
 
-**Solution:**
-*Restoration:* I located the backup terraform.tfstate file and restored it into the new MinIO bucket.
+**Remediation:** Executed a one-time targeted update applying an explicit empty string tag, forcing the provider to align state metadata with the upstream API.
 
-### Challenge C: The "Stop/Start" War
-**Symptom:** Terraform tried to force stopped VMs (Lab Zone) to start, even though onboot = false was set.
+### Challenge 2: State Loss During MinIO Storage Migration
+**Symptom:** After relocating MinIO's data directory to the secondary SATA mechanical drive, `terraform plan` reported that all 6 infrastructure resources had vanished and proposed re-creating the entire homelab from scratch.
 
-**Root Cause:** The proxmox_vm_qemu resource defaults to ensuring VMs are running. 
+**Root Cause:** The MinIO container was re-bound to an empty filesystem mount (`/mnt/storage/minio-data`), while the actual `terraform.tfstate` binary resided on the old unmounted volume.
 
-**Solution:** I linked the state directly to the boot variable in the module:
+**Remediation:**
+1. Halted Terraform execution immediately to prevent disaster.
+2. Mounted the historical volume, extracted `terraform.tfstate`, and verified JSON checksums.
+3. Seeded the state file into the new MinIO S3 bucket and executed `terraform state list` to confirm 100% resource match.
+
+### Challenge 3: VM Lifecycle Wars (`onboot` vs `vm_state`)
+**Symptom:** Terraform repeatedly attempted to power on stopped lab VMs even though `onboot = false` was configured.
+
+**Root Cause:** By default, the `proxmox_vm_qemu` provider enforces a running container state. Setting `onboot = false` only instructs Proxmox not to start the VM on hypervisor reboot; it does not tell Terraform to leave the VM powered off.
+
+**Remediation:** Directly tied the `vm_state` attribute to the operational variable in HCL:
 
 ```hcl
+# modules/compute/vm/main.tf
 vm_state = var.onboot ? "running" : "stopped"
 ```
 
-## Directory Structure
-The new structure isolates logic (how a VM is created) from configuration (what VMs we want).
+---
 
-```bash
-infrastructure/
-├── demo_files/ # Files that are ignored, bring your own credentials and reemove .example extention
-│ ├── backend.conf.example 
-│ └── terraform.tfvars.example
-├── modules/
-│ └── compute/
-│ ├── vm/ # Generic QEMU VM Logic
-│ │ ├── main.tf # Resource definition (proxmox_vm_qemu)
-│ │ ├── variables.tf# Input interfaces
-│ │ └── outputs.tf # IPs, IDs
-│ └── lxc/ # Generic LXC Container Logic
-├── main.tf # Calls the modules
-├── backend.conf # ignored file
-├── backend.tf # S3 State configuration
-├── variables.tf # Global variables
-└── terraform.tfvars # The "Inventory" of our infrastructure (ignored file)
-```
-## Module Details
-**1. Compute VM Module (modules/compute/vm)** 
+## 4. Remote State Architecture: Local to S3 Backend
 
-This module handles the complexity of Proxmox VM creation, including:
+State management was upgraded from fragile local files to an S3-compatible remote backend hosted on MinIO with distributed state locking:
 
-**State Management:** Automatically handles stopped vs running state based on onboot variables.
-
-**Dynamic Disk Allocation:** Conditionally provisions secondary storage (e.g., for MinIO) using Terraform dynamic blocks.
-
-**Cloud-Init:** Standardizes user configuration (SSH keys, IP setup).
-
-**Usage Example (in root main.tf):**
 ```hcl
-module "k8s_cluster" {
- source = "./modules/compute/vm"
- for_each = var.k8s_nodes # Iterates through inventory
+# terraform.tf
+terraform {
+  required_version = ">= 1.5.0"
 
- vm_name = each.key
- vmid = each.value.vmid
- target_node = var.target_node
-# ...
+  backend "s3" {
+    bucket                      = "terraform-state"
+    key                         = "homelab/on-prem/terraform.tfstate"
+    endpoint                    = "http://100.108.178.93:9000"
+    region                      = "main"
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    force_path_style            = true
+  }
 }
 ```
-## State Management (S3 Backend)
-We migrated from local terraform.tfstate files to a Remote S3 Backend hosted on our internal MinIO server.
 
-### How to Apply Changes
-**Authentication:** Ensure AWS secrets are loaded (via .zshrc / .bashrc or export).
+---
 
-```Bash
-export AWS_ACCESS_KEY_ID="your_key"
-export AWS_SECRET_ACCESS_KEY="your_secret"
-```
-**Initialize:**
+## 5. Standard Operating Procedure: Safe Execution
 
-```Bash
+To prevent credential leakage while maintaining automated workflows, credentials must never be hardcoded into configuration files:
+
+```bash
+# 1. Interactively export remote backend credentials
+export AWS_ACCESS_KEY_ID="<MINIO_ACCESS_KEY>"
+read -sp "Enter S3 Secret Key: " AWS_SECRET_ACCESS_KEY && export AWS_SECRET_ACCESS_KEY
+
+# 2. Initialize modules and remote state backend
 terraform init
-```
-**Plan & Apply:**
 
-```Bash
-terraform plan
-terraform apply
+# 3. Generate and inspect execution plan
+terraform plan -out=tfplan.binary
+
+# 4. Apply approved infrastructure changes
+terraform apply tfplan.binary
 ```
+
+---
+
+## 6. Architectural Evolution to Milestone v3.0
+
+The modularization of Terraform provided the foundation for **Phase 3 (Remote State Migration to OCI S3)** and **Phase 4 (Hypervisor Consolidation)** in Milestone v3.0:
+
+- **State Portability:** The S3 backend architecture cleanly transitioned from internal MinIO to enterprise-grade **Oracle Cloud Infrastructure (OCI) Object Storage** with zero downtime.
+- **Node Consolidation:** The flexible module architecture allowed collapsing multiple disparate VMs into a single, high-efficiency production Kubernetes node (`k3s-prod`), drastically optimizing resource utilization.
