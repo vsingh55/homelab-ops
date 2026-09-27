@@ -1,20 +1,36 @@
 # yaml-language-server: $schema=https://json.schemastore.org/any.json
-- Developer & Cloud Access:
+- Portfolio & Engineering Profiles:
+    - Vijay Singh Portfolio:
+        - icon: safari.png
+          href: https://vijaysingh.cloud
     - GitHub Profile:
         - icon: github.png
           href: https://github.com/vsingh55
-    - Proxmox VE Node:
-        - icon: proxmox.png
-          href: https://192.168.1.3:8006
-    - Tailscale Mesh Admin:
-        - icon: tailscale.png
-          href: https://login.tailscale.com/admin
-    - Cloudflare Edge Dashboard:
-        - icon: cloudflare.png
-          href: https://dash.cloudflare.com
-    - Kubernetes Docs:
+    - GitHub Projects Showcase:
+        - icon: github.png
+          href: https://gh.showcase.vijaysingh.cloud
+
+- Knowledge & Operations:
+    - Platform Engineering Handbook:
+        - icon: mkdocs.png
+          href: https://docs.vijaysingh.cloud
+    - Multi-Cloud Uptime & Probes:
+        - icon: uptime-kuma.png
+          href: https://status.vijaysingh.cloud
+    - Kubernetes Documentation:
         - icon: kubernetes.png
           href: https://kubernetes.io/docs/home/
     - CNCF Landscape:
         - icon: cncf.png
           href: https://landscape.cncf.io/
+
+- Host & Edge Administration:
+    - Proxmox VE Hypervisor:
+        - icon: proxmox.png
+          href: https://192.168.1.3:8006
+    - Tailscale Mesh Console:
+        - icon: tailscale.png
+          href: https://login.tailscale.com/admin
+    - Cloudflare Zero Trust Edge:
+        - icon: cloudflare.png
+          href: https://dash.cloudflare.com

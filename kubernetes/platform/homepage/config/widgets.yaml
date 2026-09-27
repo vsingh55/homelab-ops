@@ -1,7 +1,11 @@
 # yaml-language-server: $schema=https://json.schemastore.org/any.json
 - greeting:
     text_size: 2xl
-    text: "Sovereign Cloud Platform"
+    text: "Vijay Kumar Singh | Sovereign Cloud"
+
+- greeting:
+    text_size: sm
+    text: "Production Bare-Metal Kubernetes Platform • Hybrid Cloud Automation & Fleet Operations"
 
 - search:
     provider: duckduckgo

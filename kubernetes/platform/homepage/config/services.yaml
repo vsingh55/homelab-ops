@@ -18,7 +18,7 @@
         description: "OCR document scanning, tagging & searchable PDF archive"
         ping: https://docs-ocr.vijaysingh.cloud
     - BookOrbit Library:
-        icon: book.png
+        icon: bookorbit.png
         href: https://books.vijaysingh.cloud
         description: "Multi-user digital book & PDF library with sync"
         ping: https://books.vijaysingh.cloud
@@ -40,14 +40,14 @@
         description: "Minimalist, searchable bookmark manager"
         ping: https://links.vijaysingh.cloud
     - Ryot Health & Fitness:
-        icon: heartbeat.png
+        icon: ryot.png
         href: https://health.vijaysingh.cloud
         description: "Workout tracking, fitness analytics & self-hosted health platform"
         ping: https://health.vijaysingh.cloud
 
 - Platform & Observability:
     - Platform Engineering Docs:
-        icon: book-open-page-variant.png
+        icon: mkdocs.png
         href: https://docs.vijaysingh.cloud
         description: "Engineering handbook, ADRs, post-mortems & execution phases"
         ping: https://docs.vijaysingh.cloud

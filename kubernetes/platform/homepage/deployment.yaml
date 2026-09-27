@@ -15,7 +15,7 @@ spec:
       labels:
         app.kubernetes.io/name: homepage
       annotations:
-        theme.revision: "glassmorphism-v1"
+        theme.revision: "datacenter-bg-v2"
     spec:
       serviceAccountName: homepage
       volumes:
