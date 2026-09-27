@@ -104,9 +104,12 @@ a.backdrop-blur-md,
 a[class*="backdrop-blur"],
 div.mt-3 > a,
 div[class*="mt-3"] > a,
+div[class*="space-y"] > a,
 div[class*="mb-4"] a,
-a[class*="bg-theme-100"],
-a[class*="dark:bg-white"] {
+html.dark a.backdrop-blur-md,
+html:not(.dark) a.backdrop-blur-md,
+.dark a[class*="backdrop-blur"] {
+  background-color: var(--card-glass-bg) !important;
   background: var(--card-glass-bg) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
@@ -133,6 +136,10 @@ a[class*="dark:bg-white"] {
 }
 
 /* Bookmark Links, Text & URLs - Bold & High Contrast */
+html.dark a.backdrop-blur-md div,
+html.dark a.backdrop-blur-md span,
+html:not(.dark) a.backdrop-blur-md div,
+html:not(.dark) a.backdrop-blur-md span,
 a.backdrop-blur-md div,
 a.backdrop-blur-md span,
 a.backdrop-blur-md p,
@@ -156,6 +163,8 @@ a[class*="backdrop-blur"] span,
   color: var(--text-desc) !important;
 }
 
+html.dark a.backdrop-blur-md .text-xs,
+html:not(.dark) a.backdrop-blur-md .text-xs,
 a.backdrop-blur-md .text-xs,
 a.backdrop-blur-md [class*="text-xs"],
 a[class*="backdrop-blur"] [class*="text-xs"],
@@ -174,8 +183,12 @@ a[class*="backdrop-blur"] [class*="text-xs"],
 [class*="bookmark"] a:hover,
 a.backdrop-blur-md:hover,
 a[class*="backdrop-blur"]:hover,
-div.mt-3 > a:hover {
+div.mt-3 > a:hover,
+div[class*="space-y"] > a:hover,
+html.dark a.backdrop-blur-md:hover,
+html:not(.dark) a.backdrop-blur-md:hover {
   transform: translateY(-2px) !important;
+  background-color: var(--card-glass-hover) !important;
   background: var(--card-glass-hover) !important;
   border-color: var(--glow-cyan-border) !important;
   box-shadow: var(--shadow-elevation) !important;
