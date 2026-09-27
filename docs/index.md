@@ -1,116 +1,38 @@
-<div class="hero-wrapper">
-  <div class="hero-pill-badge">
-    <span class="dot"></span> Sovereign Cloud Platform • GitOps Continuous Delivery
-  </div>
-  <h1 class="hero-title">Sovereign Cloud Platform<br>&amp; GitOps Engineering</h1>
-  <p class="hero-subtitle">
-    Enterprise-grade, self-healing sovereign cloud architecture on physical bare-metal hardware in India, integrated with hybrid cloud resilience across Oracle Cloud (OCI) and Google Cloud (GCP).
-  </p>
-  <div class="hero-cta-group">
-    <a href="architecture/01-system-overview.md" class="btn-cta btn-cta-primary">
-      Explore Architecture &rarr;
-    </a>
-    <a href="projects/01-zero-trust-ingress.md" class="btn-cta btn-cta-secondary">
-      Browse Case Studies
-    </a>
-    <a href="https://github.com/vsingh55/homelab-ops" target="_blank" rel="noopener" class="btn-cta btn-cta-secondary">
-      GitHub Repository &nearr;
-    </a>
-  </div>
-</div>
+# Homelab-Ops: Sovereign Cloud Infrastructure & GitOps Platform
 
-<div class="kpi-grid">
-  <div class="kpi-card">
-    <div>
-      <span class="kpi-icon">&infin;</span>
-      <div class="kpi-value">100% GitOps</div>
-      <div class="kpi-label">Deterministic delivery with Flux CD v2. All state declared in Git. Zero manual kubectl.</div>
-    </div>
-  </div>
-  <div class="kpi-card">
-    <div>
-      <span class="kpi-icon">&#128737;</span>
-      <div class="kpi-value">Zero Inbound Ports</div>
-      <div class="kpi-label">Cloudflare Zero Trust Anycast edge tunnels with outbound-only QUIC &amp; &lt;15ms edge latency.</div>
-    </div>
-  </div>
-  <div class="kpi-card">
-    <div>
-      <span class="kpi-icon">&#128190;</span>
-      <div class="kpi-value">Dual-Tier Storage</div>
-      <div class="kpi-label">High-IOPS NVMe flash for PostgreSQL paired with durable 1TB mechanical SATA for archives.</div>
-    </div>
-  </div>
-  <div class="kpi-card">
-    <div>
-      <span class="kpi-icon">&#9729;</span>
-      <div class="kpi-value">Multi-Cloud DR</div>
-      <div class="kpi-label">Out-of-band uptime telemetry in OCI Mumbai + 3-2-1 offsite backup replication.</div>
-    </div>
-  </div>
-</div>
-
-## Architectural Deep-Dives &amp; Case Studies
-
-<div class="showcase-grid">
-  <a href="architecture/01-system-overview.md" class="showcase-card">
-    <div>
-      <span class="showcase-tag">Architecture</span>
-      <div class="showcase-title">01. System Architecture Overview</div>
-      <div class="showcase-desc">High-level multi-cloud hybrid topology, design goals, hardware budgeting, and component boundaries.</div>
-    </div>
-    <span class="showcase-link-arrow">Explore Topology &rarr;</span>
-  </a>
-
-  <a href="projects/01-zero-trust-ingress.md" class="showcase-card">
-    <div>
-      <span class="showcase-tag">Case Study</span>
-      <div class="showcase-title">02. Zero-Trust Hybrid Ingress</div>
-      <div class="showcase-desc">Carrier-Grade NAT traversal, edge TLS termination, DDoS defense, and sub-15ms edge routing.</div>
-    </div>
-    <span class="showcase-link-arrow">Read Case Study &rarr;</span>
-  </a>
-
-  <a href="projects/02-gitops-and-sops.md" class="showcase-card">
-    <div>
-      <span class="showcase-tag">Case Study</span>
-      <div class="showcase-title">03. GitOps &amp; In-Git Secret Lifecycle</div>
-      <div class="showcase-desc">Continuous deployment via Flux CD v2, declarative ordering, and Mozilla SOPS + Age encryption.</div>
-    </div>
-    <span class="showcase-link-arrow">Read Case Study &rarr;</span>
-  </a>
-
-  <a href="projects/03-cloudnativepg-ha.md" class="showcase-card">
-    <div>
-      <span class="showcase-tag">Case Study</span>
-      <div class="showcase-title">04. Stateful PostgreSQL HA Cluster</div>
-      <div class="showcase-desc">CloudNativePG operator on bare-metal, automated leader election, failover, and continuous WAL archiving.</div>
-    </div>
-    <span class="showcase-link-arrow">Read Case Study &rarr;</span>
-  </a>
-
-  <a href="projects/04-multicloud-observability-dr.md" class="showcase-card">
-    <div>
-      <span class="showcase-tag">Case Study</span>
-      <div class="showcase-title">05. Multi-Cloud Resilience &amp; DR</div>
-      <div class="showcase-desc">Out-of-band availability monitors on OCI Mumbai, remote state locking, and 3-2-1 backup verification.</div>
-    </div>
-    <span class="showcase-link-arrow">Read Case Study &rarr;</span>
-  </a>
-
-  <a href="adr/README.md" class="showcase-card">
-    <div>
-      <span class="showcase-tag">Governance</span>
-      <div class="showcase-title">06. Enterprise ADR Register (16 Decisions)</div>
-      <div class="showcase-desc">Formal Architecture Decision Records documenting every pivotal infrastructure decision.</div>
-    </div>
-    <span class="showcase-link-arrow">Inspect ADRs &rarr;</span>
-  </a>
-</div>
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Proxmox%20VE%208%20%7C%20K3s%20Kubernetes-orange?style=for-the-badge&logo=proxmox" alt="Platform" />
+  <img src="https://img.shields.io/badge/GitOps-Flux%20CD%20v2-blue?style=for-the-badge&logo=flux" alt="GitOps" />
+  <img src="https://img.shields.io/badge/Edge%20Ingress-Cloudflare%20Zero%20Trust-F38020?style=for-the-badge&logo=cloudflare" alt="Cloudflare" />
+  <img src="https://img.shields.io/badge/Secrets-SOPS%20%2B%20Age-green?style=for-the-badge&logo=gnupg" alt="SOPS" />
+  <img src="https://img.shields.io/badge/Database-CloudNativePG%20HA-336791?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Cloud%20Support-OCI%20%26%20GCP%20Hybrid-C74634?style=for-the-badge&logo=oracle" alt="Cloud Support" />
+  <img src="https://img.shields.io/badge/IaC-Terraform%20%2B%20Ansible-7B42BC?style=for-the-badge&logo=terraform" alt="Terraform" />
+  <img src="https://img.shields.io/badge/FinOps-Cost--Optimized%20Footprint-success?style=for-the-badge" alt="FinOps" />
+  <img src="https://img.shields.io/badge/Edge%20Latency-%3C15ms-brightgreen?style=for-the-badge" alt="Latency" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge" alt="License" />
+</p>
 
 ---
 
-## High-Level Platform Topology
+## Executive Overview: The Project at a Glance
+
+**Homelab-Ops** is a production-grade, self-healing **Sovereign Cloud Platform** engineered on physical bare-metal hardware in Mumbai, India, integrated with supporting cloud infrastructure in **Oracle Cloud Infrastructure (OCI)** and **Google Cloud Platform (GCP)**.
+
+This platform simulates enterprise-scale infrastructure engineering while operating under strict real-world constraints:
+
+1. **Carrier-Grade NAT (CGNAT) Traversal:** Securely accepting external webhooks and public user traffic without exposing home router ports or relying on static IPv4 leasing.
+2. **Deterministic GitOps Continuous Delivery:** Managing platform operators and applications declaratively with **Flux CD v2** and **Mozilla SOPS**, eliminating configuration drift and keeping secrets versioned safely in Git.
+3. **Dual-Tier Hardware Economics:** Overcoming disk I/O bottlenecks on a single Mini PC by partitioning high-IOPS NVMe flash for database engines and durable SATA mechanical disks for multi-terabyte media and document archives.
+4. **Hybrid Multi-Cloud Resilience:** Supplementing the on-premise sovereign cluster with cloud infrastructure across **Oracle Cloud Infrastructure (OCI)** and **Google Cloud Platform (GCP)** for out-of-band availability monitoring, remote state locking, and secondary cloud compute.
+
+---
+
+## Architecture & System Design
+
+### High-Level Platform Topology
+
+The interactive topology below illustrates how external client traffic enters through Cloudflare Zero Trust, reaches the sovereign bare-metal cluster via outbound QUIC tunnels, and connects to persistent databases and multi-cloud resilience monitors:
 
 ```mermaid
 graph TD
@@ -145,20 +67,6 @@ graph TD
 
 ---
 
-## Executive Overview: The Project at a Glance
-
-**Homelab-Ops** is a production-grade, self-healing **Sovereign Cloud Platform** engineered on physical bare-metal hardware in Mumbai, India, integrated with supporting cloud infrastructure in **Oracle Cloud Infrastructure (OCI)** and **Google Cloud Platform (GCP)**.
-
-This platform simulates enterprise-scale infrastructure engineering while operating under strict real-world constraints:
-
-1. **Carrier-Grade NAT (CGNAT) Traversal:** Securely accepting external webhooks and public user traffic without exposing home router ports or relying on static IPv4 leasing.
-2. **Deterministic GitOps Continuous Delivery:** Managing platform operators and applications declaratively with **Flux CD v2** and **Mozilla SOPS**, eliminating configuration drift and keeping secrets versioned safely in Git.
-3. **Dual-Tier Hardware Economics:** Overcoming disk I/O bottlenecks on a single Mini PC by partitioning high-IOPS NVMe flash for database engines and durable SATA mechanical disks for multi-terabyte media and document archives.
-4. **Hybrid Multi-Cloud Resilience:** Supplementing the on-premise sovereign cluster with cloud infrastructure across **Oracle Cloud Infrastructure (OCI)** and **Google Cloud Platform (GCP)** for out-of-band availability monitoring, remote state locking, and secondary cloud compute.
-
----
-
-## Architecture & System Design
 
 The platform architecture is organized into three distinct structural diagrams:
 

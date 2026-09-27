@@ -15,7 +15,7 @@ spec:
       labels:
         app.kubernetes.io/name: homelab-docs
       annotations:
-        theme.revision: "glassmorphism-v1"
+        theme.revision: "standard-material-v1"
     spec:
       volumes:
       - name: shared-site
