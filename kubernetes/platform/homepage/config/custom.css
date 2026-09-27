@@ -41,7 +41,8 @@ html:not(.dark) {
   --text-shadow-head: none;
 }
 
-body {
+body,
+#background {
   font-family: var(--font-sans) !important;
   background: var(--bg-overlay), url('https://raw.githubusercontent.com/vsingh55/homelab-ops/main/images/homepage-background.jpg') center center / cover fixed no-repeat !important;
   -webkit-font-smoothing: antialiased;
@@ -64,24 +65,24 @@ body {
   font-weight: 800 !important;
 }
 
-[class*="greeting"] span,
-[class*="greeting"] div,
-[class*="greeting"] p {
+[class*="greeting"] * {
   color: var(--text-title) !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
   text-shadow: var(--text-shadow-head) !important;
 }
 
-[class*="greeting"]:nth-of-type(2) span,
-[class*="greeting"]:nth-of-type(2) p {
+[class*="greeting"]:nth-of-type(2) * {
   color: var(--text-desc) !important;
   font-weight: 700 !important;
 }
 
 /* Category & Section Titles - Bold & High Contrast */
 [class*="group_title"],
-h2, h3 {
+[class*="group-title"],
+h2, h3, h4,
+div[class*="text-lg"],
+div[class*="text-xl"] {
   letter-spacing: -0.015em;
   font-weight: 800 !important;
   color: var(--text-title) !important;
@@ -98,7 +99,14 @@ h2, h3 {
 [class*="bookmark_item"],
 [class*="Bookmark"] a,
 [class*="bookmark"] a,
-div[class*="bookmark"] > a {
+div[class*="bookmark"] > a,
+a.backdrop-blur-md,
+a[class*="backdrop-blur"],
+div.mt-3 > a,
+div[class*="mt-3"] > a,
+div[class*="mb-4"] a,
+a[class*="bg-theme-100"],
+a[class*="dark:bg-white"] {
   background: var(--card-glass-bg) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
@@ -124,7 +132,12 @@ div[class*="bookmark"] > a {
   opacity: 0.98 !important;
 }
 
-/* Bookmark Links and Labels - Bold & High Contrast */
+/* Bookmark Links, Text & URLs - Bold & High Contrast */
+a.backdrop-blur-md div,
+a.backdrop-blur-md span,
+a.backdrop-blur-md p,
+a[class*="backdrop-blur"] div,
+a[class*="backdrop-blur"] span,
 [class*="BookmarkGroup"] [class*="title"],
 [class*="Bookmark"] a,
 [class*="bookmark"] a,
@@ -143,6 +156,9 @@ div[class*="bookmark"] > a {
   color: var(--text-desc) !important;
 }
 
+a.backdrop-blur-md .text-xs,
+a.backdrop-blur-md [class*="text-xs"],
+a[class*="backdrop-blur"] [class*="text-xs"],
 [class*="Bookmark"] [class*="url"],
 [class*="Bookmark"] [class*="href"],
 [class*="bookmark"] [class*="url"] {
@@ -155,7 +171,10 @@ div[class*="bookmark"] > a {
 [class*="ServiceCard"]:hover,
 [class*="card_card"]:hover,
 [class*="Bookmark"] a:hover,
-[class*="bookmark"] a:hover {
+[class*="bookmark"] a:hover,
+a.backdrop-blur-md:hover,
+a[class*="backdrop-blur"]:hover,
+div.mt-3 > a:hover {
   transform: translateY(-2px) !important;
   background: var(--card-glass-hover) !important;
   border-color: var(--glow-cyan-border) !important;
