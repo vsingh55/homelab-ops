@@ -12,50 +12,39 @@
   --glow-cyan: #06b6d4;
   --glow-cyan-border: rgba(6, 182, 212, 0.50);
 
-  /* Dark Theme Variables (Default) */
+  /* Dark Theme Default */
+  --bg-overlay: linear-gradient(rgba(10, 15, 26, 0.74), rgba(10, 15, 26, 0.74));
   --text-title: #ffffff;
   --text-desc: #f1f5f9;
   --text-muted: #cbd5e1;
-  --card-glass-bg: rgba(15, 23, 42, 0.86);
-  --card-glass-hover: rgba(30, 41, 59, 0.95);
+  --card-glass-bg: rgba(15, 23, 42, 0.88);
+  --card-glass-hover: rgba(30, 41, 59, 0.96);
   --card-glass-border: rgba(255, 255, 255, 0.12);
-  --scrim-overlay: radial-gradient(circle at 50% 15%, rgba(15, 23, 42, 0.40) 0%, rgba(10, 15, 26, 0.82) 100%);
   --shadow-subtle: 0 4px 14px rgba(0, 0, 0, 0.45);
   --shadow-elevation: 0 12px 30px -4px rgba(0, 0, 0, 0.65), 0 0 18px rgba(6, 182, 212, 0.28);
+  --text-shadow-head: 0 2px 8px rgba(0, 0, 0, 0.85);
   --transition-card: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Light Theme Variables */
+html.light,
 html:not(.dark) {
+  --bg-overlay: linear-gradient(rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.65));
   --text-title: #090d16;
   --text-desc: #1e293b;
   --text-muted: #334155;
-  --card-glass-bg: rgba(255, 255, 255, 0.90);
+  --card-glass-bg: rgba(255, 255, 255, 0.92);
   --card-glass-hover: rgba(255, 255, 255, 0.98);
-  --card-glass-border: rgba(0, 0, 0, 0.10);
-  --scrim-overlay: radial-gradient(circle at 50% 15%, rgba(248, 250, 252, 0.35) 0%, rgba(226, 232, 240, 0.70) 100%);
+  --card-glass-border: rgba(0, 0, 0, 0.12);
   --shadow-subtle: 0 4px 14px rgba(0, 0, 0, 0.10);
   --shadow-elevation: 0 12px 28px -4px rgba(0, 0, 0, 0.16), 0 0 16px rgba(6, 182, 212, 0.25);
+  --text-shadow-head: none;
 }
 
 body {
   font-family: var(--font-sans) !important;
-  background-image: url('https://raw.githubusercontent.com/vsingh55/homelab-ops/main/images/homepage-background.jpg') !important;
-  background-size: cover !important;
-  background-position: center center !important;
-  background-attachment: fixed !important;
-  background-repeat: no-repeat !important;
+  background: var(--bg-overlay), url('https://raw.githubusercontent.com/vsingh55/homelab-ops/main/images/homepage-background.jpg') center center / cover fixed no-repeat !important;
   -webkit-font-smoothing: antialiased;
-}
-
-/* Dynamic Contrast Scrim */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: var(--scrim-overlay);
-  pointer-events: none;
-  z-index: -1;
 }
 
 /* Header VKS Logo */
@@ -66,7 +55,7 @@ body::before {
   width: auto !important;
   object-fit: contain !important;
   border-radius: 8px !important;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35)) !important;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4)) !important;
   margin-right: 8px !important;
 }
 
@@ -81,6 +70,7 @@ body::before {
   color: var(--text-title) !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
+  text-shadow: var(--text-shadow-head) !important;
 }
 
 [class*="greeting"]:nth-of-type(2) span,
@@ -95,15 +85,20 @@ h2, h3 {
   letter-spacing: -0.015em;
   font-weight: 800 !important;
   color: var(--text-title) !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  text-shadow: var(--text-shadow-head) !important;
 }
 
-/* Card Background Blur & Translucent Glassmorphism */
+/* Card Background Blur & Translucent Glassmorphism for Services AND Bookmarks */
 .service-card,
 [class*="ServiceCard"],
 [class*="card_card"],
 [class*="widget_container"],
-[class*="BookmarkGroup"] {
+[class*="BookmarkGroup"],
+[class*="BookmarkItem"],
+[class*="bookmark_item"],
+[class*="Bookmark"] a,
+[class*="bookmark"] a,
+div[class*="bookmark"] > a {
   background: var(--card-glass-bg) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
@@ -113,10 +108,9 @@ h2, h3 {
   box-shadow: var(--shadow-subtle) !important;
 }
 
-/* Service Card Titles and Descriptions - Bold & High Contrast in both modes */
+/* Service Card Titles and Descriptions - Bold & High Contrast */
 [class*="ServiceCard"] [class*="title"],
 [class*="card_card"] [class*="title"],
-[class*="BookmarkGroup"] [class*="title"],
 [class*="service_title"] {
   font-weight: 700 !important;
   color: var(--text-title) !important;
@@ -124,17 +118,44 @@ h2, h3 {
 
 [class*="ServiceCard"] [class*="description"],
 [class*="card_card"] [class*="description"],
-[class*="BookmarkGroup"] [class*="description"],
 [class*="service_description"] {
   font-weight: 600 !important;
   color: var(--text-desc) !important;
-  opacity: 0.95 !important;
+  opacity: 0.98 !important;
+}
+
+/* Bookmark Links and Labels - Bold & High Contrast */
+[class*="BookmarkGroup"] [class*="title"],
+[class*="Bookmark"] a,
+[class*="bookmark"] a,
+[class*="Bookmark"] span,
+[class*="bookmark"] span,
+[class*="Bookmark"] p,
+[class*="bookmark"] p {
+  font-weight: 700 !important;
+  color: var(--text-title) !important;
+}
+
+[class*="BookmarkGroup"] [class*="description"],
+[class*="Bookmark"] small,
+[class*="bookmark"] small {
+  font-weight: 600 !important;
+  color: var(--text-desc) !important;
+}
+
+[class*="Bookmark"] [class*="url"],
+[class*="Bookmark"] [class*="href"],
+[class*="bookmark"] [class*="url"] {
+  color: var(--glow-cyan) !important;
+  font-weight: 600 !important;
 }
 
 /* Card Hover Elevation and Cyan Ambient Glow */
 .service-card:hover,
 [class*="ServiceCard"]:hover,
-[class*="card_card"]:hover {
+[class*="card_card"]:hover,
+[class*="Bookmark"] a:hover,
+[class*="bookmark"] a:hover {
   transform: translateY(-2px) !important;
   background: var(--card-glass-hover) !important;
   border-color: var(--glow-cyan-border) !important;
