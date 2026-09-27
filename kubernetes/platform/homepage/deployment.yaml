@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: homepage
+      annotations:
+        theme.revision: "glassmorphism-v1"
     spec:
       serviceAccountName: homepage
       volumes:
