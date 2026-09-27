@@ -15,7 +15,7 @@ spec:
       labels:
         app.kubernetes.io/name: homepage
       annotations:
-        theme.revision: "bg-test-pic5-v9"
+        theme.revision: "pic4-vkslogo-bold-v10"
     spec:
       serviceAccountName: homepage
       volumes:

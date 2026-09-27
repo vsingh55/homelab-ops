@@ -1,11 +1,15 @@
 # yaml-language-server: $schema=https://json.schemastore.org/any.json
+- logo:
+    icon: https://raw.githubusercontent.com/vsingh55/homelab-ops/main/images/vks-logo.png
+    href: https://vijaysingh.cloud
+
 - greeting:
     text_size: 2xl
-    text: "Vijay Kumar Singh | Sovereign Cloud"
+    text: "Vijay Kumar Singh"
 
 - greeting:
     text_size: sm
-    text: "Production Bare-Metal Kubernetes Platform • Hybrid Cloud Automation & Fleet Operations"
+    text: "Sovereign Cloud Platform • GitOps Infrastructure & Command Center"
 
 - kubernetes:
     cluster:
