@@ -7,10 +7,6 @@
     text_size: sm
     text: "Production Bare-Metal Kubernetes Platform • Hybrid Cloud Automation & Fleet Operations"
 
-- search:
-    provider: duckduckgo
-    target: _blank
-
 - kubernetes:
     cluster:
       show: true

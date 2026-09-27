@@ -71,7 +71,3 @@
         icon: cloudflare.png
         href: https://one.dash.cloudflare.com
         description: "Anycast edge routing, DDoS shield & QUIC tunnel connectors"
-    - Proxmox VE Hypervisor:
-        icon: proxmox.png
-        href: https://192.168.1.3:8006
-        description: "Bare-metal hypervisor, VM resource fencing & tiered storage"
