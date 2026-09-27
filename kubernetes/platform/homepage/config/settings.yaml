@@ -1,8 +1,15 @@
 # yaml-language-server: $schema=https://json.schemastore.org/any.json
-title: "Vijay Singh | Homelab Command Center"
+title: "Vijay Kumar Singh | Homelab Command Center"
 theme: dark
 color: slate
 headerStyle: clean
+cardBlur: md
+showStats: true
+quicklaunch:
+  searchDescriptions: true
+  provider: duckduckgo
+  target: _blank
+
 layout:
   Operations & Automation:
     style: row
@@ -10,7 +17,7 @@ layout:
   Sovereign Media & Documents:
     style: row
     columns: 3
-  Productivity & Health:
+  Productivity & Personal Drivers:
     style: row
     columns: 3
   Platform & Observability:
@@ -18,4 +25,4 @@ layout:
     columns: 3
   Infrastructure & Management:
     style: row
-    columns: 2
+    columns: 3

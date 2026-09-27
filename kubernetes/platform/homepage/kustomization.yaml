@@ -15,5 +15,6 @@ configMapGenerator:
       - config/kubernetes.yaml
       - config/services.yaml
       - config/bookmarks.yaml
+      - config/custom.css
     options:
       disableNameSuffixHash: true

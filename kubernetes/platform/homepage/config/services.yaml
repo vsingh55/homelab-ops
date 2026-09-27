@@ -28,7 +28,7 @@
         description: "Self-hosted audiobook & podcast streaming server"
         ping: https://audio.vijaysingh.cloud
 
-- Productivity & Health:
+- Productivity & Personal Drivers:
     - Miniflux RSS Reader:
         icon: miniflux.png
         href: https://rss.vijaysingh.cloud
@@ -46,7 +46,7 @@
         ping: https://health.vijaysingh.cloud
 
 - Platform & Observability:
-    - Architecture & Engineering Docs:
+    - Platform Engineering Docs:
         icon: book-open-page-variant.png
         href: https://docs.vijaysingh.cloud
         description: "Engineering handbook, ADRs, post-mortems & execution phases"
@@ -60,6 +60,7 @@
         icon: uptime-kuma.png
         href: https://status.vijaysingh.cloud
         description: "Out-of-band availability monitors on OCI Mumbai"
+        ping: https://status.vijaysingh.cloud
 
 - Infrastructure & Management:
     - Homelab GitOps Repository:
@@ -70,3 +71,7 @@
         icon: cloudflare.png
         href: https://one.dash.cloudflare.com
         description: "Anycast edge routing, DDoS shield & QUIC tunnel connectors"
+    - Proxmox VE Hypervisor:
+        icon: proxmox.png
+        href: https://192.168.1.3:8006
+        description: "Bare-metal hypervisor, VM resource fencing & tiered storage"

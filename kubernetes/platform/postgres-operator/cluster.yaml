@@ -9,6 +9,13 @@ spec:
   storage:
     size: 20Gi
     storageClass: local-path
+  managed:
+    roles:
+      - name: n8n
+        ensure: present
+        login: true
+        passwordSecret:
+          name: postgres-ha-app-user
   backup:
     barmanObjectStore:
       destinationPath: s3://postgres-backups/

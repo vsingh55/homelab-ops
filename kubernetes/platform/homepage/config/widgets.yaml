@@ -1,7 +1,12 @@
 # yaml-language-server: $schema=https://json.schemastore.org/any.json
 - greeting:
-    text_size: xl
-    text: "Sovereign Cloud Homelab"
+    text_size: 2xl
+    text: "Sovereign Cloud Platform"
+
+- search:
+    provider: duckduckgo
+    target: _blank
+
 - kubernetes:
     cluster:
       show: true
