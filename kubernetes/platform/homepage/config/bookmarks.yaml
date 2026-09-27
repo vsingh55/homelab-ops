@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/any.json
-- Portfolio & Engineering Profiles:
+- Portfolio & Profiles:
     - Vijay Singh Portfolio:
         - icon: safari.png
           href: https://vijaysingh.cloud
@@ -16,13 +16,7 @@
         - icon: github.png
           href: https://gh.showcase.vijaysingh.cloud
 
-- Knowledge & Operations:
-    - Platform Engineering Handbook:
-        - icon: mkdocs.png
-          href: https://docs.vijaysingh.cloud
-    - Multi-Cloud Uptime & Probes:
-        - icon: uptime-kuma.png
-          href: https://status.vijaysingh.cloud
+- Cloud Native References:
     - Kubernetes Documentation:
         - icon: kubernetes.png
           href: https://kubernetes.io/docs/home/

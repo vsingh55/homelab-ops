@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Homepage Command Center - Enterprise Cloud & Glassmorphism Styling
+   Homepage Command Center - Light & Dark Theme Responsive Styling
    Author: Vijay Kumar Singh
    ========================================================================== */
 
@@ -10,17 +10,28 @@
   --font-mono: 'JetBrains Mono', monospace;
 
   --glow-cyan: #06b6d4;
-  --glow-cyan-border: rgba(6, 182, 212, 0.40);
-  --glow-purple: #8b5cf6;
+  --glow-cyan-border: rgba(6, 182, 212, 0.45);
   
+  /* Default / Dark Theme Variables */
   --card-glass-bg: rgba(15, 23, 42, 0.80);
   --card-glass-hover: rgba(30, 41, 59, 0.92);
   --card-glass-border: rgba(255, 255, 255, 0.10);
-  
+  --scrim-overlay: radial-gradient(circle at 50% 15%, rgba(15, 23, 42, 0.35) 0%, rgba(10, 15, 26, 0.78) 100%);
+  --header-text: #f8fafc;
   --shadow-subtle: 0 4px 14px rgba(0, 0, 0, 0.40);
   --shadow-elevation: 0 12px 30px -4px rgba(0, 0, 0, 0.60), 0 0 16px rgba(6, 182, 212, 0.25);
-  
   --transition-card: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light Theme Variables */
+html:not(.dark) {
+  --card-glass-bg: rgba(255, 255, 255, 0.85);
+  --card-glass-hover: rgba(255, 255, 255, 0.96);
+  --card-glass-border: rgba(0, 0, 0, 0.08);
+  --scrim-overlay: radial-gradient(circle at 50% 15%, rgba(248, 250, 252, 0.40) 0%, rgba(226, 232, 240, 0.75) 100%);
+  --header-text: #0f172a;
+  --shadow-subtle: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --shadow-elevation: 0 12px 28px -4px rgba(0, 0, 0, 0.14), 0 0 16px rgba(6, 182, 212, 0.25);
 }
 
 body {
@@ -33,12 +44,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Atmospheric Contrast Scrim: guarantees text legibility over any background */
+/* Contrast Scrim: adapts dynamically to light or dark mode */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at 50% 15%, rgba(15, 23, 42, 0.35) 0%, rgba(10, 15, 26, 0.78) 100%);
+  background: var(--scrim-overlay);
   pointer-events: none;
   z-index: -1;
 }
@@ -78,19 +89,19 @@ body::before {
 h2, h3 {
   letter-spacing: -0.015em;
   font-weight: 700;
-  color: #f8fafc !important;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  color: var(--header-text) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Quick Launch & Search Input */
 [class*="SearchWidget"],
 [class*="quicklaunch"] input,
 input[type="search"] {
-  background: rgba(15, 23, 42, 0.85) !important;
+  background: var(--card-glass-bg) !important;
   backdrop-filter: blur(14px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid var(--card-glass-border) !important;
   border-radius: 10px !important;
-  color: #f8fafc !important;
+  color: var(--header-text) !important;
 }
 
 [class*="quicklaunch"] input:focus,
@@ -106,11 +117,11 @@ input[type="search"]:focus {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(11, 15, 25, 0.7);
+  background: rgba(11, 15, 25, 0.4);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(71, 85, 105, 0.7);
+  background: rgba(71, 85, 105, 0.6);
   border-radius: 9999px;
 }
 

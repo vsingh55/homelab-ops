@@ -1,7 +1,6 @@
 # yaml-language-server: $schema=https://json.schemastore.org/any.json
 title: "Vijay Kumar Singh | Homelab Command Center"
 description: "Sovereign Cloud Platform, Bare-Metal Kubernetes Cluster & Hybrid Multi-Cloud Hub"
-theme: dark
 color: slate
 headerStyle: clean
 background: https://raw.githubusercontent.com/vsingh55/homelab-ops/main/images/homepage-background.jpg
