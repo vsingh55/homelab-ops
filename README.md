@@ -221,11 +221,11 @@ flux reconcile kustomization apps --with-source
 
 ### Out-of-Band Host Administration (Tailscale Mesh)
 ```bash
-# Direct SSH access to the Proxmox VE hypervisor
-ssh root@100.108.178.93
+# Direct SSH access to the Proxmox VE hypervisor (Tailscale mesh)
+ssh root@<tailscale-mesh-host>
 
 # Direct SSH access to the Production K3s node
-ssh devops@192.168.1.30
+ssh devops@192.168.1.x
 
 # Inspect active Cloudflare tunnel connections
 kubectl logs -n platform -l app.kubernetes.io/name=cloudflared --tail=50
