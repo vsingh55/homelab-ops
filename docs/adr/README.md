@@ -80,7 +80,7 @@ The `homelab-ops` platform is a production-grade, self-hosted **Sovereign Cloud*
 ### Important Architectural Boundaries
 1. **Edge vs. On-Prem Ingress Boundary:** Demarcated by the Cloudflare Tunnel daemon (`cloudflared`), terminating public internet exposure and initiating internal private network routing.
 2. **Management vs. Workload Boundary:** Hard separation between Proxmox hypervisor (`pve`) and `k3s-prod` (containerized application plane).
-3. **Public Exposure vs. Zero Trust Access Boundary:** Public domains (`docs.*`, `hooks.*`) permit anonymous edge traffic; private management interfaces (`dash.*`, `books.*`, `docs-ocr.*`) are gated by Cloudflare Access MFA (Google SSO / Email OTP).
+3. **Public Exposure vs. Zero Trust Access Boundary:** Public domains (`docs.*`, `hooks.*`) permit anonymous edge traffic; private management interfaces (`dash.*`, `books.*`, `ocr.*`, `ab.*`) are gated by Cloudflare Access MFA (Google SSO / Email OTP).
 4. **Storage Tier Boundary:** Hot I/O tier (NVMe SSD: OS, etcd/K3s state, active database tables) versus Cold capacity tier (SATA HDD: backups, media libraries, documents).
 
 ### Major Risks & Technical Constraints
@@ -776,7 +776,7 @@ ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) fo
 - **Decision:** We will implement a **Hybrid Zero-Trust Identity Architecture**:
  1. *Private Web Application Layer (Browser Access):* Governed by **Cloudflare Zero Trust Access**:
 
-- Private subdomains (`dash.vijaysingh.cloud`, `books.vijaysingh.cloud`, `docs-ocr.vijaysingh.cloud`) are protected at Cloudflare's edge before traffic touches the homelab.
+- Private subdomains (`dash.vijaysingh.cloud`, `books.vijaysingh.cloud`, `ocr.vijaysingh.cloud`, `ab.vijaysingh.cloud`) are protected at Cloudflare's edge before traffic touches the homelab.
 - Authentication enforced via **Google OAuth / SSO** or **One-Time Pin (OTP)** sent to approved email addresses.
 - Unauthenticated requests are blocked at the edge; zero unauthorized packets reach the home network.
  2. *Infrastructure & Node Administration Layer (Terminal Access):* Governed by **Tailscale**:
@@ -800,7 +800,7 @@ ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) fo
 - **Operational Considerations:** Policies managed declaratively via Terraform in `infrastructure/cloudflare/`.
 - **Cost Considerations:** Infrastructure: Cost-Optimized (Cloudflare Zero Trust).
 - **Migration Plan:**
- 1. Configure Cloudflare Access application policies for `dash`, `books`, and `docs-ocr`.
+ 1. Configure Cloudflare Access application policies for `dash`, `books`, `ocr`, and `ab`.
  2. Map identity providers (Google SSO).
  3. Validate access from unauthenticated browsers.
 

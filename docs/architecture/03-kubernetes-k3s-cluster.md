@@ -83,9 +83,9 @@ flowchart TD
 | **Homepage** | `platform` | `https://home.vijaysingh.cloud` | NVMe (Tier 1) | Centralized platform navigation portal and real-time service health board. |
 | **Platform Docs** | `platform` | `https://docs.vijaysingh.cloud` | NVMe (Tier 1) | Material MkDocs documentation portal and architecture handbook. |
 | **PostgreSQL** | `database` | Internal Service Only | NVMe (Tier 1) | Centralized, operator-managed database cluster for applications. |
-| **Paperless-ngx** | `apps` | `https://paperless.vijaysingh.cloud` | Hybrid (NVMe + SATA) | Document indexing, Optical Character Recognition (OCR), and searchable archive. |
+| **Paperless-ngx** | `apps` | `https://ocr.vijaysingh.cloud` | Hybrid (NVMe + SATA) | Document indexing, Optical Character Recognition (OCR), and searchable archive. |
 | **n8n** | `apps` | `https://n8n.vijaysingh.cloud` | NVMe (Tier 1) | Event-driven workflow automation engine and webhook ingestion handler. |
-| **Audiobookshelf**| `apps` | `https://audio.vijaysingh.cloud` | SATA HDD (Tier 2) | Self-hosted audiobook streaming server and multi-device sync. |
+| **Audiobookshelf**| `apps` | `https://ab.vijaysingh.cloud` | SATA HDD (Tier 2) | Self-hosted audiobook streaming server and multi-device sync. |
 | **BookOrbit** | `apps` | `https://books.vijaysingh.cloud` | SATA HDD (Tier 2) | Digital book catalog, metadata fetcher, and reading companion. |
 | **Miniflux** | `apps` | `https://rss.vijaysingh.cloud` | NVMe (Tier 1) | Lightweight, privacy-focused RSS news aggregator. |
 | **Linkding** | `apps` | `https://links.vijaysingh.cloud` | NVMe (Tier 1) | Minimalist bookmark manager with automatic archive caching. |

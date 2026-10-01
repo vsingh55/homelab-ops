@@ -25,7 +25,7 @@ This standalone Docker Compose stack runs out-of-band on the Oracle Cloud Infras
 | **Homelab Documentation** | HTTP(s) | `https://docs.vijaysingh.cloud` | 60s |
 | **n8n Webhook Engine** | HTTP(s) | `https://hooks.vijaysingh.cloud` | 60s |
 | **Homepage Command Center** | HTTP(s) | `https://hub.vijaysingh.cloud` | 60s |
-| **Paperless OCR Archive** | HTTP(s) | `https://docs-ocr.vijaysingh.cloud` | 60s |
+| **Paperless OCR Archive** | HTTP(s) | `https://ocr.vijaysingh.cloud` | 60s |
 | **Miniflux RSS** | HTTP(s) | `https://rss.vijaysingh.cloud` | 60s |
 | **Homelab Router (Tailscale)**| Ping | Router Tailscale IP | 30s |
 

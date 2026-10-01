@@ -96,7 +96,7 @@ spec:
         - name: PAPERLESS_DBNAME
           value: "n8n"
         - name: PAPERLESS_URL
-          value: "https://docs-ocr.vijaysingh.cloud"
+          value: "https://ocr.vijaysingh.cloud"
         - name: PAPERLESS_OCR_THREADS
           value: "1" # Throttled to prevent hypervisor CPU starvation
         - name: PAPERLESS_OCR_MAX_IMAGE_PIXELS
@@ -174,7 +174,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: docs-ocr.vijaysingh.cloud
+  - host: ocr.vijaysingh.cloud
     http:
       paths:
       - path: /

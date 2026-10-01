@@ -14,9 +14,9 @@
 - Sovereign Media & Documents:
     - Paperless-ngx Archive:
         icon: paperless-ngx.png
-        href: https://docs-ocr.vijaysingh.cloud
+        href: https://ocr.vijaysingh.cloud
         description: "OCR document scanning, tagging & searchable PDF archive"
-        ping: https://docs-ocr.vijaysingh.cloud
+        ping: https://ocr.vijaysingh.cloud
     - BookOrbit Library:
         icon: bookorbit.png
         href: https://books.vijaysingh.cloud
@@ -24,9 +24,9 @@
         ping: https://books.vijaysingh.cloud
     - Audiobookshelf Streaming:
         icon: audiobookshelf.png
-        href: https://audio.vijaysingh.cloud
+        href: https://ab.vijaysingh.cloud
         description: "Self-hosted audiobook & podcast streaming server"
-        ping: https://audio.vijaysingh.cloud
+        ping: https://ab.vijaysingh.cloud
 
 - Productivity & Personal Drivers:
     - Miniflux RSS Reader:

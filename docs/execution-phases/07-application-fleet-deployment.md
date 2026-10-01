@@ -52,8 +52,8 @@ Replacing standalone PostgreSQL containers with **CloudNativePG** provides:
 | **Homelab Docs** | `platform` | `docs.vijaysingh.cloud` | NVMe (MkDocs) | Architecture handbook and operational showcase portal |
 | **Homepage** | `platform` | `dash.vijaysingh.cloud` (SSO) | NVMe | Central service directory with live K8s, Proxmox, and resource widgets |
 | **BookOrbit** | `media` | `books.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/books`) | Multi-user eBook, PDF, and comic library with reading progress sync |
-| **Paperless-ngx** | `documents` | `docs-ocr.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/paperless`) | OCR document scanning, tagging, and searchable PDF archive |
-| **Audiobookshelf** | `media` | `audio.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/media`) | Streaming server for audiobooks and podcasts |
+| **Paperless-ngx** | `documents` | `ocr.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/paperless`) | OCR document scanning, tagging, and searchable PDF archive |
+| **Audiobookshelf** | `media` | `ab.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/media`) | Streaming server for audiobooks and podcasts |
 | **Miniflux** | `productivity` | `rss.vijaysingh.cloud` (SSO) | NVMe | Lightweight Go RSS reader with automated daily digests |
 | **Linkding** | `productivity` | `links.vijaysingh.cloud` (SSO) | NVMe | Minimalist, searchable bookmark manager |
 | **Wger / Ryot** | `health` | `health.vijaysingh.cloud` (SSO) | NVMe | Workout, calorie, and meal planning tracker |
@@ -164,7 +164,8 @@ Configured active HTTP probes monitoring:
 - `https://docs.vijaysingh.cloud`
 - `https://hooks.vijaysingh.cloud`
 - `https://dash.vijaysingh.cloud`
-- `https://docs-ocr.vijaysingh.cloud`
+- `https://ocr.vijaysingh.cloud`
+- `https://ab.vijaysingh.cloud`
 - `https://rss.vijaysingh.cloud`
 
 ### 5. Multi-Channel Slack ChatOps Routing
