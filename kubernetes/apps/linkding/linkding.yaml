@@ -31,6 +31,9 @@ spec:
       containers:
       - name: linkding
         image: sissbruecker/linkding:latest
+        env:
+        - name: LD_CSRF_TRUSTED_ORIGINS
+          value: "https://links.vijaysingh.cloud"
         ports:
         - containerPort: 9090
           name: http
