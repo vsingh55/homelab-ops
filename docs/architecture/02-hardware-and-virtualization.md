@@ -109,3 +109,20 @@ Physical Network (192.168.1.0/24 LAN)
 2. **Dedicated Automation User:** Automated operations execute as the unprivileged `devops` user with scoped `sudoers` privileges.
 3. **Proxmox Firewall:** Hypervisor administration interface (`8006`) is restricted to the local management subnet and authenticated Tailscale nodes.
 4. **Kernel Livepatching:** Automated security updates are scheduled via Debian `unattended-upgrades`, ensuring security patches apply without manual intervention.
+
+---
+
+## 6. Hypervisor Lifecycle & OOM Dynamics (Operational Learnings)
+
+### Hypervisor Lifecycle (Proxmox VE 8 to 9 Upgrade)
+- **Support Lifecycle:** Proxmox VE 8 reached official End of Life (EOL) on August 31, 2026, tracking Debian 12's oldstable cycle. Proxmox VE 9 (based on Debian 13 Trixie) is the current long-term stable release.
+- **Maintenance Path:** Because the production Kubernetes cluster runs decoupled inside VM 500 (`k3s-prod`), the hypervisor upgrade is non-disruptive to persistent cluster state. Upgrades are staged during a maintenance window via:
+  1. Offsite disk backup via `vzdump` to secondary storage and OCI S3.
+  2. Execution of the `pve8to9 --full` pre-upgrade checklist.
+  3. In-place Debian package repository migration (`bookworm` -> `trixie`).
+  4. Host reboot with automated VM auto-start.
+
+### Host vs. Guest OOM Dynamics
+- **Host Protection:** Reserving 3.5GB strictly for the Debian hypervisor prevents host-level kernel panics and hypervisor freezes during background I/O operations (such as backup compression or disk replication).
+- **Guest-Level Constraint:** Fencing RAM at the hypervisor level does not prevent out-of-memory events *inside* the virtual machine if workloads spike beyond 12GB. To safeguard guest stability, Kubernetes-level eviction thresholds (`evictionHard: memory.available<500Mi`) and strict container `resources.limits` are enforced in GitOps manifests to evict non-critical pods before guest kernel OOM occurs.
+

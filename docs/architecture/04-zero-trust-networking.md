@@ -108,3 +108,41 @@ flowchart TD
 1. **Immunity to Port Scanning:** Because all router ports are closed, automated Shodan/Censys scanners perceive the residential IP as a completely dead host.
 2. **DDoS Protection:** Volumetric attacks are absorbed at Cloudflare's multi-terabit Anycast edge, never reaching the physical residential connection bandwidth limit.
 3. **Transport Encryption:** 100% of public transit is encrypted with TLS 1.3; 100% of internal cluster traffic is segregated by Kubernetes network namespaces.
+
+---
+
+## 6. Egress Origin Protection & Out-of-Band Routing (Evolution Roadmap)
+
+While Cloudflare Zero Trust eliminates all open inbound router ports, true zero-trust networking requires analyzing both inbound and outbound traffic paths:
+
+```mermaid
+flowchart LR
+    subgraph Cluster["Kubernetes Pods"]
+        InboundApp["Web App (Incoming Request)"]
+        OutboundApp["Scraper / RSS / Webhook (Pod Egress)"]
+    end
+
+    subgraph IngressPath["Path 1: Ingress & Response (Protected)"]
+        Tunnel["cloudflared QUIC Tunnel"]
+        CF_Edge["Cloudflare Edge PoP"]
+        InboundApp <==> Tunnel <==> CF_Edge
+    end
+
+    subgraph EgressPath["Path 2: Pod-Initiated Egress (Roadmap Evolution)"]
+        OutboundApp -->|Current| CGNAT["Residential CGNAT Pool (Shared ISP Gateway)"]
+        OutboundApp -.->|Target State| ExitNode["OCI Cloud Exit Node / WireGuard Egress Gateway"]
+        ExitNode --> PublicWeb["Public Web / APIs"]
+    end
+```
+
+### 1. Ingress vs. Pod Egress Traffic Paths
+- **Path 1 (Ingress & Responses):** Inbound traffic arriving via Cloudflare tunnels generates response packets that route strictly back through the established, outbound-initiated QUIC tunnel. Response traffic never exposes the residential WAN IP.
+- **Path 2 (Pod-Initiated Outbound Egress):** Workloads initiating outbound calls (e.g. Miniflux pulling RSS feeds, Paperless downloading document metadata) currently exit through the residential gateway.
+
+### 2. Threat Model: Upstream CGNAT Saturation
+- While the residential ISP assigns private RFC 6598 addresses (`100.64.0.0/10`) pooling outbound traffic with thousands of homes, a motivated adversary who identifies the egress upstream IP could execute a volumetric flood against that shared ISP gateway, causing collateral disruption.
+
+### 3. Target Implementation: Out-of-Band Cloud Egress Gateway
+- **Roadmap Architecture:** Decouple all cluster pod egress from the residential connection by routing default egress through an encrypted WireGuard tunnel to the Oracle Cloud (OCI Mumbai) support VM, acting as a dedicated egress proxy / Tailscale Exit Node.
+- **Result:** Complete end-to-end anonymity: Zero-Trust Ingress via Cloudflare Edge, and Zero-Trust Egress via Out-of-Band Cloud Gateway.
+

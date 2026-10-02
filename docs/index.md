@@ -184,6 +184,19 @@ Productivity & Personal Health
 
 ---
 
+## Architectural Evolution & Future Roadmap
+
+In alignment with production platform engineering standards and peer review, the following improvements are prioritized on the active roadmap:
+
+| Initiative | Operational Rationale | Architectural Solution | Status |
+| :--- | :--- | :--- | :--- |
+| **Out-of-Band Egress Origin Masking** | While Cloudflare Tunnels provide zero-trust inbound without open ports, pod-initiated egress (e.g. RSS fetching, metadata scrapers) routes via residential CGNAT. A targeted upstream attack on the ISP's shared pool could saturate connectivity. | Route all cluster outbound egress through an external VPS / Tailscale Exit Node (or Cilium Egress Gateway) hosted in OCI, completely decoupling home broadband from egress traffic. | 🟡 In Backlog |
+| **Hypervisor Lifecycle Upgrade (PVE 9)** | Proxmox VE 8 reached official End of Life (EOL) on August 31, 2026, following Debian 12's oldstable cycle. | Execute in-place dist-upgrade to Proxmox VE 9.2 (Debian 13 Trixie kernel) during a scheduled maintenance window, leveraging `vzdump` snapshots and `pve8to9` pre-checks. | 🟡 Scheduled |
+| **Guest VM Memory & Eviction Hardening** | Hypervisor resource fencing protects host kernel stability (3.5GB reserved), but workloads inside the 12GB `k3s-prod` VM could still experience memory pressure if unconstrained. | Enforce strict `resources.limits` across all Helm/Kustomize manifests, tune Kubelet hard eviction thresholds (`memory.available<500Mi`), and evaluate scale-to-zero (KEDA) for low-frequency pods. | 🟡 In Progress |
+| **Physical Multi-Node & Distributed CSI** | A single physical node is a physical SPOF mitigated by offsite 3-2-1 backups. Rancher `local-path` is optimized for single-node NVMe IOPS, but lacks multi-node data replication. | Scale to a 3-node physical bare-metal cluster and evaluate migrating from `local-path` to distributed replicated block storage (Rook-Ceph or Longhorn / Mayastor). | 🔵 Future Milestone |
+
+---
+
 ## Standard Engineering Documentation & Enterprise Handbook
 
 Following CNCF and enterprise platform standards, all architecture specifications, flagship project case studies, and incident post-mortems are documented in the sections below:

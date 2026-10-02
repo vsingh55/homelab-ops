@@ -107,3 +107,15 @@ The platform enforces strict logical and physical boundaries between components 
 - [x] GitOps continuous reconciliation active with zero drift.
 - [x] Production database operates on automated WAL archiving and daily snapshot cycles.
 - [x] Out-of-band monitoring active from independent cloud region.
+
+---
+
+## 8. Architectural Evolution & Roadmap
+
+Following production operational learnings and community peer review, the following four milestones define the platform's architectural evolution:
+
+1. **Out-of-Band Egress Origin Masking:** Route pod-initiated outbound traffic through an OCI/WireGuard cloud egress gateway, ensuring home ISP broadband is completely decoupled from cluster outbound telemetry and scrapers.
+2. **Hypervisor Lifecycle Upgrade (Proxmox VE 9):** Execute in-place dist-upgrade from Proxmox VE 8 (EOL August 2026) to Proxmox VE 9.2 (Debian 13 Trixie kernel) during a scheduled maintenance window.
+3. **Guest Memory Eviction Hardening:** Enforce strict container resource limits and Kubelet eviction thresholds (`memory.available<500Mi`) inside the `k3s-prod` VM to protect guest stability, with scale-to-zero (KEDA) evaluation for idle microservices.
+4. **Multi-Node Physical Clustering & Distributed CSI:** Scale from a single physical host to a 3-node physical cluster, migrating from Rancher `local-path` to distributed replicated storage (Rook-Ceph or Longhorn / Mayastor).
+

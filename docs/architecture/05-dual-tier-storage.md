@@ -105,3 +105,18 @@ The platform adheres strictly to the industry **3-2-1 Backup Standard**:
 - **Recovery Point Objective (RPO):** < 15 Minutes (Maximum potential data loss window during catastrophic hardware failure).
 - **Recovery Time Objective (RTO):** < 45 Minutes (Time required to flash a replacement machine, restore VM snapshot, and restore public ingress).
 - **Storage Durability:** Multi-regional redundancy across bare metal and enterprise cloud object storage.
+
+---
+
+## 7. CSI Driver Rationale & Multi-Node Storage Evolution
+
+### 1. Why Rancher `local-path-provisioner` for Single-Node?
+Many homelab architects default to deploying distributed storage operators (such as Longhorn, Rook-Ceph, or Mayastor) even on single-node machines. In an enterprise single-node context, this represents severe resource inefficiency:
+- **Daemon Overhead:** Distributed storage engines consume **2GB to 4GB of RAM** and significant CPU cycles running quorum, synchronous replication, and snapshot daemons.
+- **Zero Replication Benefit:** When running on a single physical box, replicating blocks across virtual disks provides zero physical hardware failure protection while introducing network and virtualization I/O amplification.
+- **The Sovereign Alternative:** Rancher `local-path-provisioner` mounts persistent directories directly from host NVMe and SATA partitions with zero daemon overhead, delivering **native bare-metal I/O speeds** and freeing RAM for production workloads. Data durability is offloaded to CloudNativePG WAL streaming and Restic 3-2-1 offsite backups.
+
+### 2. Multi-Node Distributed CSI Roadmap
+- **Trigger:** Expansion from single-node bare metal to a 3-node physical Proxmox VE / K3s cluster.
+- **Target Storage Architecture:** Evaluate **Rook-Ceph** or **Longhorn / Mayastor** to implement true three-way synchronous block replication across physical nodes, enabling automatic Kubernetes PersistentVolume failover if a physical machine loses power.
+
