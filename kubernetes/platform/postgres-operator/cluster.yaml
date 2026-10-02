@@ -16,19 +16,6 @@ spec:
         login: true
         passwordSecret:
           name: postgres-ha-app-user
-  backup:
-    barmanObjectStore:
-      destinationPath: s3://postgres-backups/
-      endpointURL: http://minio.database.svc.cluster.local:9000
-      s3Credentials:
-        accessKeyId:
-          name: minio-creds
-          key: ACCESS_KEY
-        secretAccessKey:
-          name: minio-creds
-          key: SECRET_KEY
-      wal:
-        compression: gzip
   bootstrap:
     initdb:
       database: n8n

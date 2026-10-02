@@ -4,7 +4,5 @@ kind: Kustomization
 resources:
   - helm-repository.yaml
   - helm-release.yaml
-  - minio.yaml
-  - minio-creds.enc.yaml
   - postgres-app-user.enc.yaml
   - cluster.yaml
