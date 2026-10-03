@@ -40,6 +40,8 @@ spec:
               key: ADMIN_PASSWORD
         - name: BASE_URL
           value: "https://rss.vijaysingh.cloud"
+        - name: CLEANUP_ARCHIVE_UNREAD_DAYS
+          value: "1095"
         ports:
         - containerPort: 8080
           name: http

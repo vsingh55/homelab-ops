@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>Vijay's Target Tech, Funding &amp; Career Intelligence</title>
+  </head>
+  <body>
+    <!-- P0: EUROPE TECH - SERIES B & GROWTH STARTUPS (PRIMARY TARGET) -->
+    <outline text="🎯 Europe: Series B &amp; Startup Funding (Hiring Radar)" title="🎯 Europe: Series B &amp; Startup Funding (Hiring Radar)">
+      <outline type="rss" text="Sifted (European Startups &amp; VC Funding)" title="Sifted (European Startups &amp; VC Funding)" xmlUrl="https://sifted.eu/feed" htmlUrl="https://sifted.eu" />
+      <outline type="rss" text="Silicon Canals (European Scaleups &amp; Funding)" title="Silicon Canals (European Scaleups &amp; Funding)" xmlUrl="https://siliconcanals.com/feed/" htmlUrl="https://siliconcanals.com" />
+      <outline type="rss" text="Tech.eu (European Venture &amp; Growth)" title="Tech.eu (European Venture &amp; Growth)" xmlUrl="https://tech.eu/feed/" htmlUrl="https://tech.eu" />
+      <outline type="rss" text="TechCrunch Europe (Startups &amp; Funding)" title="TechCrunch Europe (Startups &amp; Funding)" xmlUrl="https://techcrunch.com/tag/europe/feed/" htmlUrl="https://techcrunch.com/tag/europe/" />
+      <outline type="rss" text="HN: Who is Hiring (Europe Filter)" title="HN: Who is Hiring (Europe Filter)" xmlUrl="https://hnrss.org/whoishiring/jobs?q=Europe" htmlUrl="https://news.ycombinator.com" />
+      <outline type="rss" text="HN: Who is Hiring (Visa Sponsorship Filter)" title="HN: Who is Hiring (Visa Sponsorship Filter)" xmlUrl="https://hnrss.org/whoishiring/jobs?q=visa" htmlUrl="https://news.ycombinator.com" />
+      <outline type="rss" text="WeWorkRemotely (DevOps &amp; Platform)" title="WeWorkRemotely (DevOps &amp; Platform)" xmlUrl="https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss" htmlUrl="https://weworkremotely.com" />
+    </outline>
+
+    <!-- P0: JAPAN TECH & RELOCATION TARGETS (PRIMARY TARGET) -->
+    <outline text="🎯 Japan: Tech Startups &amp; Relocation Hiring" title="🎯 Japan: Tech Startups &amp; Relocation Hiring">
+      <outline type="rss" text="The Bridge Japan (English Startup Funding)" title="The Bridge Japan (English Startup Funding)" xmlUrl="https://thebridge.jp/en/feed" htmlUrl="https://thebridge.jp/en/" />
+      <outline type="rss" text="The Japan Times (Technology &amp; Modernization)" title="The Japan Times (Technology &amp; Modernization)" xmlUrl="https://www.japantimes.co.jp/feed/?post_type=news&amp;genre=tech" htmlUrl="https://www.japantimes.co.jp/news/tech/" />
+      <outline type="rss" text="The Japan Times (Business &amp; Enterprise)" title="The Japan Times (Business &amp; Enterprise)" xmlUrl="https://www.japantimes.co.jp/feed/?post_type=news&amp;genre=business" htmlUrl="https://www.japantimes.co.jp/news/business/" />
+      <outline type="rss" text="Disrupting Japan (Startup Ecosystem &amp; Founders)" title="Disrupting Japan (Startup Ecosystem &amp; Founders)" xmlUrl="https://www.disruptingjapan.com/feed/" htmlUrl="https://www.disruptingjapan.com" />
+      <outline type="rss" text="HN: Who is Hiring (Tokyo Filter)" title="HN: Who is Hiring (Tokyo Filter)" xmlUrl="https://hnrss.org/whoishiring/jobs?q=Tokyo" htmlUrl="https://news.ycombinator.com" />
+    </outline>
+
+    <!-- CLOUD & PLATFORM ENGINEERING (SECONDARY) -->
+    <outline text="Cloud &amp; Platform Engineering" title="Cloud &amp; Platform Engineering">
+      <outline type="rss" text="Kubernetes Official Blog" title="Kubernetes Official Blog" xmlUrl="https://kubernetes.io/feed.xml" htmlUrl="https://kubernetes.io/blog/" />
+      <outline type="rss" text="CNCF Blog" title="CNCF Blog" xmlUrl="https://www.cncf.io/feed/" htmlUrl="https://www.cncf.io/blog/" />
+      <outline type="rss" text="AWS Architecture Blog" title="AWS Architecture Blog" xmlUrl="https://aws.amazon.com/blogs/architecture/feed/" htmlUrl="https://aws.amazon.com/blogs/architecture/" />
+      <outline type="rss" text="Cloudflare Engineering Blog" title="Cloudflare Engineering Blog" xmlUrl="https://blog.cloudflare.com/rss/" htmlUrl="https://blog.cloudflare.com/" />
+      <outline type="rss" text="Uber Engineering" title="Uber Engineering" xmlUrl="https://www.uber.com/en-IN/blog/engineering/rss/" htmlUrl="https://www.uber.com/en-IN/blog/engineering/" />
+      <outline type="rss" text="GitHub Changelog" title="GitHub Changelog" xmlUrl="https://github.blog/changelog/feed/" htmlUrl="https://github.blog/changelog/" />
+      <outline type="rss" text="Tailscale Blog" title="Tailscale Blog" xmlUrl="https://tailscale.com/blog/index.xml" htmlUrl="https://tailscale.com/blog" />
+      <outline type="rss" text="Lobste.rs (Platform &amp; DevOps)" title="Lobste.rs (Platform &amp; DevOps)" xmlUrl="https://lobste.rs/t/devops,kubernetes,infrastructure.rss" htmlUrl="https://lobste.rs" />
+    </outline>
+
+    <!-- INFRA SECURITY & ADVISORIES (SECONDARY) -->
+    <outline text="Infra Security &amp; Advisories" title="Infra Security &amp; Advisories">
+      <outline type="rss" text="Kubernetes Security Announcements" title="Kubernetes Security Announcements" xmlUrl="https://groups.google.com/forum/feed/kubernetes-security-announce/msgs/rss.xml" htmlUrl="https://groups.google.com/g/kubernetes-security-announce" />
+      <outline type="rss" text="CISA Cybersecurity Alerts" title="CISA Cybersecurity Alerts" xmlUrl="https://www.cisa.gov/cybersecurity-advisories/all.xml" htmlUrl="https://www.cisa.gov/news-events/cybersecurity-advisories" />
+      <outline type="rss" text="The Hacker News (Cybersecurity)" title="The Hacker News" xmlUrl="https://feeds.feedburner.com/TheHackersNews" htmlUrl="https://thehackernews.com/" />
+      <outline type="rss" text="Krebs on Security" title="Krebs on Security" xmlUrl="https://krebsonsecurity.com/feed/" htmlUrl="https://krebsonsecurity.com/" />
+    </outline>
+
+    <!-- AI & STARTUP INNOVATIONS (SECONDARY) -->
+    <outline text="AI &amp; Startup Intelligence" title="AI &amp; Startup Intelligence">
+      <outline type="rss" text="OpenAI News &amp; Research" title="OpenAI News &amp; Research" xmlUrl="https://openai.com/news/rss.xml" htmlUrl="https://openai.com/news/" />
+      <outline type="rss" text="Hugging Face Blog" title="Hugging Face Blog" xmlUrl="https://huggingface.co/blog/feed.xml" htmlUrl="https://huggingface.co/blog" />
+      <outline type="rss" text="Latent Space (AI Engineering)" title="Latent Space" xmlUrl="https://www.latent.space/feed" htmlUrl="https://www.latent.space" />
+      <outline type="rss" text="Y Combinator Blog" title="Y Combinator Blog" xmlUrl="https://www.ycombinator.com/blog/rss" htmlUrl="https://www.ycombinator.com/blog" />
+      <outline type="rss" text="TechCrunch Startups" title="TechCrunch Startups" xmlUrl="https://techcrunch.com/category/startups/feed/" htmlUrl="https://techcrunch.com/category/startups/" />
+      <outline type="rss" text="VentureBeat AI" title="VentureBeat AI" xmlUrl="https://venturebeat.com/category/ai/feed/" htmlUrl="https://venturebeat.com/category/ai/" />
+    </outline>
+
+    <!-- SCMP & ASIA TECH (SECONDARY) -->
+    <outline text="SCMP &amp; Asia Tech" title="SCMP &amp; Asia Tech">
+      <outline type="rss" text="South China Morning Post - Tech &amp; AI" title="South China Morning Post - Tech &amp; AI" xmlUrl="https://www.scmp.com/rss/318208/feed" htmlUrl="https://www.scmp.com/tech" />
+      <outline type="rss" text="South China Morning Post - Business &amp; Startups" title="South China Morning Post - Business &amp; Startups" xmlUrl="https://www.scmp.com/rss/92/feed" htmlUrl="https://www.scmp.com/business" />
+    </outline>
+  </body>
+</opml>
