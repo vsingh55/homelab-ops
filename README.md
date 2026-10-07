@@ -127,8 +127,7 @@ Operations & Workflow Automation
 
 Sovereign Documents & Media (1TB HDD Tier)
 ├── paperless-ngx # OCR document ingestion, tagging, and search archive
-├── bookorbit # Multi-user digital book library & sync manager
-└── audiobookshelf # Audiobook and podcast streaming server
+└── bookorbit # Multi-user digital book library & sync manager
 
 Productivity & Personal Health
 ├── miniflux # Ultra-fast, lightweight Go RSS reader

@@ -6,7 +6,6 @@ resources:
   - n8n
   - paperless
   - bookorbit
-  - audiobookshelf
   - miniflux
   - linkding
   - wger

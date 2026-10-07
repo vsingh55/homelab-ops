@@ -31,7 +31,7 @@
 - [ADR-010: Database Modernization: Migration from Standalone PostgreSQL Pod to CloudNativePG HA Operator](#adr-010-database-modernization-migration-from-standalone-postgresql-pod-to-cloudnativepg-ha-operator)
 - [ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band Monitoring (Uptime Kuma) and Offsite Disaster Recovery](#adr-011-zero-cost-cloud-extension-oci-always-free-mumbai-for-out-of-band-monitoring-and-offsite-restic-backup-sync)
 - [ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) for Web Applications and Tailscale for Host Infrastructure](#adr-012-hybrid-zero-trust-identity-architecture-cloudflare-access-for-web-applications-and-tailscale-for-host-infrastructure)
-- [ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD for Paperless-ngx, BookOrbit, and Audiobookshelf](#adr-013-sovereign-document--media-storage-tiering-strategy-on-1tb-hdd)
+- [ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD for Paperless-ngx and BookOrbit](#adr-013-sovereign-document--media-storage-tiering-strategy-on-1tb-hdd)
 - [ADR-014: Progressive Delivery Scoping: Deferral of Canary Deployments for Single-Replica Workloads](#adr-014-progressive-delivery-scoping-deferral-of-canary-deployments-for-single-replica-workloads)
 - [ADR-015: Decommissioning of ops-center VM in Favor of OCI S3 Remote State and Direct Laptop Operations](#adr-015-decommissioning-of-ops-center-vm-in-favor-of-oci-s3-remote-state-and-direct-laptop-operations)
 - [ADR-016: Complete Decommissioning and Code Purge of the Academy / Lab Zone Post-Certification](#adr-016-complete-decommissioning-and-code-purge-of-the-academy--lab-zone-post-certification)
@@ -57,7 +57,7 @@ The `homelab-ops` platform is a production-grade, self-hosted **Sovereign Cloud*
 - **Application Fleet:** 
 - *Public Web:* Homelab Architecture Docs (`docs.vijaysingh.cloud`).
 - *Productivity & Core:* Homepage dashboard, Miniflux RSS engine, Linkding bookmark manager.
-- *Data & Media:* Paperless-ngx OCR archive, BookOrbit multi-user library, Audiobookshelf media streaming.
+- *Data & Media:* Paperless-ngx OCR archive, BookOrbit multi-user library.
 - *Automation & DB:* n8n workflow engine, CloudNativePG (CNPG) High-Availability PostgreSQL operator.
 - *Observability:* Kube-Prometheus-Stack (internal metrics) and Uptime Kuma (external availability).
 
@@ -112,7 +112,7 @@ The `homelab-ops` platform is a production-grade, self-hosted **Sovereign Cloud*
 
 ### Current Scale & Non-Functional Specifications
 - **Current Scale:** 1 Operator/Engineer (Vijay Singh); 2 active applications (n8n custom v6, Python PDF automation); ~100 requests/day; peak throughput <5 req/sec; local data footprint ~45GB on NVMe, ~120GB on HDD; database size <2GB.
-- **Projected 1-Year Scale:** 5–10 active users (family members on BookOrbit/Audiobookshelf, sister's clients on portfolio); 9 production containerized workloads + 2 websites; ~5,000 requests/day; peak throughput 25 req/sec; storage volume ~450GB on HDD; database size ~15GB.
+- **Projected 1-Year Scale:** 5–10 active users (family members on BookOrbit, sister's clients on portfolio); 8 production containerized workloads + 2 websites; ~5,000 requests/day; peak throughput 25 req/sec; storage volume ~450GB on HDD; database size ~15GB.
 - **Projected 3-Year Scale:** 25 active users; 15 containerized services; ~25,000 requests/day; storage volume ~800GB on HDD (reaching drive capacity); database size ~40GB.
 - **Service Level Objectives (SLOs):**
 - **Availability:** Public Websites: 99.9% (Cloudflare edge cached); Internal Applications: 99.5% (subject to residential ISP and single-node power).
@@ -138,7 +138,7 @@ The following major architectural decisions have been identified across the lega
 10. **CloudNativePG (CNPG) High-Availability Database Architecture (Accepted - Implemented in v3.0.0):** Replacing single-pod PostgreSQL with a declarative CNPG operator managing HA replication and continuous WAL archiving to MinIO.
 11. **Multi-Cloud Hybrid Resilience via OCI Mumbai (Accepted - Implemented in v3.0.0):** Establishing an OCI Mumbai Ampere A1 instance for out-of-band Uptime Kuma monitoring and offsite encrypted Restic backup synchronization.
 12. **Hybrid Identity & Access Architecture (Accepted - Implemented in v3.0.0):** Using Cloudflare Access with Google SSO / Email OTP for browser-based private web apps, and Tailscale for underlying node administration.
-13. **Cold Storage Tiering for Sovereign Media & Documents (Accepted - Implemented in v3.0.0):** Enforcing strict volume isolation and dedicated PVC mount patterns on the 1TB HDD for Paperless-ngx, BookOrbit, and Audiobookshelf.
+13. **Cold Storage Tiering for Sovereign Media & Documents (Accepted - Implemented in v3.0.0):** Enforcing strict volume isolation and dedicated PVC mount patterns on the 1TB HDD for Paperless-ngx and BookOrbit.
 14. **Deferral of Canary Deployments for Single-Replica Workloads (Accepted - Implemented in v3.0.0):** Postponing complex Flagger canary configurations until workloads scale beyond single-pod instances.
 15. **Decommissioning of ops-center Virtual Machine (Accepted - Modernization):** Eliminating the 2GB RAM KVM VM in favor of remote Terraform state in OCI Object Storage and direct laptop administration over Tailscale, reclaiming 2GB RAM, 2 vCPUs, 20GB NVMe, and 250GB HDD.
 16. **Retirement of Academy Zone (Accepted - Modernization):** Decommissioning and purging all 5 lab VMs/LXCs post-certification to reclaim ~7.5GB defined RAM and dedicate 12GB RAM to k3s-prod.
@@ -213,7 +213,7 @@ Prior to this architectural review, several critical operational and technical d
 | **P1** | **ADR-002: Dual-Tier Physical Storage Allocation (NVMe vs. SATA HDD)** | Prevents high-IOPS write starvation on solid-state boot disks while ensuring large media libraries do not exhaust cluster storage. |
 | **P1** | **ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2** | Eliminates configuration drift, enforces single source of truth in Git, and automates disaster recovery deployments. |
 | **P1** | **ADR-012: Hybrid Zero-Trust Identity Architecture (Cloudflare Access + Tailscale)** | Prevents public attack surfaces on private administrative dashboards without incurring the massive RAM overhead of self-hosted Keycloak. |
-| **P1** | **ADR-013: Sovereign Media & Document Storage Tiering Strategy** | Governs storage mounting, backup deduplication, and volume boundaries for data-heavy workloads (Paperless, BookOrbit, Audiobookshelf). |
+| **P1** | **ADR-013: Sovereign Media & Document Storage Tiering Strategy** | Governs storage mounting, backup deduplication, and volume boundaries for data-heavy workloads (Paperless, BookOrbit). |
 | **P2** | **ADR-004: In-Memory "Vault Hydration" Pattern for Bare-Metal Secrets** | Documents historical bare-metal bootstrapping secrets pattern; prevents Terraform variables from leaking onto unencrypted disks. |
 | **P2** | **ADR-005: Out-of-Band Administrative Access via Tailscale Mesh** | Documents remote access pattern for hypervisor and infrastructure maintenance over non-routable CGNAT connections. |
 | **P2** | **ADR-014: Progressive Delivery Scoping: Deferral of Flagger Canaries** | Simplifies deployment pipelines, prevents premature optimization, and conserves cluster memory on single-node hardware. |
@@ -283,7 +283,7 @@ ADR-002: Dual-Tier Storage Topology (Hot NVMe vs. Cold SATA HDD)
 - Prevention of SSD write-wear and disk-full lockouts on OS partitions.
 - **Decision:** We will establish a strict **Two-Tier Storage Topology**:
  1. *Tier 1 (Hot NVMe - 256GB - `local-lvm`):* Dedicated exclusively to Proxmox OS boot partitions, VM/LXC virtual system disks, and active database volumes.
- 2. *Tier 2 (Cold SATA HDD - 1TB - `/mnt/hdd`):* Formatted as `ext4`, mounted via `/etc/fstab` on the host, and provisioned as Proxmox directory storage `backup-hdd`. Dedicated to Proxmox `vzdump` archives, MinIO object buckets, Velero snapshots, BookOrbit digital library, Audiobookshelf media, and Paperless-ngx document originals.
+ 2. *Tier 2 (Cold SATA HDD - 1TB - `/mnt/hdd`):* Formatted as `ext4`, mounted via `/etc/fstab` on the host, and provisioned as Proxmox directory storage `backup-hdd`. Dedicated to Proxmox `vzdump` archives, MinIO object buckets, Velero snapshots, BookOrbit digital library, and Paperless-ngx document originals.
 
 - **Architecture Impact:** Affects Proxmox storage pools, Terraform VM disk provisioning, and Kubernetes Persistent Volume Claim (PVC) storage classes.
 - **Alternatives Considered:**
@@ -776,7 +776,7 @@ ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) fo
 - **Decision:** We will implement a **Hybrid Zero-Trust Identity Architecture**:
  1. *Private Web Application Layer (Browser Access):* Governed by **Cloudflare Zero Trust Access**:
 
-- Private subdomains (`dash.vijaysingh.cloud`, `books.vijaysingh.cloud`, `ocr.vijaysingh.cloud`, `ab.vijaysingh.cloud`) are protected at Cloudflare's edge before traffic touches the homelab.
+- Private subdomains (`dash.vijaysingh.cloud`, `books.vijaysingh.cloud`, `ocr.vijaysingh.cloud`) are protected at Cloudflare's edge before traffic touches the homelab.
 - Authentication enforced via **Google OAuth / SSO** or **One-Time Pin (OTP)** sent to approved email addresses.
 - Unauthenticated requests are blocked at the edge; zero unauthorized packets reach the home network.
  2. *Infrastructure & Node Administration Layer (Terminal Access):* Governed by **Tailscale**:
@@ -821,7 +821,7 @@ ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD
 - **Status:** Recommended (Future Decision)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Application Platform
-- **Context:** The modernization blueprint introduces storage-heavy applications: Paperless-ngx (OCR searchable document archive), BookOrbit (multi-user digital book and PDF library), and Audiobookshelf (audiobook streaming). These workloads generate hundreds of gigabytes of unstructured binary files that would quickly overwhelm the 256GB NVMe SSD.
+- **Context:** The modernization blueprint introduces storage-heavy applications: Paperless-ngx (OCR searchable document archive) and BookOrbit (multi-user digital book and PDF library). These workloads generate hundreds of gigabytes of unstructured binary files that would quickly overwhelm the 256GB NVMe SSD.
 - **Problem Statement:** How do we structure persistent volume allocation, directory paths, and backup exclusions on the 1TB HDD to ensure multi-user media workloads operate reliably without degrading transactional database performance?
 - **Decision Drivers:**
 - Preventing storage exhaustion on the 256GB NVMe drive.
@@ -832,12 +832,11 @@ ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD
 
 - `/mnt/hdd/data/paperless/`: Document archive, originals, and OCR exports.
 - `/mnt/hdd/data/books/`: BookOrbit library assets and multi-user reading caches.
-- `/mnt/hdd/data/media/`: Audiobookshelf audio files and podcast downloads.
 - `/mnt/hdd/backups/`: Proxmox vzdump snapshots and local MinIO S3 buckets.
  2. *Kubernetes Storage Provisioning:* Provision individual PersistentVolumes using a dedicated `local-storage-hdd` storage class, mapped via Kustomize in each application overlay.
- 3. *Backup Tiering:* Unstructured media files (e.g. EPUBs/Audiobooks) will be backed up via deduplicated weekly Restic snapshots, while transactional databases (PostgreSQL metadata) remain on continuous WAL archiving.
+ 3. *Backup Tiering:* Unstructured media files (e.g. EPUBs) will be backed up via deduplicated weekly Restic snapshots, while transactional databases (PostgreSQL metadata) remain on continuous WAL archiving.
 
-- **Architecture Impact:** Affects Kubernetes manifests for Paperless-ngx, BookOrbit, and Audiobookshelf.
+- **Architecture Impact:** Affects Kubernetes manifests for Paperless-ngx and BookOrbit.
 - **Alternatives Considered:**
 - *NFS Network Share from separate NAS:* Rejected because adding an external NAS incurs hardware and power costs.
 - *Dynamic Provisioner writing to NVMe root:* Rejected; media ingestion would exhaust the SSD within weeks.
@@ -845,7 +844,7 @@ ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD
 - **Consequences:**
 - *Positive:* 1TB capacity utilized efficiently; SSD protected from media bloat; clear operational file structure.
 - *Negative:* Workloads bound to the specific node path (`local-storage`).
-- *Risks:* Concurrent heavy I/O (e.g. bulk OCR processing while streaming audiobooks) can cause mechanical disk head thrashing.
+- *Risks:* Concurrent heavy I/O (e.g. bulk OCR processing) can cause mechanical disk head thrashing.
 - *Trade-offs:* Read speeds capped at SATA HDD limits (~140 MB/s), which is completely sufficient for books, documents, and media streaming.
 - **Security Considerations:** Linux permissions enforced (`UID 1000:1000`); Paperless documents encrypted at rest by Restic during offsite backup.
 - **Reliability Considerations:** File integrity verified via ext4 filesystem journaling; weekly SMART disk checks.

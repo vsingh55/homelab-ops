@@ -28,7 +28,7 @@ flowchart TD
     subgraph Tier2["Tier 2: Cold Bulk Storage (1TB SATA Mechanical HDD)"]
         direction TB
         HDD_Docs["Paperless-ngx Ingested Documents & Search Index"]
-        HDD_Media["BookOrbit E-Books & Audiobookshelf Media Files"]
+        HDD_Media["BookOrbit E-Books Archive"]
         HDD_Snapshots["Proxmox vzdump VM Snapshots (ZSTD Compressed)"]
     end
 
@@ -51,7 +51,7 @@ flowchart TD
 | Storage Tier | Physical Medium | Filesystem / Driver | IOPS & Throughput Profile | Target Workloads & Directories |
 | :--- | :--- | :--- | :--- | :--- |
 | **Tier 1 (Hot Flash)** | 256GB M.2 NVMe PCIe SSD | `local-lvm` (LVM-Thin Pool) / `ext4` | High Random IOPS (>150,000 IOPS), Latency < 0.1ms | Proxmox base OS, K3s datastore state, CloudNativePG active database tables and write-ahead logs (`/var/lib/postgresql/data`). |
-| **Tier 2 (Cold Bulk)** | 1TB 2.5" SATA HDD (5400 RPM) | Mount `/mnt/hdd` (`ext4`) | High Sequential Throughput (~120MB/s) | Paperless document archive (`/mnt/data/paperless`), Audiobookshelf streaming audio, BookOrbit library, daily compressed Proxmox backups (`/mnt/hdd/dump`). |
+| **Tier 2 (Cold Bulk)** | 1TB 2.5" SATA HDD (5400 RPM) | Mount `/mnt/hdd` (`ext4`) | High Sequential Throughput (~120MB/s) | Paperless document archive (`/mnt/data/paperless`), BookOrbit library, daily compressed Proxmox backups (`/mnt/hdd/dump`). |
 | **Tier 3 (Offsite Cloud)**| OCI Object Storage (Mumbai) | S3 REST API Protocol | High Durability (11 9s), Geographically Isolated | Encrypted Restic backup snapshots, CloudNativePG cold database backups, Terraform remote state files. |
 
 ---

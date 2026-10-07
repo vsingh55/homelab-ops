@@ -59,7 +59,6 @@ flowchart TD
             n8n["n8n Workflow Engine"]
             Paperless["Paperless-ngx (OCR)"]
             BookOrbit["BookOrbit Library"]
-            Audio["Audiobookshelf"]
             Miniflux["Miniflux RSS"]
             Linkding["Linkding Bookmarks"]
             Ryot["Ryot Tracker"]
@@ -85,7 +84,6 @@ flowchart TD
 | **PostgreSQL** | `database` | Internal Service Only | NVMe (Tier 1) | Centralized, operator-managed database cluster for applications. |
 | **Paperless-ngx** | `apps` | `https://ocr.vijaysingh.cloud` | Hybrid (NVMe + SATA) | Document indexing, Optical Character Recognition (OCR), and searchable archive. |
 | **n8n** | `apps` | `https://n8n.vijaysingh.cloud` | NVMe (Tier 1) | Event-driven workflow automation engine and webhook ingestion handler. |
-| **Audiobookshelf**| `apps` | `https://ab.vijaysingh.cloud` | SATA HDD (Tier 2) | Self-hosted audiobook streaming server and multi-device sync. |
 | **BookOrbit** | `apps` | `https://books.vijaysingh.cloud` | SATA HDD (Tier 2) | Digital book catalog, metadata fetcher, and reading companion. |
 | **Miniflux** | `apps` | `https://rss.vijaysingh.cloud` | NVMe (Tier 1) | Lightweight, privacy-focused RSS news aggregator. |
 | **Linkding** | `apps` | `https://links.vijaysingh.cloud` | NVMe (Tier 1) | Minimalist bookmark manager with automatic archive caching. |
@@ -100,7 +98,7 @@ Storage volumes are dynamically and statically mapped to the physical storage ti
 | Storage Class | Physical Media | Path on Host | Workloads Bound | IOPS Profile |
 | :--- | :--- | :--- | :--- | :--- |
 | **`local-path`** (Default) | 256GB NVMe SSD | `/var/lib/rancher/k3s/storage` | PostgreSQL database tables, Redis caches, Homepage configuration, Miniflux DB. | High Random Read/Write (>150k IOPS) |
-| **`local-path-hdd`** | 1TB SATA HDD | `/mnt/data/` | Paperless media originals, BookOrbit e-book archive, Audiobookshelf streaming media. | High Sequential Throughput (~120MB/s) |
+| **`local-path-hdd`** | 1TB SATA HDD | `/mnt/data/` | Paperless media originals, BookOrbit e-book archive. | High Sequential Throughput (~120MB/s) |
 
 ---
 

@@ -12,13 +12,13 @@
 
 ## 1. Executive Summary & Objective
 
-Phase 7 represents the culminating implementation phase of the platform modernization. With the physical hypervisor consolidated, cloud ingress optimized, GitOps bootstrapped, and storage partitioned, the full production fleet of **9 containerized workloads and the platform documentation portal** are deployed onto `k3s-prod`.
+Phase 7 represents the culminating implementation phase of the platform modernization. With the physical hypervisor consolidated, cloud ingress optimized, GitOps bootstrapped, and storage partitioned, the full production fleet of **8 containerized workloads and the platform documentation portal** are deployed onto `k3s-prod`.
 
 Key achievements in Phase 7:
 1. **Core Stateful Resilience:** **CloudNativePG (CNPG)** delivers declarative PostgreSQL high availability with continuous Write-Ahead Log (WAL) streaming.
 2. **Security Hardening:** n8n workflow engine is hardened to run as a non-root container with dropped Linux capabilities and zero host SSH access.
 3. **Public Documentation Presence:** The **Homelab Documentation Portal** (`https://docs.vijaysingh.cloud`) is live with sub-15ms edge latency.
-4. **Physical Storage Tiering:** Heavy document and media workloads (**Paperless-ngx**, **BookOrbit**, **Audiobookshelf**) are mounted directly to the physical 1TB mechanical SATA HDD, preventing flash wear on the NVMe SSD.
+4. **Physical Storage Tiering:** Heavy document and media workloads (**Paperless-ngx**, **BookOrbit**) are mounted directly to the physical 1TB mechanical SATA HDD, preventing flash wear on the NVMe SSD.
 5. **Out-of-Band Observability:** In-cluster Prometheus/Grafana and external **Uptime Kuma** on OCI Mumbai deliver automated health alerts to 5 dedicated Slack channels.
 
 ---
@@ -39,7 +39,7 @@ Replacing standalone PostgreSQL containers with **CloudNativePG** provides:
 
 ### C. Physical Dual-Tier Storage Partitioning (ADR-013)
 - **Hot Tier (256GB NVMe):** High-IOPS transactional storage for etcd state and PostgreSQL active tables.
-- **Cold Tier (1TB SATA HDD):** Unstructured bulk files (scanned document PDFs, eBooks, audiobooks, and backup snapshots) mounted to `/mnt/hdd/` via PersistentVolumes. This guarantees large bulk files never consume high-speed SSD space.
+- **Cold Tier (1TB SATA HDD):** Unstructured bulk files (scanned document PDFs, eBooks, and backup snapshots) mounted to `/mnt/hdd/` via PersistentVolumes. This guarantees large bulk files never consume high-speed SSD space.
 
 ---
 
@@ -53,7 +53,6 @@ Replacing standalone PostgreSQL containers with **CloudNativePG** provides:
 | **Homepage** | `platform` | `dash.vijaysingh.cloud` (SSO) | NVMe | Central service directory with live K8s, Proxmox, and resource widgets |
 | **BookOrbit** | `media` | `books.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/books`) | Multi-user eBook, PDF, and comic library with reading progress sync |
 | **Paperless-ngx** | `documents` | `ocr.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/paperless`) | OCR document scanning, tagging, and searchable PDF archive |
-| **Audiobookshelf** | `media` | `ab.vijaysingh.cloud` (SSO) | 1TB HDD (`/mnt/hdd/media`) | Streaming server for audiobooks and podcasts |
 | **Miniflux** | `productivity` | `rss.vijaysingh.cloud` (SSO) | NVMe | Lightweight Go RSS reader with automated daily digests |
 | **Linkding** | `productivity` | `links.vijaysingh.cloud` (SSO) | NVMe | Minimalist, searchable bookmark manager |
 | **Wger / Ryot** | `health` | `health.vijaysingh.cloud` (SSO) | NVMe | Workout, calorie, and meal planning tracker |
@@ -165,7 +164,6 @@ Configured active HTTP probes monitoring:
 - `https://hooks.vijaysingh.cloud`
 - `https://dash.vijaysingh.cloud`
 - `https://ocr.vijaysingh.cloud`
-- `https://ab.vijaysingh.cloud`
 - `https://rss.vijaysingh.cloud`
 
 ### 5. Multi-Channel Slack ChatOps Routing

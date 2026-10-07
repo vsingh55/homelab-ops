@@ -22,11 +22,6 @@
         href: https://books.vijaysingh.cloud
         description: "Multi-user digital book & PDF library with sync"
         ping: https://books.vijaysingh.cloud
-    - Audiobookshelf Streaming:
-        icon: audiobookshelf.png
-        href: https://ab.vijaysingh.cloud
-        description: "Self-hosted audiobook & podcast streaming server"
-        ping: https://ab.vijaysingh.cloud
 
 - Productivity & Personal Drivers:
     - Miniflux RSS Reader:

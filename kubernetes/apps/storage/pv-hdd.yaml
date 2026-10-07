@@ -27,17 +27,3 @@ spec:
   storageClassName: local-hdd
   hostPath:
     path: /mnt/hdd/paperless
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pv-hdd-media
-spec:
-  capacity:
-    storage: 150Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-hdd
-  hostPath:
-    path: /mnt/hdd/media
