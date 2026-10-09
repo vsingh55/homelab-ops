@@ -65,6 +65,7 @@ nav:
       - "02. GitOps & In-Git Secrets": projects/02-gitops-and-sops.md # pragma: allowlist secret
       - "03. Stateful PostgreSQL HA": projects/03-cloudnativepg-ha.md
       - "04. Multi-Cloud Resilience & DR": projects/04-multicloud-observability-dr.md
+      - "05. Autonomous Sysadmin & Patch Engine": projects/05-autonomous-sysadmin-patching.md
   - "Architecture Decisions (ADRs)":
       - "Enterprise ADR Register": adr/README.md
   - "Execution Phases":
