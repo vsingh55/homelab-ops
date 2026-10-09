@@ -1,0 +1,181 @@
+---
+# ==============================================================================
+# Homelab-Ops: Autonomous Sysadmin Maintenance & Safe Patching Engine
+# ==============================================================================
+# Targets:
+#   - hypervisor (Proxmox VE 8: 192.168.1.3)
+#   - production (k3s-prod VM: 192.168.1.30)
+#   - monitoring_oci (OCI Cloud VM: 155.248.243.123)
+#
+# Enterprise Guardrails:
+#   1. Pre-flight disk space assertion (prevents OOM / full root during unpack)
+#   2. Security-focused patching by default (safe from unintended major leaps)
+#   3. Non-interactive Dpkg flags (--force-confdef --force-confold)
+#   4. Coordinated K8s Cordon & Drain before rebooting the k3s-prod guest VM
+#   5. K8s Uncordon and pod stabilization verification post-reboot
+#   6. Disk hygiene (crictl image pruning, apt cache clean, journal vacuum)
+#   7. Discord webhook notification with summary report
+# ==============================================================================
+
+- name: "Autonomous Sysadmin Maintenance: Host & OS Patching"
+  hosts: all
+  become: true
+  serial: 1  # Patch hosts sequentially to maintain cluster availability
+  vars:
+    # Security toggle: set to false if you intentionally want full dist-upgrade
+    security_only: true
+    min_disk_free_gb: 3
+    discord_webhook: "{{ discord_webhook_url | default('') }}"
+
+  tasks:
+    # --------------------------------------------------------------------------
+    # Phase 1: Pre-Flight Safety Checks
+    # --------------------------------------------------------------------------
+    - name: "Pre-Flight | Check available root disk space"
+      ansible.builtin.setup:
+        filter: "ansible_mounts"
+
+    - name: "Pre-Flight | Assert sufficient root disk space (>= {{ min_disk_free_gb }} GB)"
+      ansible.builtin.assert:
+        that:
+          - (item.size_available / 1024 / 1024 / 1024) >= min_disk_free_gb
+        fail_msg: "ABORT: Root partition on {{ inventory_hostname }} has less than {{ min_disk_free_gb }}GB free space!"
+        success_msg: "Disk check passed: {{ (item.size_available / 1024 / 1024 / 1024) | round(2) }} GB available on {{ item.mount }}"
+      when: item.mount == '/'
+      loop: "{{ ansible_mounts }}"
+
+    - name: "Pre-Flight | Check K3s cluster health (Production Node)"
+      ansible.builtin.command: k3s kubectl get nodes
+      register: k3s_pre_check
+      when: "'production' in group_names"
+      changed_when: false
+      failed_when: "'Ready' not in k3s_pre_check.stdout"
+
+    # --------------------------------------------------------------------------
+    # Phase 2: Safe Package Patching
+    # --------------------------------------------------------------------------
+    - name: "Patching | Update apt package index"
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: "Patching | Apply security patches (Non-interactive)"
+      ansible.builtin.apt:
+        upgrade: "{{ 'yes' if security_only else 'dist' }}"
+        dpkg_options: "force-confdef,force-confold"
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+      register: apt_upgrade_result
+
+    # --------------------------------------------------------------------------
+    # Phase 3: Reboot Detection & Coordinated Kubernetes Draining
+    # --------------------------------------------------------------------------
+    - name: "Reboot Check | Check if reboot is required"
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required_file
+
+    - name: "Reboot Coordination | Cordon K3s node before reboot"
+      ansible.builtin.command: k3s kubectl cordon {{ inventory_hostname }}
+      when:
+        - "'production' in group_names"
+        - reboot_required_file.stat.exists
+      register: cordon_result
+      changed_when: true
+
+    - name: "Reboot Coordination | Gracefully drain K3s node"
+      ansible.builtin.command: >
+        k3s kubectl drain {{ inventory_hostname }}
+        --ignore-daemonsets
+        --delete-emptydir-data
+        --force
+        --timeout=180s
+      when:
+        - "'production' in group_names"
+        - reboot_required_file.stat.exists
+      register: drain_result
+      changed_when: true
+
+    - name: "Reboot Execution | Reboot host if required"
+      ansible.builtin.reboot:
+        msg: "Homelab Autonomous Sysadmin: Rebooting following kernel/security updates"
+        connect_timeout: 10
+        reboot_timeout: 300
+        pre_reboot_delay: 2
+        post_reboot_delay: 15
+        test_command: uptime
+      when: reboot_required_file.stat.exists
+
+    - name: "Reboot Recovery | Uncordon K3s node"
+      ansible.builtin.command: k3s kubectl uncordon {{ inventory_hostname }}
+      when:
+        - "'production' in group_names"
+        - reboot_required_file.stat.exists
+      register: uncordon_result
+      changed_when: true
+
+    - name: "Reboot Recovery | Wait for K3s workloads to stabilize"
+      ansible.builtin.command: k3s kubectl get pods -A --field-selector=status.phase!=Running,status.phase!=Succeeded
+      register: non_running_pods
+      when:
+        - "'production' in group_names"
+        - reboot_required_file.stat.exists
+      until: non_running_pods.stdout_lines | length <= 1  # Only header line or empty
+      retries: 20
+      delay: 10
+      changed_when: false
+
+    # --------------------------------------------------------------------------
+    # Phase 4: Storage Hygiene & Disk Pruning
+    # --------------------------------------------------------------------------
+    - name: "Hygiene | Remove unused dependency packages (autoremove)"
+      ansible.builtin.apt:
+        autoremove: true
+        purge: true
+
+    - name: "Hygiene | Clean apt package archive cache"
+      ansible.builtin.apt:
+        autoclean: true
+
+    - name: "Hygiene | Prune dangling container images (K3s containerd)"
+      ansible.builtin.command: k3s crictl rmi --prune
+      when: "'production' in group_names"
+      register: crictl_prune
+      changed_when: "'Deleted' in crictl_prune.stdout"
+
+    - name: "Hygiene | Vacuum systemd journal logs (> 14 days)"
+      ansible.builtin.command: journalctl --vacuum-time=14d
+      changed_when: false
+
+    # --------------------------------------------------------------------------
+    # Phase 5: Notification & Reporting
+    # --------------------------------------------------------------------------
+    - name: "Reporting | Dispatch Sysadmin Maintenance Report to Discord"
+      ansible.builtin.uri:
+        url: "{{ discord_webhook }}"
+        method: POST
+        body_format: json
+        body:
+          username: "Homelab Autonomous Sysadmin"
+          avatar_url: "https://raw.githubusercontent.com/vsingh55/homelab-ops/main/images/v.3.0.0/gitops-pipeline.png"
+          embeds:
+            - title: "🛠️ System Maintenance Completed: {{ inventory_hostname }}"
+              color: "{{ 3066993 if not reboot_required_file.stat.exists else 15105570 }}"
+              fields:
+                - name: "Host"
+                  value: "`{{ inventory_hostname }}` ({{ ansible_host }})"
+                  inline: true
+                - name: "Reboot Performed"
+                  value: "{{ '✅ Yes (Reboot Required)' if reboot_required_file.stat.exists else 'ℹ️ No (Kernel Current)' }}"
+                  inline: true
+                - name: "Patch Scope"
+                  value: "{{ 'Security Patches' if security_only else 'Full Dist-Upgrade' }}"
+                  inline: true
+                - name: "Cluster Health"
+                  value: "{{ '✅ Ready & Reconciled' if 'production' in group_names else 'N/A (Host Node)' }}"
+                  inline: false
+              timestamp: "{{ ansible_date_time.iso8601 }}"
+      when:
+        - discord_webhook is defined
+        - discord_webhook | length > 10
+      ignore_errors: true

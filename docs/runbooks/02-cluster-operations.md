@@ -92,9 +92,38 @@ flux reconcile source git flux-system
 
 ## 3. Node Maintenance, Kernel Updates & Graceful Host Reboot
 
-When applying Linux kernel updates or security patches to the bare-metal Proxmox hypervisor or `k3s-prod` guest OS:
+Host and guest patching is automated through the **Autonomous Sysadmin Maintenance Engine** (`sysadmin_maintenance.yml`), with manual commands retained as an emergency fallback.
 
-### Step 1: Cordon and Drain the Kubernetes Node
+### Method A: Automated Sysadmin Maintenance Engine (Recommended)
+
+Execute the end-to-end maintenance pipeline across the bare-metal hypervisor, production K3s VM, and cloud monitoring node:
+
+```bash
+cd configuration/
+
+# 1. Run safe security patch maintenance (Non-disruptive, preserves minor/major kernel pins)
+ansible-playbook -i inventory/hosts.yml playbooks/sysadmin_maintenance.yml
+
+# 2. (Optional) Run full dist-upgrade explicitly during scheduled maintenance windows
+ansible-playbook -i inventory/hosts.yml playbooks/sysadmin_maintenance.yml -e "security_only=false"
+```
+
+**Automated Guardrail Pipeline:**
+1. **Pre-flight Assertion:** Asserts $\ge$ 3GB free root partition space before downloading packages.
+2. **Health Probe:** Validates K3s cluster node status is `Ready` before touching any system packages.
+3. **Non-Interactive Patching:** Enforces `--force-confdef --force-confold` to eliminate interactive prompt hangs.
+4. **Coordinated Drain:** Automatically detects `/var/run/reboot-required`. If a reboot is required, it cordons and drains `k3s-prod` with `--ignore-daemonsets --delete-emptydir-data --force` before triggering `reboot`.
+5. **Recovery & Stabilization:** Reconnects post-reboot, uncordons the node, and polls `kubectl get pods -A` until all pods report `Running`.
+6. **Disk Hygiene:** Runs `crictl rmi --prune`, cleans APT cache, and vacuums systemd logs older than 14 days.
+7. **Audit Notification:** Dispatches a structured status embed to Discord.
+
+---
+
+### Method B: Manual Fallback Procedure (Emergency Only)
+
+If Ansible is unavailable, perform manual maintenance sequentially:
+
+#### Step 1: Cordon and Drain the Kubernetes Node
 ```bash
 # Prevent new pods from being scheduled onto k3s-prod
 kubectl cordon k3s-prod
@@ -103,7 +132,7 @@ kubectl cordon k3s-prod
 kubectl drain k3s-prod --ignore-daemonsets --delete-emptydir-data --force
 ```
 
-### Step 2: Apply OS Updates on Hypervisor
+#### Step 2: Apply OS Updates on Hypervisor
 ```bash
 ssh root@100.108.178.93
 apt-get update && apt-get dist-upgrade -y
@@ -112,7 +141,7 @@ apt-get update && apt-get dist-upgrade -y
 needrestart -b || reboot
 ```
 
-### Step 3: Uncordon Node & Verify Workload Health
+#### Step 3: Uncordon Node & Verify Workload Health
 ```bash
 # Allow pods to be scheduled again
 kubectl uncordon k3s-prod

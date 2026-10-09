@@ -1,0 +1,98 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Homelab-Ops Sovereign GitOps Renovate configuration with senior platform safety guardrails.",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "timezone": "Asia/Kolkata",
+  "schedule": [
+    "before 06:00 on Monday"
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+
+  // Guardrail 1: Stability Quarantine (Hold new releases for 3 days to weed out day-0 bugs & yanked tags)
+  "minimumReleaseAge": "3 days",
+
+  // GitOps Discipline: Renovate creates PRs against main for Flux CD reconciliation
+  "baseBranchPatterns": ["main"],
+  "commitMessagePrefix": "chore(deps):",
+  "rebaseWhen": "behind-base-branch",
+
+  // Kubernetes & Flux CD file matchers
+  "kubernetes": {
+    "managerFilePatterns": ["/^kubernetes/.+\\.ya?ml$/"]
+  },
+  "kustomize": {
+    "managerFilePatterns": ["/(^|/)kustomization\\.ya?ml$/"]
+  },
+
+  "packageRules": [
+    // -------------------------------------------------------------------------
+    // Guardrail 2: Patch Versions (x.y.Z) - Safe bugfixes & security updates
+    // -------------------------------------------------------------------------
+    {
+      "description": "Group non-breaking patch updates into a unified weekly batch",
+      "matchUpdateTypes": ["patch"],
+      "groupName": "Weekly Safe Patch Updates",
+      "labels": ["dependencies", "type:patch"],
+      "automerge": false
+    },
+
+    // -------------------------------------------------------------------------
+    // Guardrail 3: Minor Versions (x.Y.z) - New features & potential config drift
+    // -------------------------------------------------------------------------
+    {
+      "description": "Separate minor updates into dedicated PRs with changelogs",
+      "matchUpdateTypes": ["minor"],
+      "labels": ["dependencies", "type:minor", "review-required"],
+      "automerge": false
+    },
+
+    // -------------------------------------------------------------------------
+    // Guardrail 4: Major Versions (X.y.z) - Breaking changes & schema shifts
+    // -------------------------------------------------------------------------
+    {
+      "description": "Strict manual staging required for breaking major releases",
+      "matchUpdateTypes": ["major"],
+      "labels": ["dependencies", "type:major", "breaking-change"],
+      "automerge": false,
+      "minimumReleaseAge": "7 days"
+    },
+
+    // -------------------------------------------------------------------------
+    // Guardrail 5: Stateful Datastores & Database Operators (Zero-Risk Policy)
+    // -------------------------------------------------------------------------
+    {
+      "description": "Pin and safeguard stateful relational engines and database operators",
+      "matchPackageNames": [
+        "postgres",
+        "redis",
+        "ghcr.io/cloudnative-pg/*",
+        "cloudnative-pg/*"
+      ],
+      "labels": ["database", "stateful-storage", "do-not-automerge"],
+      "automerge": false,
+      "major": {
+        "enabled": false
+      }
+    },
+
+    // -------------------------------------------------------------------------
+    // Guardrail 6: High-Risk Document & Media Ingestion Engines (Migration Warning)
+    // -------------------------------------------------------------------------
+    {
+      "description": "Require manual review for apps with irreversible SQLite/PostgreSQL migrations",
+      "matchPackageNames": [
+        "ghcr.io/paperless-ngx/paperless-ngx",
+        "miniflux/miniflux",
+        "docker.io/n8nio/n8n",
+        "sissbruecker/linkding"
+      ],
+      "labels": ["migration-sensitive", "review-required"],
+      "automerge": false
+    }
+  ]
+}
