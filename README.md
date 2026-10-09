@@ -187,6 +187,7 @@ Following CNCF and enterprise platform standards, all architecture specification
 - **[Case Study: Declarative GitOps & In-Git Secrets](docs/projects/02-gitops-and-sops.md)** — Continuous delivery via Flux CD v2 and Mozilla SOPS + Age encryption.
 - **[Case Study: Stateful PostgreSQL Operator on Bare-Metal](docs/projects/03-cloudnativepg-ha.md)** — CloudNativePG high-availability operator, automated failover, and WAL archiving.
 - **[Case Study: Multi-Cloud Resilience & Out-of-Band DR](docs/projects/04-multicloud-observability-dr.md)** — OCI Mumbai & GCP support compute, Uptime Kuma external probes, and 3-2-1 backup replication.
+- **[Case Study: Autonomous Sysadmin & Patch Automation](docs/projects/05-autonomous-sysadmin-patching.md)** — Host OS patching engine, K3s cordon/drain coordination, and Renovate GitOps guardrails.
 
 ### 3. Architecture Decision Records (ADRs)
 - **[Comprehensive ADR Register](docs/adr/README.md)** — 16 formal Architecture Decision Records documenting every pivotal architectural decision (ADR-001 through ADR-016), following the Michael Nygard standard.
