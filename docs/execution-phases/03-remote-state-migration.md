@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Phase Scope** | Offsite Remote State Storage, State Locking & Disaster Resilience |
 | **Target Infrastructure** | Oracle Cloud Infrastructure (OCI) Mumbai (`ap-mumbai-1`), Terraform S3 Backend |
-| **Primary Code Paths** | [`infrastructure/on-prem/backend.tf`](file:///home/vsc/devlopment/myGH/homelab-ops/infrastructure/on-prem/backend.tf) |
+| **Primary Code Paths** | [`infrastructure/on-prem/backend.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/on-prem/backend.tf) |
 | **Relevant Decisions** | [ADR-011](../adr/README.md#adr-011), [ADR-015](../adr/README.md#adr-015) |
 | **Operational Status** | Production Verified (Platform v3.0.0) |
 

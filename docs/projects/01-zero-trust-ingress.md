@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Architecture Pattern** | Zero Trust Network Access (ZTNA) & Edge Reverse Ingress |
 | **Core Technologies** | Cloudflare Zero Trust, `cloudflared` (QUIC/HTTP2), Traefik Ingress Controller |
-| **Primary Code Paths** | [`kubernetes/platform/cloudflared/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/cloudflared/), [`kubernetes/platform/traefik/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/traefik/) |
+| **Primary Code Paths** | [`kubernetes/platform/cloudflared/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/cloudflared), [`kubernetes/platform/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/traefik) |
 | **Relevant Decisions** | [ADR-006](../adr/README.md#adr-006), [ADR-012](../adr/README.md#adr-012) |
 | **Operational Status** | Production Verified (Latency <15ms, Zero Open Ports, Edge WAF Active) |
 

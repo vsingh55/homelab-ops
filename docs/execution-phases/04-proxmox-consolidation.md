@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Phase Scope** | Virtual Machine Decommissioning, Compute Consolidation & Storage Expansion |
 | **Target Infrastructure** | Proxmox VE 8.x Hypervisor (`192.168.1.3`), `k3s-prod` (VM 500) |
-| **Primary Code Paths** | [`infrastructure/on-prem/`](file:///home/vsc/devlopment/myGH/homelab-ops/infrastructure/on-prem/), [`configuration/inventory/group_vars/all/vars.yml`](file:///home/vsc/devlopment/myGH/homelab-ops/configuration/inventory/group_vars/all/vars.yml) |
+| **Primary Code Paths** | [`infrastructure/on-prem/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/on-prem), [`configuration/inventory/group_vars/all/vars.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/inventory/group_vars/all/vars.yml) |
 | **Relevant Decisions** | [ADR-001](../adr/README.md#adr-001), [ADR-013](../adr/README.md#adr-013), [ADR-015](../adr/README.md#adr-015), [ADR-016](../adr/README.md#adr-016) |
 | **Operational Status** | Production Verified (Platform v3.0.0) |
 

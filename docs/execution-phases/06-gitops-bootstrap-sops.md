@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Phase Scope** | Continuous Delivery Control Loop & Asymmetric Secret Encryption |
 | **Target Infrastructure** | K3s Kubernetes Cluster (`k3s-prod`), Flux CD v2, Mozilla SOPS |
-| **Primary Code Paths** | [`kubernetes/bootstrap/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/bootstrap/), [`kubernetes/platform/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/), [`.sops.yaml`](file:///home/vsc/devlopment/myGH/homelab-ops/.sops.yaml) |
+| **Primary Code Paths** | [`kubernetes/bootstrap/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/bootstrap), [`kubernetes/platform/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform), [`.sops.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.sops.yaml) |
 | **Relevant Decisions** | [ADR-007](../adr/README.md#adr-007), [ADR-014](../adr/README.md#adr-014) |
 | **Operational Status** | Production Verified (Platform v3.0.0) |
 
@@ -76,7 +76,7 @@ grep "public key:" ~/.config/sops/age/keys.txt
 ```
 
 ### 2. Configuring Repository Encryption Rules
-Defined [.sops.yaml](file:///home/vsc/devlopment/myGH/homelab-ops/.sops.yaml) at the repository root:
+Defined [`.sops.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.sops.yaml) at the repository root:
 
 ```yaml
 creation_rules:

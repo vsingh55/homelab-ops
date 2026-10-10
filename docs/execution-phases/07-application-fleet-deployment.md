@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Phase Scope** | Workload Fleet Onboarding, Stateful HA Database & Slack ChatOps Routing |
 | **Target Infrastructure** | K3s Kubernetes Cluster, CloudNativePG, 1TB SATA HDD, OCI Mumbai Uptime Kuma |
-| **Primary Code Paths** | [`kubernetes/apps/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/apps/), [`kubernetes/platform/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/), [`infrastructure/oci/`](file:///home/vsc/devlopment/myGH/homelab-ops/infrastructure/oci/) |
+| **Primary Code Paths** | [`kubernetes/apps/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps), [`kubernetes/platform/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform), [`infrastructure/oci/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/oci) |
 | **Relevant Decisions** | [ADR-009](../adr/README.md#adr-009), [ADR-010](../adr/README.md#adr-010), [ADR-012](../adr/README.md#adr-012), [ADR-013](../adr/README.md#adr-013) |
 | **Operational Status** | Production Verified (Platform v3.0.0) |
 
@@ -63,7 +63,7 @@ Replacing standalone PostgreSQL containers with **CloudNativePG** provides:
 ## 4. Technical Execution Details
 
 ### 1. Deploying CloudNativePG HA Operator & Cluster
-The declarative PostgreSQL cluster was deployed via [kubernetes/platform/postgres-operator/cluster.yaml](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/postgres-operator/cluster.yaml):
+The declarative PostgreSQL cluster was deployed via [`kubernetes/platform/postgres-operator/cluster.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/postgres-operator/cluster.yaml):
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1

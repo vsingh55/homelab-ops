@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Architecture Pattern** | Pull-Based GitOps Continuous Delivery & Asymmetric Secret Encryption |
 | **Core Technologies** | Flux CD v2, Kustomize, Mozilla SOPS, Age Cryptography, GitHub |
-| **Primary Code Paths** | [`kubernetes/bootstrap/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/bootstrap/), [`kubernetes/platform/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/), [`.sops.yaml`](file:///home/vsc/devlopment/myGH/homelab-ops/.sops.yaml) |
+| **Primary Code Paths** | [`kubernetes/bootstrap/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/bootstrap), [`kubernetes/platform/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform), [`.sops.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.sops.yaml) |
 | **Relevant Decisions** | [ADR-007](../adr/README.md#adr-007), [ADR-014](../adr/README.md#adr-014) |
 | **Operational Status** | Production Verified (100% Declarative, Zero Drift, In-Memory Decryption) |
 
@@ -57,7 +57,7 @@ Pipeline Lifecycle:
 ### 1. In-Git Asymmetric Encryption with Mozilla SOPS & Age
 Rather than storing whole encrypted blobs or relying on symmetric passwords:
 
-- Developers encrypt secrets using the platform's public Age key (`age1...`) defined in [.sops.yaml](file:///home/vsc/devlopment/myGH/homelab-ops/.sops.yaml).
+- Developers encrypt secrets using the platform's public Age key (`age1...`) defined in [`.sops.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.sops.yaml).
 - SOPS encrypts **strictly the YAML values**, leaving object names, keys, and metadata in plain text for transparent code reviews and Git diff inspections.
 - The private Age secret key (`AGE-SECRET-KEY-...`) is injected into the `flux-system` namespace once during initial bootstrap and never leaves cluster memory.
 

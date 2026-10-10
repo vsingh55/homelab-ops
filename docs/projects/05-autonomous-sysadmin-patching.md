@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Architecture Pattern** | Two-Pillar Autonomous Maintenance: Host OS Patch Engine & Conservative GitOps Workload Guardrails |
 | **Core Technologies** | Ansible, Renovate Bot, K3s Kubelet Drain/Cordon, GitHub Actions, Discord Webhooks |
-| **Primary Code Paths** | [`configuration/playbooks/sysadmin_maintenance.yml`](file:///home/vsc/devlopment/myGH/homelab-ops/configuration/playbooks/sysadmin_maintenance.yml), [`.github/renovate.json5`](file:///home/vsc/devlopment/myGH/homelab-ops/.github/renovate.json5), [`.github/workflows/renovate.yaml`](file:///home/vsc/devlopment/myGH/homelab-ops/.github/workflows/renovate.yaml), [`docs/runbooks/02-cluster-operations.md`](file:///home/vsc/devlopment/myGH/homelab-ops/docs/runbooks/02-cluster-operations.md) |
+| **Primary Code Paths** | [`configuration/playbooks/sysadmin_maintenance.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/playbooks/sysadmin_maintenance.yml), [`.github/renovate.json5`](https://github.com/vsingh55/homelab-ops/blob/main/.github/renovate.json5), [`.github/workflows/renovate.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.github/workflows/renovate.yaml), [`docs/runbooks/02-cluster-operations.md`](https://github.com/vsingh55/homelab-ops/blob/main/docs/runbooks/02-cluster-operations.md) |
 | **Relevant Decisions** | [ADR-001](../adr/README.md#adr-001), [ADR-007](../adr/README.md#adr-007), [ADR-010](../adr/README.md#adr-010) |
 | **Operational Status** | Production Verified (Sequential Drain/Reboot <180s, 3-Day Quarantine Buffer, Zero Day-0 Regressions) |
 
@@ -28,12 +28,22 @@ This project engineered a production-grade **Autonomous Sysadmin Maintenance & S
 In high-availability infrastructure, naive automation is often more dangerous than manual execution. Unconstrained auto-upgrades introduce four catastrophic failure modes:
 
 ```mermaid
-graph TD
-    subgraph FailureModes["Real-World Blind Update Disasters"]
-        F1["1. One-Way Database Migration Trap<br>(Paperless / Miniflux startup alters schemas; rollback impossible)"]
-        F2["2. Stateful Operator CrashLoop<br>(Postgres 15 -> 16 tag bump crashes with incompatible data directory)"]
-        F3["3. Day-0 Upstream Regressions<br>(Broken dependencies or yanked container images pulled immediately)"]
-        F4["4. Kernel & Driver Desynchronization<br>(Uncoordinated kernel reboot causes cgroup v2 & containerd panic)"]
+flowchart TB
+    Root["💥 Real-World Blind Auto-Update Disasters"]
+    
+    Root --> DataPlane
+    Root --> InfraPlane
+
+    subgraph DataPlane["📁 Data & Workload Failure Risks"]
+        direction TB
+        F1["⚠️ 1. One-Way Database Migrations<br>Paperless / Miniflux alter schemas on startup;<br>reversion impossible if container crashes"]
+        F2["💥 2. Stateful Operator CrashLoops<br>Postgres 15 → 16 image bump fails immediately<br>without physical pg_upgrade data migration"]
+    end
+
+    subgraph InfraPlane["🖥️ Infrastructure & Node Stability Risks"]
+        direction TB
+        F3["🐛 3. Day-0 Upstream Regressions<br>Broken dependencies or yanked container tags<br>pulled into production without community soak"]
+        F4["⚡ 4. Kernel & Driver Desynchronization<br>Rebooting without K8s drain causes containerd panic,<br>interactive dpkg prompts hang headless scripts"]
     end
 ```
 
@@ -46,29 +56,43 @@ graph TD
 
 ## 3. High-Level Architecture & Two-Pillar Model
 
-The platform divides maintenance responsibility into two distinct operational scopes, preserving Git as the single source of truth for workloads while enabling deterministic host administration:
+The platform divides maintenance responsibility into two distinct operational scopes, preserving Git as the single source of truth for workloads while enabling deterministic host administration.
+
+### Pillar 1: Host & Node Sysadmin Engine Flow (Ansible)
 
 ```mermaid
-graph TD
-    subgraph Pillar1["Pillar 1: Host & Node Sysadmin Engine (Ansible)"]
-        P1["Pre-Flight Disk Free Check (>= 3GB)"] --> P2["Non-Interactive Security Patching (force-confold)"]
-        P2 --> P3{Reboot Required?}
-        P3 -- Yes --> P4["Cordon & Drain k3s-prod (--ignore-daemonsets)"]
-        P4 --> P5["Sequential Reboot & SSH Watchdog"]
-        P5 --> P6["Uncordon Node & Wait for Pods (Ready)"]
-        P3 -- No --> P7["Disk Hygiene (crictl prune, journal vacuum)"]
-        P6 --> P7
-        P7 --> P8["Discord Status Embed & Audit Log"]
-    end
+flowchart TD
+    Start(["🚀 Scheduled Host Maintenance Trigger"]) --> PreFlight["1. Pre-Flight Disk Safety Check<br>Assert root partition has >= 3GB free space"]
+    PreFlight --> K8sCheck["2. Cluster Readiness Probe<br>Validate k3s-prod node status is Ready"]
+    K8sCheck --> AptPatch["3. Safe Non-Interactive Patching<br>Run apt upgrade with force-confdef & force-confold"]
+    AptPatch --> RebootCheck{"4. Reboot Required?<br>(/var/run/reboot-required)"}
+    
+    RebootCheck -- "Yes" --> DrainNode["5. Cordon & Drain Node<br>kubectl drain --ignore-daemonsets --delete-emptydir-data"]
+    DrainNode --> HostReboot["6. Sequential Host Reboot<br>Reboot VM/host with SSH reconnect polling"]
+    HostReboot --> UncordonNode["7. Uncordon & Health Probe<br>kubectl uncordon & poll until all pods report Running"]
+    
+    RebootCheck -- "No" --> DiskHygiene["8. Storage Hygiene & Pruning<br>k3s crictl rmi --prune & vacuum systemd journal"]
+    UncordonNode --> DiskHygiene
+    
+    DiskHygiene --> Report(["📣 Discord Audit Report Dispatched"])
+```
 
-    subgraph Pillar2["Pillar 2: Workload GitOps Guardrails (Renovate)"]
-        R1["Scan Upstream Container Registries"] --> R2["Guardrail 1: 3-Day Stability Quarantine"]
-        R2 --> R3{Version Type?}
-        R3 -- "Patch (x.y.Z)" --> R4["Grouped Weekly Batch PR (Safe Bugfixes)"]
-        R3 -- "Minor (x.Y.z)" --> R5["Isolated PR with Release Notes (Review Required)"]
-        R3 -- "Major (X.y.z)" --> R6["7-Day Quarantine + Manual Staging Gate"]
-        R3 -- "Databases (CNPG/Postgres)" --> R7["Major Version Freeze (Zero-Risk Policy)"]
-    end
+### Pillar 2: Conservative Workload GitOps Guardrails Flow (Renovate)
+
+```mermaid
+flowchart TD
+    Scan(["🔍 Upstream Registry Scan<br>Docker Hub, GHCR, Quay, Helm Repos"]) --> Quarantine["🛡️ Guardrail 1: 3-Day Stability Quarantine<br>minimumReleaseAge: '3 days' (Buffers Day-0 bugs)"]
+    Quarantine --> SemVerCheck{"Guardrail 2: Semantic Version Type?"}
+    
+    SemVerCheck -- "Patch (x.y.Z)" --> BatchPR["📦 Safe Patch Updates Batch<br>Grouped into single Monday weekly PR"]
+    SemVerCheck -- "Minor (x.Y.z)" --> IsolatedPR["📋 Isolated Feature PR<br>Attaches changelog, marked 'review-required'"]
+    SemVerCheck -- "Major (X.y.z)" --> MajorHold["🛑 Breaking Major Release<br>7-Day quarantine, marked 'breaking-change'"]
+    SemVerCheck -- "Database / Operator" --> DBFreeze["🔒 Stateful Database Guardrail<br>Freeze major versions (Postgres, Redis, CNPG)"]
+    
+    BatchPR --> GitReview["📥 Flux CD Pull Request against main"]
+    IsolatedPR --> GitReview
+    MajorHold --> ManualStage["⚙️ Manual Staging & Backup Verification"]
+    DBFreeze --> Frozen["⛔ Auto-PR Blocked (Manual pg_upgrade required)"]
 ```
 
 ---

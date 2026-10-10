@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Phase Scope** | Codebase Cleansing, IaC Simplification & Inventory Restructuring |
 | **Target Infrastructure** | Infrastructure as Code (Terraform) & Configuration Management (Ansible) |
-| **Primary Code Paths** | [`infrastructure/on-prem/`](file:///home/vsc/devlopment/myGH/homelab-ops/infrastructure/on-prem/), [`configuration/inventory/`](file:///home/vsc/devlopment/myGH/homelab-ops/configuration/inventory/) |
+| **Primary Code Paths** | [`infrastructure/on-prem/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/on-prem), [`configuration/inventory/`](https://github.com/vsingh55/homelab-ops/tree/main/configuration/inventory) |
 | **Relevant Decisions** | [ADR-005](../adr/README.md#adr-005), [ADR-015](../adr/README.md#adr-015), [ADR-016](../adr/README.md#adr-016) |
 | **Operational Status** | Production Verified (Platform v3.0.0) |
 

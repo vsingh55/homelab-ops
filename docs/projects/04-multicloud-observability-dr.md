@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Architecture Pattern** | Multi-Cloud Hybrid Support, External Heartbeat Probing & 3-2-1 Disaster Recovery |
 | **Core Technologies** | Oracle Cloud Infrastructure (OCI Mumbai), Google Cloud (GCP), Uptime Kuma, Restic, Terraform S3 |
-| **Primary Code Paths** | [`infrastructure/oci/`](file:///home/vsc/devlopment/myGH/homelab-ops/infrastructure/oci/), [`infrastructure/on-prem/backend.tf`](file:///home/vsc/devlopment/myGH/homelab-ops/infrastructure/on-prem/backend.tf), [`configuration/playbooks/deploy_uptime_kuma.yml`](file:///home/vsc/devlopment/myGH/homelab-ops/configuration/playbooks/deploy_uptime_kuma.yml) |
+| **Primary Code Paths** | [`infrastructure/oci/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/oci), [`infrastructure/on-prem/backend.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/on-prem/backend.tf), [`configuration/playbooks/deploy_uptime_kuma.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/playbooks/deploy_uptime_kuma.yml) |
 | **Relevant Decisions** | [ADR-011](../adr/README.md#adr-011), [ADR-015](../adr/README.md#adr-015) |
 | **Operational Status** | Production Verified (Out-of-Band Alerts <60s, Remote State Locked, Nightly Encrypted Sync) |
 

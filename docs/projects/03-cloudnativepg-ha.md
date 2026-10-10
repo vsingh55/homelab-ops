@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Architecture Pattern** | Declarative Cloud-Native Database Operator & Continuous WAL Archiving |
 | **Core Technologies** | CloudNativePG Operator, PostgreSQL 16, Barman Object Store, NVMe Local Storage |
-| **Primary Code Paths** | [`kubernetes/platform/postgres-operator/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/postgres-operator/), [ADR-010](../adr/README.md#adr-010) |
+| **Primary Code Paths** | [`kubernetes/platform/postgres-operator/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/postgres-operator), [ADR-010](../adr/README.md#adr-010) |
 | **Relevant Decisions** | [ADR-010](../adr/README.md#adr-010), [ADR-013](../adr/README.md#adr-013) |
 | **Operational Status** | Production Verified (Self-Healing Failover, WAL Streaming, Sub-ms NVMe I/O) |
 

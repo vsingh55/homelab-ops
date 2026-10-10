@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Phase Scope** | Edge Ingress Routing, CGNAT Traversal & Container Registry Migration |
 | **Target Infrastructure** | Cloudflare Edge Network, `k3s-prod` (`cloudflared`), GitHub Container Registry |
-| **Primary Code Paths** | [`kubernetes/platform/cloudflared/`](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/cloudflared/), [`.github/workflows/`](file:///home/vsc/devlopment/myGH/homelab-ops/.github/workflows/) |
+| **Primary Code Paths** | [`kubernetes/platform/cloudflared/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/cloudflared), [`.github/workflows/`](https://github.com/vsingh55/homelab-ops/tree/main/.github/workflows) |
 | **Relevant Decisions** | [ADR-006](../adr/README.md#adr-006), [ADR-008](../adr/README.md#adr-008) |
 | **Operational Status** | Production Verified (Platform v3.0.0) |
 
@@ -66,7 +66,7 @@ Ingress Flow:
 ## 4. Technical Execution Details
 
 ### 1. Deploying `cloudflared` to `k3s-prod`
-The tunnel connector was deployed inside the cluster via [kubernetes/platform/cloudflared/cloudflared.yaml](file:///home/vsc/devlopment/myGH/homelab-ops/kubernetes/platform/cloudflared/cloudflared.yaml):
+The tunnel connector was deployed inside the cluster via [`kubernetes/platform/cloudflared/cloudflared.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/cloudflared/cloudflared.yaml):
 
 ```yaml
 apiVersion: apps/v1
