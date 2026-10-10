@@ -58,7 +58,7 @@ Reconciliation Architecture:
 [ Native Kubernetes Secrets & Pods ]
 ```
 
-![Declarative GitOps & Secret Lifecycle Pipeline](../../images/v.3.0.0/gitops-pipeline.png)
+![Declarative GitOps & Secret Lifecycle Pipeline](../images/v.3.0.0/gitops-pipeline.png)
 
 ---
 
@@ -105,7 +105,7 @@ flux bootstrap github \
 ```
 
 ### 5. Configuring SOPS Decryption in Kustomization
-Configured the root Kustomization in `kubernetes/bootstrap/` to decrypt SOPS secrets automatically:
+Configured the root Kustomization in [`kubernetes/bootstrap/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/bootstrap) to decrypt SOPS secrets automatically:
 
 ```yaml
 apiVersion: kustomize.toolkit.fluxcd.io/v1

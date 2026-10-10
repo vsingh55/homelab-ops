@@ -6,6 +6,7 @@
 __pycache__/
 .ansible/
 .ansible_vault_pass
+site/
 # --- Secrets & Local Configs ---
 configuration/inventory/hosts.yml
 scripts/watchdog.conf

@@ -63,7 +63,7 @@ Traffic Flow Topology:
 ## 4. Key Architectural Implementations
 
 ### 1. Outbound-Only QUIC/HTTPS Tunnels
-The in-cluster `cloudflared` daemon establishes four persistent outbound UDP connections over port 7844 (with automatic fallback to TCP 443 HTTP/2) to Cloudflare's nearest Anycast data centers. Because connections originate from inside the cluster:
+The in-cluster `cloudflared` daemon deployed via [`kubernetes/platform/cloudflared/cloudflared.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/cloudflared/cloudflared.yaml) establishes four persistent outbound UDP connections over port 7844 (with automatic fallback to TCP 443 HTTP/2) to Cloudflare's nearest Anycast data centers. Because connections originate from inside the cluster:
 
 - The residential router firewall blocks all inbound traffic.
 - No public IP address is associated with the home infrastructure.
@@ -99,20 +99,20 @@ spec:
 ```
 
 ### 2. High-Availability Traefik Mapping
-Rather than maintaining discrete ingress tunnel connectors for every service, `cloudflared` proxies all incoming hostnames to the cluster's internal **Traefik Ingress Controller**:
+Rather than maintaining discrete ingress tunnel connectors for every service, `cloudflared` proxies all incoming hostnames to the cluster's internal **Traefik Ingress Controller** ([`kubernetes/platform/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/traefik)):
 
-- `docs.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
-- `hooks.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
-- `dash.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80`
+- `docs.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80` ([`kubernetes/platform/docs/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/docs))
+- `hooks.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80` ([`kubernetes/apps/n8n/ingress.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/apps/n8n/ingress.yaml))
+- `dash.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80` ([`kubernetes/platform/homepage/ingress.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/homepage/ingress.yaml))
 
 Traefik evaluates native Kubernetes `Ingress` and `IngressRoute` resources, managing internal TLS headers, middleware, and request forwarding.
 
 ### 3. Edge Identity Protection with Cloudflare Access (SSO)
-Administrative web portals (such as the Homepage dashboard at `dash.vijaysingh.cloud`) are protected at the Cloudflare edge using **Cloudflare Access Zero Trust policies**:
+Administrative web portals (such as the Homepage dashboard at `dash.vijaysingh.cloud`, declared in [`kubernetes/platform/homepage/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/homepage)) are protected at the Cloudflare edge using **Cloudflare Access Zero Trust policies**:
 
 - Unauthenticated requests are intercepted at the edge before packets reach the homelab.
 - Users authenticate via Google OAuth 2.0 with hardware security key (FIDO2/WebAuthn) support.
-- External webhook endpoints (e.g. `hooks.vijaysingh.cloud` for n8n) bypass SSO and are protected by HMAC SHA-256 webhook signatures.
+- External webhook endpoints (e.g. `hooks.vijaysingh.cloud` for [`n8n`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/n8n)) bypass SSO and are protected by HMAC SHA-256 webhook signatures.
 
 ---
 

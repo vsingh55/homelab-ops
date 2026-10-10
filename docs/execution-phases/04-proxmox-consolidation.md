@@ -56,7 +56,7 @@ Host Virtualization Topology:
         └── Tier 2 (Cold): 800GB SATA HDD Mount (/mnt/hdd)
 ```
 
-![Bare-Metal Cluster Architecture](../../images/v.3.0.0/bare-metal-cluster-architecture.png)
+![Bare-Metal Cluster Architecture](../images/v.3.0.0/bare-metal-cluster-architecture.png)
 
 ---
 
@@ -95,7 +95,7 @@ ssh root@192.168.1.3 "qm stop 900 2>/dev/null || true; qm destroy 900 --purge --
 ```
 
 ### 4. Applying Hardware Resizing via Terraform
-In `infrastructure/on-prem/`, the updated `k3s-prod` allocation was applied:
+In [`infrastructure/on-prem/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/on-prem), the updated `k3s-prod` allocation was applied:
 
 ```bash
 cd infrastructure/on-prem

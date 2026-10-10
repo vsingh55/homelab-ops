@@ -52,7 +52,7 @@ Repository Changes in Phase 2:
 
 ## 4. Technical Execution Details
 
-### 1. Pruning `infrastructure/on-prem/main.tf`
+### 1. Pruning [`infrastructure/on-prem/main.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/on-prem/main.tf)
 The on-premises root manifest was streamlined to declare strictly the production K3s VM with its dedicated compute, memory, and secondary 1TB SATA HDD data mount:
 
 ```hcl
@@ -83,7 +83,7 @@ module "k3s_prod" {
 }
 ```
 
-### 2. Restructuring `configuration/inventory/hosts.yml`
+### 2. Restructuring [`configuration/inventory/hosts.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/inventory/hosts.yml)
 The Ansible inventory was reduced from complex nested bastion groups into a flat, deterministic topology:
 
 ```yaml

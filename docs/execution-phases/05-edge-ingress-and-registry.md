@@ -59,7 +59,7 @@ Ingress Flow:
         └── dash.vijaysingh.cloud  ──► Homepage Dashboard (Cloudflare SSO)
 ```
 
-![Global Multi-Cloud & Network Ingress Topology](../../images/v.3.0.0/global-network-topology.png)
+![Global Multi-Cloud & Network Ingress Topology](../images/v.3.0.0/global-network-topology.png)
 
 ---
 

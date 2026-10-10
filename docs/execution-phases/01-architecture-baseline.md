@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Phase Scope** | Global Architecture Blueprint, Resource Budgeting & Governance |
 | **Target Infrastructure** | Bare-Metal Host (16GB RAM Mini PC), Proxmox VE 8.x, K3s Kubernetes |
-| **Primary Code Paths** | [`docs/architecture/`](../architecture/), [`docs/adr/`](../adr/) |
+| **Primary Code Paths** | [`docs/architecture/`](https://github.com/vsingh55/homelab-ops/tree/main/docs/architecture), [`docs/adr/`](https://github.com/vsingh55/homelab-ops/tree/main/docs/adr) |
 | **Relevant Decisions** | [ADR-001](../adr/README.md#adr-001), [ADR-015](../adr/README.md#adr-015), [ADR-016](../adr/README.md#adr-016) |
 | **Operational Status** | Production Verified (Platform v3.0.0) |
 

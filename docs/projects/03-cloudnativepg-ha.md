@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Architecture Pattern** | Declarative Cloud-Native Database Operator & Continuous WAL Archiving |
 | **Core Technologies** | CloudNativePG Operator, PostgreSQL 16, Barman Object Store, NVMe Local Storage |
-| **Primary Code Paths** | [`kubernetes/platform/postgres-operator/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/postgres-operator), [ADR-010](../adr/README.md#adr-010) |
+| **Primary Code Paths** | [`kubernetes/platform/postgres-operator/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/postgres-operator), [`kubernetes/platform/postgres-operator/cluster.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/postgres-operator/cluster.yaml) |
 | **Relevant Decisions** | [ADR-010](../adr/README.md#adr-010), [ADR-013](../adr/README.md#adr-013) |
 | **Operational Status** | Production Verified (Self-Healing Failover, WAL Streaming, Sub-ms NVMe I/O) |
 
@@ -14,7 +14,7 @@
 
 Running production stateful workloads in Kubernetes is notoriously challenging. Traditional approaches rely on static, single-instance database pods with manual failover, risking data corruption during hypervisor reboots and lacking automated point-in-time recovery.
 
-This project deployed the enterprise-grade **CloudNativePG Operator** to manage stateful relational data on bare-metal hardware. The implementation features self-healing database instance recovery, automated leader election, continuous Write-Ahead Log (WAL) streaming, and physical storage pinning on high-IOPS NVMe flash storage, providing robust database infrastructure for mission-critical platform applications (**n8n**, **Paperless-ngx**, **Miniflux**).
+This project deployed the enterprise-grade **CloudNativePG Operator** to manage stateful relational data on bare-metal hardware. The implementation features self-healing database instance recovery, automated leader election, continuous Write-Ahead Log (WAL) streaming, and physical storage pinning on high-IOPS NVMe flash storage, providing robust database infrastructure for mission-critical platform applications ([`n8n`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/n8n), [`Paperless-ngx`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/paperless), [`Miniflux`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/miniflux)).
 
 ---
 
@@ -51,7 +51,7 @@ Database Architecture:
 ## 4. Key Architectural Implementations
 
 ### 1. Declarative Database Custom Resource (`kind: Cluster`)
-Database instances are defined as native Kubernetes Custom Resources, managed declaratively through GitOps without manual SQL initialization:
+Database instances are defined as native Kubernetes Custom Resources via [`kubernetes/platform/postgres-operator/cluster.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/postgres-operator/cluster.yaml), managed declaratively through GitOps without manual SQL initialization:
 
 ```yaml
 # Declarative HA Cluster (kubernetes/platform/postgres-operator/cluster.yaml)
@@ -92,7 +92,7 @@ Rather than relying on coarse nightly database dumps:
 - Recovery Point Objective (RPO) is reduced from 24 hours to **< 15 minutes**.
 
 ### 4. Zero-Downtime Rolling Maintenance
-When applying PostgreSQL minor updates or configuration changes:
+When applying PostgreSQL minor updates or operator configuration changes via [`kubernetes/platform/postgres-operator/helm-release.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/postgres-operator/helm-release.yaml):
 1. The operator updates and synchronizes the standby replica.
 2. Once streaming parity is reached, the operator performs a coordinated, graceful switchover.
 3. The standby is promoted to primary with zero data loss.

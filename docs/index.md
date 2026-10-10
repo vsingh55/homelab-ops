@@ -147,28 +147,21 @@ To achieve enterprise-grade resilience, the architecture integrates **Oracle Clo
 
 All services are containerized, declared in Git, and routed through Cloudflare Zero Trust:
 
-```text
-Platform & Security
-├── cloudflared             # High-availability Anycast edge ingress tunnel
-├── postgres-operator       # CloudNativePG enterprise PostgreSQL lifecycle operator
-├── homepage                # Homelab Command Center (Live CPU/RAM & status portal)
-├── monitoring              # Prometheus metrics scraping & Grafana telemetry
-├── kwatch                  # Instant Discord/Slack notifier for crashed pods
-└── docs                    # MkDocs Material engineering handbook (docs.vijaysingh.cloud)
-
-Operations & Workflow Automation
-├── n8n                     # Hardened event-driven workflow automation engine
-└── pdf-generator           # Automated document compilation microservice
-
-Sovereign Documents & Media (1TB HDD Tier)
-├── paperless-ngx           # OCR document ingestion, tagging, and search archive
-└── bookorbit               # Multi-user digital book library & sync manager
-
-Productivity & Personal Health
-├── miniflux                # Ultra-fast, lightweight Go RSS reader
-├── linkding                # Bookmarking service with tag search
-└── ryot / wger             # Fitness analytics and workout tracking platform
-```
+| Workload Domain | Component / Service | In-Repo Kubernetes Manifests | Production Role & Engineering Function |
+| :--- | :--- | :--- | :--- |
+| **Platform & Security** | `cloudflared` | [`kubernetes/platform/cloudflared/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/cloudflared) | High-availability Anycast edge ingress tunnel |
+| | `postgres-operator` | [`kubernetes/platform/postgres-operator/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/postgres-operator) | CloudNativePG enterprise PostgreSQL lifecycle operator |
+| | `homepage` | [`kubernetes/platform/homepage/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/homepage) | Homelab Command Center (Live CPU/RAM & status portal) |
+| | `monitoring` | [`kubernetes/platform/monitoring/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/monitoring) | Prometheus metrics scraping & Grafana telemetry |
+| | `kwatch` | [`kubernetes/platform/kwatch/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/kwatch) | Instant Discord/Slack notifier for crashed pods |
+| | `docs` | [`kubernetes/platform/docs/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/docs) | MkDocs Material engineering handbook (`docs.vijaysingh.cloud`) |
+| **Operations & Automation** | `n8n` | [`kubernetes/apps/n8n/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/n8n) | Hardened event-driven workflow automation engine |
+| **Sovereign Documents & Media** | `paperless-ngx` | [`kubernetes/apps/paperless/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/paperless) | OCR document ingestion, tagging, and search archive (1TB HDD) |
+| | `bookorbit` | [`kubernetes/apps/bookorbit/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/bookorbit) | Multi-user digital book library & sync manager (1TB HDD) |
+| **Productivity & Utilities** | `miniflux` | [`kubernetes/apps/miniflux/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/miniflux) | Ultra-fast, lightweight Go RSS reader |
+| | `linkding` | [`kubernetes/apps/linkding/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/linkding) | Bookmarking service with tag search |
+| | `ryot / wger` | [`kubernetes/apps/wger/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/wger) | Fitness analytics and workout tracking platform |
+| **Bootstrapping & Fleet** | `bootstrap` | [`kubernetes/bootstrap/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/bootstrap) | Flux CD root sync definitions and dependency sequencing |
 
 ---
 
@@ -240,12 +233,13 @@ Following CNCF and enterprise platform standards, all architecture specification
 ## Quick Operator Runbook
 
 ### Secret Encryption Workflow (SOPS + Age)
+Rules configured in [`.sops.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.sops.yaml):
 ```bash
 # Encrypt an updated Kubernetes Secret manifest before committing to Git
-sops --encrypt --in-place kubernetes/apps/n8n/secret.enc.yaml
+sops --encrypt --in-place kubernetes/apps/n8n/secrets.enc.yaml
 
 # Directly edit an encrypted secret file using your default editor
-sops kubernetes/apps/n8n/secret.enc.yaml
+sops kubernetes/apps/n8n/secrets.enc.yaml
 ```
 
 ### GitOps Synchronization

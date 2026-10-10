@@ -53,7 +53,7 @@ kubectl describe pod -n <NAMESPACE> <POD_NAME> | grep -E "State:|Reason:|Exit Co
 
 2. If `Reason: OOMKilled` (Exit Code 137):
 - The workload exceeded its memory limit.
-- Edit the application manifest in `kubernetes/apps/<APP_NAME>/deployment.yaml` to increase `resources.limits.memory`.
+- Edit the application manifest in [`kubernetes/apps/<APP_NAME>/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps) to increase `resources.limits.memory`.
 - Commit to Git and reconcile via Flux: `git commit -am "fix: increase memory limit" && git push && flux reconcile kustomization apps --with-source`.
 
 3. If application crash (Exit Code 1):
@@ -66,7 +66,7 @@ kubectl logs -n <NAMESPACE> <POD_NAME> --previous --tail=100
 
 ### Playbook 2: Cloudflare Zero Trust Ingress Severed (HTTP 530 / 502)
 
-1. Check the `cloudflared` connector pod status:
+1. Check the `cloudflared` connector pod status ([`kubernetes/platform/cloudflared/cloudflared.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/cloudflared/cloudflared.yaml)):
 ```bash
 kubectl -n platform get pods -l app.kubernetes.io/name=cloudflared
 ```
@@ -77,7 +77,7 @@ kubectl -n platform logs deployment/cloudflared --tail=50
 ```
 
 3. **Common Cause A: QUIC Connection Failure (UDP 7844 blocked by ISP):**
-- Update deployment to force TCP fallback:
+- Update deployment ([`kubernetes/platform/cloudflared/cloudflared.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/cloudflared/cloudflared.yaml)) to force TCP fallback:
 - Add args: `- --protocol` and `- http2` to container spec.
 - Re-apply manifest.
 
@@ -89,7 +89,7 @@ kubectl -n platform logs deployment/cloudflared --tail=50
 
 ### Playbook 3: CloudNativePG Database Failover & Replication Split-Brain
 
-1. Check database cluster health and primary role:
+1. Check database cluster health and primary role ([`kubernetes/platform/postgres-operator/cluster.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/postgres-operator/cluster.yaml)):
 ```bash
 kubectl get cluster -n database postgres-ha
 kubectl describe cluster -n database postgres-ha | grep -A 10 "Instances status"

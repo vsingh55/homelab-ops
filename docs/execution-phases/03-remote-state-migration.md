@@ -67,7 +67,7 @@ terraform state pull > ~/homelab-backups/terraform-state/terraform.tfstate.pre-m
 ```
 
 ### 2. OCI S3 Endpoint Configuration
-The on-premises backend was configured in `infrastructure/on-prem/backend.tf`:
+The on-premises backend was configured in [`infrastructure/on-prem/backend.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/on-prem/backend.tf):
 
 ```hcl
 terraform {

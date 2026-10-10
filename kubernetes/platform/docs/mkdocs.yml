@@ -3,6 +3,7 @@ site_description: "Production Homelab, Hybrid Cloud Architecture, Disaster Recov
 site_author: "Vijay Kumar Singh"
 repo_url: "https://github.com/vsingh55/homelab-ops"
 repo_name: "vsingh55/homelab-ops"
+edit_uri: "blob/main/docs/"
 
 theme:
   name: material

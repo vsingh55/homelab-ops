@@ -4,8 +4,8 @@
 | :--- | :--- |
 | **Architecture Pattern** | Two-Pillar Autonomous Maintenance: Host OS Patch Engine & Conservative GitOps Workload Guardrails |
 | **Core Technologies** | Ansible, Renovate Bot, K3s Kubelet Drain/Cordon, GitHub Actions, Discord Webhooks |
-| **Primary Code Paths** | [`configuration/playbooks/sysadmin_maintenance.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/playbooks/sysadmin_maintenance.yml), [`.github/renovate.json5`](https://github.com/vsingh55/homelab-ops/blob/main/.github/renovate.json5), [`.github/workflows/renovate.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.github/workflows/renovate.yaml), [`docs/runbooks/02-cluster-operations.md`](https://github.com/vsingh55/homelab-ops/blob/main/docs/runbooks/02-cluster-operations.md) |
-| **Relevant Decisions** | [ADR-001](../adr/README.md#adr-001), [ADR-007](../adr/README.md#adr-007), [ADR-010](../adr/README.md#adr-010) |
+| **Primary Code Paths** | [`configuration/playbooks/sysadmin_maintenance.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/playbooks/sysadmin_maintenance.yml), [`.github/renovate.json5`](https://github.com/vsingh55/homelab-ops/blob/main/.github/renovate.json5), [`.github/workflows/renovate.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.github/workflows/renovate.yaml), [`configuration/inventory/hosts.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/inventory/hosts.yml) |
+| **Relevant Decisions** | [ADR-001](../adr/README.md#adr-001), [ADR-007](../adr/README.md#adr-007), [ADR-010](../adr/README.md#adr-010), [Day-2 Operations Runbook](../runbooks/02-cluster-operations.md) |
 | **Operational Status** | Production Verified (Sequential Drain/Reboot <180s, 3-Day Quarantine Buffer, Zero Day-0 Regressions) |
 
 ---
@@ -99,9 +99,9 @@ flowchart TD
 
 ## 4. Key Architectural Implementations
 
-### Pillar 1: Host & Node Sysadmin Engine (`sysadmin_maintenance.yml`)
+### Pillar 1: Host & Node Sysadmin Engine ([`configuration/playbooks/sysadmin_maintenance.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/playbooks/sysadmin_maintenance.yml))
 
-The host maintenance playbook operates across the bare-metal Proxmox hypervisor (`192.168.1.3`), the production K3s VM (`192.168.1.30`), and the out-of-band OCI Mumbai cloud node (`155.248.243.123`):
+The host maintenance playbook operates across the bare-metal Proxmox hypervisor (`192.168.1.3`), the production K3s VM (`192.168.1.30`), and the out-of-band OCI Mumbai cloud node (`155.248.243.123`) using inventory defined in [`configuration/inventory/hosts.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/inventory/hosts.yml):
 
 1. **Pre-Flight Disk Space Assertions:**
    Prevents package extraction failures or kernel panic due to full root partitions:
@@ -153,9 +153,9 @@ The host maintenance playbook operates across the bare-metal Proxmox hypervisor 
 
 ---
 
-### Pillar 2: Conservative Workload GitOps Guardrails (`.github/renovate.json5`)
+### Pillar 2: Conservative Workload GitOps Guardrails ([`.github/renovate.json5`](https://github.com/vsingh55/homelab-ops/blob/main/.github/renovate.json5))
 
-Workload updates adhere strictly to GitOps principles—no container tags are mutated directly on the running cluster. All changes flow through Git Pull Requests validated by Flux CD v2:
+Workload updates adhere strictly to GitOps principles via [`.github/workflows/renovate.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.github/workflows/renovate.yaml)—no container tags are mutated directly on the running cluster. All changes flow through Git Pull Requests validated by Flux CD v2:
 
 1. **Stability Quarantine (`minimumReleaseAge: "3 days"`):**
    New container images and Helm charts must sit in public registries for at least 3 days (7 days for major versions) before Renovate proposes an update. This buffers against Day-0 regressions and yanked releases.

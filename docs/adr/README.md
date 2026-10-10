@@ -14,27 +14,27 @@
 1. [Executive Architecture Summary](#1-executive-architecture-summary)
 2. [Current Architecture Overview](#2-current-architecture-overview)
 3. [Architectural Decision Inventory](#3-architectural-decision-inventory)
-4. [Missing / Undocumented Decisions](#4-missing--undocumented-decisions)
+4. [Missing / Undocumented Decisions](#4-missing-undocumented-decisions)
 5. [Architectural Risks and Smells](#5-architectural-risks-and-smells)
 6. [ADR Priority Matrix](#6-adr-priority-matrix)
 7. [Comprehensive Architecture Decision Records](#7-comprehensive-architecture-decision-records)
 
-- [ADR-001: Bare-Metal Virtualization via Proxmox VE with Isolated Logical Zones](#adr-001-bare-metal-virtualization-via-proxmox-ve-with-isolated-logical-zones)
-- [ADR-002: Dual-Tier Storage Topology (Hot NVMe vs. Cold SATA HDD)](#adr-002-dual-tier-storage-topology-hot-nvme-vs-cold-sata-hdd)
-- [ADR-003: Public Ingress via Cloud VM & WireGuard Site-to-Site Tunnel](#adr-003-public-ingress-via-cloud-vm--wireguard-site-to-site-tunnel)
-- [ADR-004: In-Memory "Vault Hydration" Pattern for Bare-Metal Infrastructure Secrets](#adr-004-in-memory-vault-hydration-pattern-for-bare-metal-infrastructure-secrets)
-- [ADR-005: Out-of-Band Administrative Access via Tailscale Mesh Overlay](#adr-005-out-of-band-administrative-access-via-tailscale-mesh-overlay)
-- [ADR-006: Ingress Modernization: Migration from Cloud VM / WireGuard to Cloudflare Zero Trust Tunnels](#adr-006-ingress-modernization-migration-from-cloud-vm--wireguard-to-cloudflare-zero-trust-tunnels)
-- [ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2 with Trunk-Based Directory Overlays](#adr-007-pull-based-gitops-continuous-delivery-via-flux-cd-v2-with-trunk-based-directory-overlays)
-- [ADR-008: Declarative In-Git Secrets Management via Mozilla SOPS and Age Encryption](#adr-008-declarative-in-git-secrets-management-via-mozilla-sops-and-age-encryption)
-- [ADR-009: Workload Hardening & Remediation Decoupling for Automation Engines (Elimination of `hostNetwork`, Root Privileges, and In-Pod SSH Access)](#adr-009-workload-hardening--remediation-decoupling-for-automation-engines)
-- [ADR-010: Database Modernization: Migration from Standalone PostgreSQL Pod to CloudNativePG HA Operator](#adr-010-database-modernization-migration-from-standalone-postgresql-pod-to-cloudnativepg-ha-operator)
-- [ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band Monitoring (Uptime Kuma) and Offsite Disaster Recovery](#adr-011-zero-cost-cloud-extension-oci-always-free-mumbai-for-out-of-band-monitoring-and-offsite-restic-backup-sync)
-- [ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) for Web Applications and Tailscale for Host Infrastructure](#adr-012-hybrid-zero-trust-identity-architecture-cloudflare-access-for-web-applications-and-tailscale-for-host-infrastructure)
-- [ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD for Paperless-ngx and BookOrbit](#adr-013-sovereign-document--media-storage-tiering-strategy-on-1tb-hdd)
-- [ADR-014: Progressive Delivery Scoping: Deferral of Canary Deployments for Single-Replica Workloads](#adr-014-progressive-delivery-scoping-deferral-of-canary-deployments-for-single-replica-workloads)
-- [ADR-015: Decommissioning of ops-center VM in Favor of OCI S3 Remote State and Direct Laptop Operations](#adr-015-decommissioning-of-ops-center-vm-in-favor-of-oci-s3-remote-state-and-direct-laptop-operations)
-- [ADR-016: Complete Decommissioning and Code Purge of the Academy / Lab Zone Post-Certification](#adr-016-complete-decommissioning-and-code-purge-of-the-academy--lab-zone-post-certification)
+- [ADR-001: Bare-Metal Virtualization via Proxmox VE with Isolated Logical Zones](#adr-001)
+- [ADR-002: Dual-Tier Storage Topology (Hot NVMe vs. Cold SATA HDD)](#adr-002)
+- [ADR-003: Public Ingress via Cloud VM & WireGuard Site-to-Site Tunnel](#adr-003)
+- [ADR-004: In-Memory "Vault Hydration" Pattern for Bare-Metal Infrastructure Secrets](#adr-004)
+- [ADR-005: Out-of-Band Administrative Access via Tailscale Mesh Overlay](#adr-005)
+- [ADR-006: Ingress Modernization: Migration from Cloud VM / WireGuard to Cloudflare Zero Trust Tunnels](#adr-006)
+- [ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2 with Trunk-Based Directory Overlays](#adr-007)
+- [ADR-008: Declarative In-Git Secrets Management via Mozilla SOPS and Age Encryption](#adr-008)
+- [ADR-009: Workload Hardening & Remediation Decoupling for Automation Engines (Elimination of `hostNetwork`, Root Privileges, and In-Pod SSH Access)](#adr-009)
+- [ADR-010: Database Modernization: Migration from Standalone PostgreSQL Pod to CloudNativePG HA Operator](#adr-010)
+- [ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band Monitoring (Uptime Kuma) and Offsite Disaster Recovery](#adr-011)
+- [ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) for Web Applications and Tailscale for Host Infrastructure](#adr-012)
+- [ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD for Paperless-ngx and BookOrbit](#adr-013)
+- [ADR-014: Progressive Delivery Scoping: Deferral of Canary Deployments for Single-Replica Workloads](#adr-014)
+- [ADR-015: Decommissioning of ops-center VM in Favor of OCI S3 Remote State and Direct Laptop Operations](#adr-015)
+- [ADR-016: Complete Decommissioning and Code Purge of the Academy / Lab Zone Post-Certification](#adr-016)
 
 ---
 
@@ -222,11 +222,7 @@ Prior to this architectural review, several critical operational and technical d
 
 ## 7. Comprehensive Architecture Decision Records
 
-```
-================================================================================
-ADR-001: Bare-Metal Virtualization via Proxmox VE with Isolated Logical Zones
-================================================================================
-```
+### ADR-001: Bare-Metal Virtualization via Proxmox VE with Isolated Logical Zones {#adr-001}
 - **Status:** Accepted (Historical) — **Updated by ADR-015 & ADR-016 (Modernization)**
 - **Date:** December 2025 (Updated September 2026)
 - **Owner:** Principal Architect / Homelab Platform Team
@@ -267,11 +263,7 @@ ADR-001: Bare-Metal Virtualization via Proxmox VE with Isolated Logical Zones
 
 ---
 
-```
-================================================================================
-ADR-002: Dual-Tier Storage Topology (Hot NVMe vs. Cold SATA HDD)
-================================================================================
-```
+### ADR-002: Dual-Tier Storage Topology (Hot NVMe vs. Cold SATA HDD) {#adr-002}
 - **Status:** Accepted (Historical)
 - **Date:** December 2025
 - **Owner:** Principal Architect / Homelab Storage Team
@@ -312,11 +304,7 @@ ADR-002: Dual-Tier Storage Topology (Hot NVMe vs. Cold SATA HDD)
 
 ---
 
-```
-================================================================================
-ADR-003: Public Ingress via Cloud VM & WireGuard Site-to-Site Tunnel
-================================================================================
-```
+### ADR-003: Public Ingress via Cloud VM & WireGuard Site-to-Site Tunnel {#adr-003}
 - **Status:** Accepted (Historical) — **Superseded by ADR-006**
 - **Date:** January 2026
 - **Owner:** Principal Architect / Homelab Network Team
@@ -337,11 +325,7 @@ ADR-003: Public Ingress via Cloud VM & WireGuard Site-to-Site Tunnel
 
 ---
 
-```
-================================================================================
-ADR-004: In-Memory "Vault Hydration" Pattern for Bare-Metal Infrastructure Secrets
-================================================================================
-```
+### ADR-004: In-Memory "Vault Hydration" Pattern for Bare-Metal Infrastructure Secrets {#adr-004}
 - **Status:** Accepted (Historical)
 - **Date:** December 2025
 - **Owner:** Principal Architect / DevOps Automation Team
@@ -358,7 +342,7 @@ ADR-004: In-Memory "Vault Hydration" Pattern for Bare-Metal Infrastructure Secre
  3. A specialized playbook (`hydrate_infra.yml`) uses Jinja2 templates (`terraform.tfvars.j2`) to decrypt values in memory and generate ephemeral `terraform.tfvars` files locally on the deployment node just-in-time.
  4. Global `.gitignore` rules strictly prevent `terraform.tfvars` from ever being staged or committed.
 
-- **Architecture Impact:** Governs bare-metal provisioning in `infrastructure/on-prem/` and legacy `infrastructure/gcp/`.
+- **Architecture Impact:** Governs bare-metal provisioning in [`infrastructure/on-prem/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/on-prem) and legacy `infrastructure/gcp/`.
 - **Alternatives Considered:**
 - *Environment Variables (`export TF_VAR_...`):* Rejected due to poor developer experience and lack of auditability when managing 25+ infrastructure parameters.
 - *HashiCorp Vault Cluster:* Rejected as severe over-engineering consuming >1GB RAM on the constrained host.
@@ -384,11 +368,7 @@ ADR-004: In-Memory "Vault Hydration" Pattern for Bare-Metal Infrastructure Secre
 
 ---
 
-```
-================================================================================
-ADR-005: Out-of-Band Administrative Access via Tailscale Mesh Overlay
-================================================================================
-```
+### ADR-005: Out-of-Band Administrative Access via Tailscale Mesh Overlay {#adr-005}
 - **Status:** Accepted (Historical) — **Updated by ADR-015 (Modernization)**
 - **Date:** January 2026 (Updated September 2026)
 - **Owner:** Principal Architect / Security & Operations Team
@@ -430,11 +410,7 @@ ADR-005: Out-of-Band Administrative Access via Tailscale Mesh Overlay
 
 ---
 
-```
-================================================================================
-ADR-006: Ingress Modernization: Migration from Cloud VM / WireGuard to Cloudflare Zero Trust Tunnels
-================================================================================
-```
+### ADR-006: Ingress Modernization: Migration from Cloud VM / WireGuard to Cloudflare Zero Trust Tunnels {#adr-006}
 - **Status:** Proposed (Active Modernization Blueprint) — **Supersedes ADR-003**
 - **Date:** September 2026
 - **Owner:** Principal Architect / Network Engineering
@@ -454,7 +430,7 @@ ADR-006: Ingress Modernization: Migration from Cloud VM / WireGuard to Cloudflar
 - Automation Webhooks: `hooks.vijaysingh.cloud` -> Traefik -> `n8n:5678`
  4. Universal SSL certificates and edge CDN caching will be terminated at Cloudflare's edge with HTTP/2 and HTTP/3 support.
 
-- **Architecture Impact:** Completely removes `infrastructure/gcp/` and WireGuard peer configs. Introduces `kubernetes/platform/cloudflared/` and `infrastructure/cloudflare/` Terraform resources. Traefik shifts to an internal-only gateway receiving sanitized traffic from the local `cloudflared` daemon.
+- **Architecture Impact:** Completely removes `infrastructure/gcp/` and WireGuard peer configs. Introduces [`kubernetes/platform/cloudflared/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/cloudflared) and `infrastructure/cloudflare/` Terraform resources. Traefik shifts to an internal-only gateway receiving sanitized traffic from the local `cloudflared` daemon.
 - **Alternatives Considered:**
 - *Retain GCP VM and relocate to Mumbai (`asia-south1`):* Solves latency, but perpetuates ~$7/mo compute/IP billing and requires maintaining VM security patches and WireGuard configs.
 - *Migrate WireGuard Gateway to OCI Compute VM in Mumbai:* Solves cost and latency, but still requires maintaining a cloud VM, Nginx proxy, Let's Encrypt certificates, and manual WireGuard keepalive watchdogs.
@@ -486,11 +462,7 @@ ADR-006: Ingress Modernization: Migration from Cloud VM / WireGuard to Cloudflar
 
 ---
 
-```
-================================================================================
-ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2 with Trunk-Based Directory Overlays
-================================================================================
-```
+### ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2 with Trunk-Based Directory Overlays {#adr-007}
 - **Status:** Proposed (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Platform Engineering
@@ -506,9 +478,9 @@ ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2 with Trunk-Based D
  1. *Branching Strategy:* Single `main` branch protected by automated GitHub Actions CI checks (Kubeconform, Trivy, Yamllint). No long-lived environment branches (`dev`/`stage`/`prod`).
  2. *Repository Structure:*
 
-- `kubernetes/bootstrap/`: Flux root sync definitions.
-- `kubernetes/platform/`: Cluster-wide controllers (CloudNativePG, Traefik, Monitoring, `cloudflared`).
-- `kubernetes/apps/`: Individual application Kustomize overlays (`n8n`, `bookorbit`, etc.).
+- [`kubernetes/bootstrap/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/bootstrap): Flux root sync definitions.
+- [`kubernetes/platform/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform): Cluster-wide controllers (CloudNativePG, Traefik, Monitoring, `cloudflared`).
+- [`kubernetes/apps/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps): Individual application Kustomize overlays (`n8n`, `bookorbit`, etc.).
  3. *Reconciliation Engine:* Flux controllers (`source-controller`, `kustomize-controller`, `helm-controller`) reconcile live state from Git.
  4. *Reliability Rules:* Mandatory explicit `healthChecks`, strict dependency sequencing via `dependsOn` (e.g. databases ready before apps), and automated garbage collection (`prune: true`).
 
@@ -532,7 +504,7 @@ ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2 with Trunk-Based D
 - **Migration Plan:**
  1. Run `flux bootstrap` targeting `kubernetes/bootstrap`.
  2. Commit platform definitions (`traefik`, `cnpg`) and verify reconciliation.
- 3. Migrate application manifests from `apps/` to `kubernetes/apps/` sequentially.
+ 3. Migrate application manifests from `apps/` to [`kubernetes/apps/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps) sequentially.
 
 - **Validation / Fitness Functions:**
 - Manual changes applied via `kubectl` to a managed deployment must be automatically drifted-back and overwritten by Flux within 10 minutes.
@@ -544,11 +516,7 @@ ADR-007: Pull-Based GitOps Continuous Delivery via Flux CD v2 with Trunk-Based D
 
 ---
 
-```
-================================================================================
-ADR-008: Declarative In-Git Secrets Management via Mozilla SOPS and Age Encryption
-================================================================================
-```
+### ADR-008: Declarative In-Git Secrets Management via Mozilla SOPS and Age Encryption {#adr-008}
 - **Status:** Proposed (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / DevSecOps Team
@@ -595,11 +563,7 @@ ADR-008: Declarative In-Git Secrets Management via Mozilla SOPS and Age Encrypti
 
 ---
 
-```
-================================================================================
-ADR-009: Workload Hardening & Remediation Decoupling for Automation Engines
-================================================================================
-```
+### ADR-009: Workload Hardening & Remediation Decoupling for Automation Engines {#adr-009}
 - **Status:** Proposed (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Information Security Team
@@ -616,7 +580,7 @@ ADR-009: Workload Hardening & Remediation Decoupling for Automation Engines
  3. *Credential Purge:* Permanently remove `/home/node/.ssh/id_rsa` and `remediate.py` from the n8n container and ConfigMaps.
  4. *Out-of-Band Remediation:* If automated hypervisor remediation (e.g. restarting a service) is required, n8n will dispatch a signed, authenticated webhook event to an isolated daemon on `ops-center` or use the Proxmox REST API with a heavily scoped, fine-grained API token (never raw root SSH).
 
-- **Architecture Impact:** Modifies `kubernetes/apps/n8n/` deployment manifests. Eliminates security vulnerability on Proxmox host.
+- **Architecture Impact:** Modifies [`kubernetes/apps/n8n/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/n8n) deployment manifests. Eliminates security vulnerability on Proxmox host.
 - **Alternatives Considered:**
 - *Retain SSH script but restrict with `sudoers`:* Rejected because mounting private SSH keys inside an internet-facing web application container remains an unacceptable attack surface.
 - *Complete elimination of self-healing automation:* Unnecessary; self-healing can be achieved safely via scoped REST APIs.
@@ -647,11 +611,7 @@ ADR-009: Workload Hardening & Remediation Decoupling for Automation Engines
 
 ---
 
-```
-================================================================================
-ADR-010: Database Modernization: Migration from Standalone PostgreSQL Pod to CloudNativePG HA Operator
-================================================================================
-```
+### ADR-010: Database Modernization: Migration from Standalone PostgreSQL Pod to CloudNativePG HA Operator {#adr-010}
 - **Status:** Proposed (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Data Platform Engineering
@@ -663,7 +623,7 @@ ADR-010: Database Modernization: Migration from Standalone PostgreSQL Pod to Clo
 - Automated database lifecycle management (rolling minor upgrades, declarative user/schema management).
 - Strict resource budgeting to prevent RAM starvation on the K3s host.
 - **Decision:** We will deploy the **CloudNativePG (CNPG) Operator** to manage our transactional database tier:
- 1. *Operator Deployment:* Managed declaratively via Flux CD HelmRelease in `kubernetes/platform/postgres-operator/`.
+ 1. *Operator Deployment:* Managed declaratively via Flux CD HelmRelease in [`kubernetes/platform/postgres-operator/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/postgres-operator).
  2. *Cluster Topology:* Deploy a declarative PostgreSQL cluster (initially 1 primary with automated replication readiness, expanding to 2 instances if memory permits) using high-performance NVMe storage for active tables.
  3. *Continuous WAL Archiving:* CNPG configured to continuously stream Write-Ahead Logs (WAL) and base backups to our local MinIO S3 bucket on the 1TB SATA HDD.
  4. *Multi-Tenant Database Provisioning:* n8n, Paperless-ngx, and future apps will consume distinct, isolated logical databases and credentials managed declaratively via CNPG CRDs rather than spawning separate PostgreSQL container instances.
@@ -703,11 +663,7 @@ ADR-010: Database Modernization: Migration from Standalone PostgreSQL Pod to Clo
 
 ---
 
-```
-================================================================================
-ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band Monitoring (Uptime Kuma) and Offsite Disaster Recovery
-================================================================================
-```
+### ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band Monitoring (Uptime Kuma) and Offsite Disaster Recovery {#adr-011}
 - **Status:** Proposed (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Cloud Operations & FinOps
@@ -719,13 +675,13 @@ ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band
 - Strict FinOps constraint: ₹0.00 / month cost target (eliminating GCP's $7–$12/mo bill).
 - Geographical proximity: Cloud resources located in India (Mumbai) for minimum latency.
 - **Decision:** We will provision an **Oracle Cloud Infrastructure (OCI) support instance in the Mumbai region (`ap-mumbai-1`)**:
- 1. *Compute Instance:* Provision an OCI Compute VM managed via Terraform (`infrastructure/oci/`).
+ 1. *Compute Instance:* Provision an OCI Compute VM managed via Terraform ([`infrastructure/oci/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/oci)).
  2. *FinOps Safeguard:* Enforce a strict ₹1.00 budget threshold and email alarm in OCI to guarantee zero unexpected billing.
  3. *Out-of-Band Monitoring (Uptime Kuma):* Deploy Uptime Kuma on the OCI VM to probe public endpoints (`docs.vijaysingh.cloud`, `hooks.vijaysingh.cloud`) and home router connectivity via Tailscale, sending instant alerts to Slack `#homelab-alerts`.
  4. *Offsite 3-2-1 Backup Target:* Configure an encrypted Restic repository backed by OCI Object Storage in Mumbai, synchronizing database dumps, configurations, and document assets nightly via AES-256 encryption.
  5. *Terraform S3 Remote State Backend:* Host the remote Terraform state bucket in OCI Object Storage in Mumbai, enabling resilient offsite state locking and decoupling state survival from local hardware availability (per ADR-015).
 
-- **Architecture Impact:** Replaces `infrastructure/gcp/` with `infrastructure/oci/`. Establishes external monitoring, remote state backend, and true geographic disaster recovery.
+- **Architecture Impact:** Replaces `infrastructure/gcp/` with [`infrastructure/oci/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/oci). Establishes external monitoring, remote state backend, and true geographic disaster recovery.
 - **Alternatives Considered:**
 - *AWS Promotional Tier:* Rejected because AWS EC2 promotion expires after 12 months, leading to unexpected billing traps.
 - *Retaining GCP e2-micro:* Rejected because GCP charges ~$4/mo for static IPs and cross-region egress, whereas OCI provides permanently free compute, static IPs, and 10TB free monthly egress.
@@ -739,7 +695,7 @@ ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band
 - **Reliability Considerations:** Uptime Kuma operates outside the home power/ISP failure domain, ensuring 100% reliable blackout alerting.
 - **Scalability Considerations:** OCI 200GB free storage provides ample headroom for encrypted database dumps and critical document archives for multiple years.
 - **Performance Considerations:** Low latency (<20ms) between OCI Mumbai and residential connection in India.
-- **Operational Considerations:** Managed via standard Terraform in `infrastructure/oci/`; monitored via OCI budget alerts.
+- **Operational Considerations:** Managed via standard Terraform in [`infrastructure/oci/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/oci); monitored via OCI budget alerts.
 - **Cost Considerations:** Infrastructure: **₹0.00 / month**.
 - **Migration Plan:**
  1. Provision OCI Mumbai VCN and VM via Terraform.
@@ -758,11 +714,7 @@ ADR-011: Multi-Cloud Hybrid Resilience: OCI Mumbai Support Plane for Out-of-Band
 
 ---
 
-```
-================================================================================
-ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) for Web Applications and Tailscale for Host Infrastructure
-================================================================================
-```
+### ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) for Web Applications and Tailscale for Host Infrastructure {#adr-012}
 - **Status:** Proposed (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Security Architecture
@@ -782,7 +734,7 @@ ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) fo
  2. *Infrastructure & Node Administration Layer (Terminal Access):* Governed by **Tailscale**:
 
 - Raw Proxmox GUI (Port 8006), SSH (Port 22), and Kubernetes API (Port 6443) are accessible strictly over the private Tailscale WireGuard mesh (`100.x.x.x`).
-- **Architecture Impact:** Deprecates planned Keycloak deployment. Governs all ingress route configurations in `kubernetes/apps/` and Cloudflare Access rules in `infrastructure/cloudflare/`.
+- **Architecture Impact:** Deprecates planned Keycloak deployment. Governs all ingress route configurations in [`kubernetes/apps/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps) and Cloudflare Access rules in `infrastructure/cloudflare/`.
 - **Alternatives Considered:**
 - *Self-Hosted Keycloak (OIDC/SAML):* Enterprise standard. Rejected due to massive RAM footprint (consuming 10–15% of total cluster memory), complex maintenance, and high risk of operator lockout.
 - *Authelia / Authentik:* Lighter than Keycloak (~250MB RAM), but requires maintaining internal Redis, forward-auth proxy middleware in Traefik, and internal certificate authorities.
@@ -813,11 +765,7 @@ ADR-012: Hybrid Zero-Trust Identity Architecture: Cloudflare Access (SSO/MFA) fo
 
 ---
 
-```
-================================================================================
-ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD
-================================================================================
-```
+### ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD {#adr-013}
 - **Status:** Recommended (Future Decision)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Application Platform
@@ -862,11 +810,7 @@ ADR-013: Sovereign Document & Media Storage Tiering Strategy on 1TB HDD
 
 ---
 
-```
-================================================================================
-ADR-014: Progressive Delivery Scoping: Deferral of Canary Deployments for Single-Replica Workloads
-================================================================================
-```
+### ADR-014: Progressive Delivery Scoping: Deferral of Canary Deployments for Single-Replica Workloads {#adr-014}
 - **Status:** Recommended (Future Decision)
 - **Date:** September 2026
 - **Owner:** Principal Architect / DevOps Platform Team
@@ -883,7 +827,7 @@ ADR-014: Progressive Delivery Scoping: Deferral of Canary Deployments for Single
  3. *Rollback Mechanism:* Rollbacks will be executed via GitOps standard practice: `git revert <commit-sha>`, which Flux CD will reconcile within seconds.
  4. *Future Trigger:* Flagger will be evaluated only when an application scales to >=3 replicas and serves critical high-volume production traffic requiring automated traffic splitting.
 
-- **Architecture Impact:** Simplifies `kubernetes/platform/` by omitting Flagger controllers and complex Prometheus canary analysis metrics, saving cluster memory and CPU cycles.
+- **Architecture Impact:** Simplifies [`kubernetes/platform/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform) by omitting Flagger controllers and complex Prometheus canary analysis metrics, saving cluster memory and CPU cycles.
 - **Alternatives Considered:**
 - *Full Flagger Canary Implementation:* Recommended by LFS269. Rejected for current scale because running canary pods duplicates memory usage per app and adds unnecessary failure modes for static websites and low-traffic webhooks.
 - **Decision Rationale:** A CTO must eliminate over-engineering. In a single-node homelab, Flagger adds negative business value and operational friction without providing meaningful reliability gains.
@@ -908,11 +852,7 @@ ADR-014: Progressive Delivery Scoping: Deferral of Canary Deployments for Single
 
 ---
 
-```
-================================================================================
-ADR-015: Decommissioning of ops-center VM in Favor of OCI S3 Remote State and Direct Laptop Operations
-================================================================================
-```
+### ADR-015: Decommissioning of ops-center VM in Favor of OCI S3 Remote State and Direct Laptop Operations {#adr-015}
 - **Status:** Accepted (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / DevOps & Infrastructure Team
@@ -928,7 +868,7 @@ ADR-015: Decommissioning of ops-center VM in Favor of OCI S3 Remote State and Di
  2. *Direct Laptop Operations:* The operator's laptop (Fedora) will execute Ansible playbooks and Terraform commands directly. Tailscale provides direct authenticated WireGuard connectivity to Proxmox and `k3s-prod` without requiring an intermediate bastion or `ProxyCommand`.
  3. *In-Cluster Backup Target:* In-cluster Kubernetes backups (Velero snapshots and CloudNativePG continuous WAL archiving) will target an in-cluster S3 service or persistent volume mapped directly to the 1TB SATA HDD tier.
 
-- **Architecture Impact:** Purges `module "ops_center"` from `infrastructure/on-prem/main.tf`; removes `ansible_ssh_common_args` from `configuration/inventory/group_vars/hypervisor/vars.yml`; cleans up `hosts.yml`.
+- **Architecture Impact:** Purges `module "ops_center"` from [`infrastructure/on-prem/main.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/on-prem/main.tf); removes `ansible_ssh_common_args` from `configuration/inventory/group_vars/hypervisor/vars.yml`; cleans up `hosts.yml`.
 - **Alternatives Considered:**
 - *Convert ops-center to Proxmox LXC Container:* Consumes only 256MB–512MB RAM. Rejected because local state storage still suffers from co-located disaster risk (if Mini PC hardware dies, state is lost with it). OCI Object Storage provides true offsite durability at zero local RAM cost.
 - *Keep ops-center as a 1GB VM:* Rejected as unjustified memory waste on a single-node host.
@@ -960,11 +900,7 @@ ADR-015: Decommissioning of ops-center VM in Favor of OCI S3 Remote State and Di
 
 ---
 
-```
-================================================================================
-ADR-016: Complete Decommissioning and Code Purge of the Academy / Lab Zone Post-Certification
-================================================================================
-```
+### ADR-016: Complete Decommissioning and Code Purge of the Academy / Lab Zone Post-Certification {#adr-016}
 - **Status:** Accepted (Active Modernization Blueprint)
 - **Date:** September 2026
 - **Owner:** Principal Architect / Platform Engineering
@@ -976,8 +912,8 @@ ADR-016: Complete Decommissioning and Code Purge of the Academy / Lab Zone Post-
 - Operational simplicity: Eliminating multi-zone startup ordering and lab power management scripts.
 - **Decision:** We will **permanently decommission and delete the entire Academy Zone**:
  1. *Proxmox Cleanup:* Destroy running/stopped VMs 100, 200, 210, 220, and 221 from Proxmox VE, purging their disk images from `local-lvm`.
- 2. *Terraform Purge:* Remove `module "gateway"` and `module "k8s_cluster"` from `infrastructure/on-prem/main.tf`, and purge all associated variables from `variables.tf` and `terraform.tfvars.example`.
- 3. *Ansible Inventory Purge:* Delete the `lab` group from `configuration/inventory/hosts.yml`, remove lab variables from `configuration/inventory/group_vars/all/vars.yml`, and delete `configuration/playbooks/manage_lab.yml`.
+ 2. *Terraform Purge:* Remove `module "gateway"` and `module "k8s_cluster"` from [`infrastructure/on-prem/main.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/on-prem/main.tf), and purge all associated variables from `variables.tf` and `terraform.tfvars.example`.
+ 3. *Ansible Inventory Purge:* Delete the `lab` group from [`configuration/inventory/hosts.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/inventory/hosts.yml), remove lab variables from `configuration/inventory/group_vars/all/vars.yml`, and delete `configuration/playbooks/manage_lab.yml`.
  4. *Resource Consolidation:* Reallocate the reclaimed compute resources directly into `k3s-prod` (VM 500), expanding its memory allocation from 8GB to **12GB RAM** and 4 vCPUs.
 
 - **Architecture Impact:** Completely removes Zone A from infrastructure declarations; consolidates the on-premises platform into a single-VM architecture (`k3s-prod`) on Proxmox VE.
@@ -999,10 +935,10 @@ ADR-016: Complete Decommissioning and Code Purge of the Academy / Lab Zone Post-
 - **Migration Plan:**
  1. Verify certification completion and backup any personal lab notes.
  2. Run `terraform destroy` on Academy modules or delete VMs directly in Proxmox.
- 3. Purge code blocks from `infrastructure/on-prem/` and `configuration/`.
+ 3. Purge code blocks from [`infrastructure/on-prem/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/on-prem) and `configuration/`.
 
 - **Validation / Fitness Functions:**
-- `terraform plan` in `infrastructure/on-prem/` reflects only the single `k3s_prod` module.
+- `terraform plan` in [`infrastructure/on-prem/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/on-prem) reflects only the single `k3s_prod` module.
 - Proxmox GUI shows only VM 500 (`k3s-prod`) running.
 - **Dependencies:** Proxmox VE API.
 - **Open Questions:** None.

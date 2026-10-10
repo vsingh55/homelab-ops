@@ -18,7 +18,7 @@ The core application platform runs on **K3s**, a lightweight, fully compliant Ku
 | **Network CNI** | Flannel (Host-Gateway / VXLAN) | Minimal overhead container networking providing seamless pod-to-pod routing across cluster namespaces. |
 | **Ingress Controller** | Embedded Traefik Ingress Controller | Lightweight reverse proxy terminating in-cluster routing from the `cloudflared` edge daemon to Kubernetes Services. |
 | **Storage Provisioner** | Rancher Local Path Provisioner | Dynamically provisions PersistentVolumes directly on host NVMe and SATA block mounts with zero distributed storage overhead. |
-| **Continuous Delivery** | Flux CD v2 (GitOps) | Reconciles cluster state every 5 minutes directly from the Git repository, decrypting SOPS secrets in-memory. |
+| **Continuous Delivery** | Flux CD v2 (GitOps) | Reconciles cluster state every 5 minutes directly from [`kubernetes/bootstrap/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/bootstrap), decrypting secrets in-memory via [`.sops.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.sops.yaml). |
 
 ---
 
@@ -77,17 +77,17 @@ flowchart TD
 
 ## 3. Production Workload Fleet Inventory
 
-| Workload Name | Namespace | Public Ingress URL | Storage Tier | Workload Function |
-| :--- | :--- | :--- | :--- | :--- |
-| **Homepage** | `platform` | `https://home.vijaysingh.cloud` | NVMe (Tier 1) | Centralized platform navigation portal and real-time service health board. |
-| **Platform Docs** | `platform` | `https://docs.vijaysingh.cloud` | NVMe (Tier 1) | Material MkDocs documentation portal and architecture handbook. |
-| **PostgreSQL** | `database` | Internal Service Only | NVMe (Tier 1) | Centralized, operator-managed database cluster for applications. |
-| **Paperless-ngx** | `apps` | `https://ocr.vijaysingh.cloud` | Hybrid (NVMe + SATA) | Document indexing, Optical Character Recognition (OCR), and searchable archive. |
-| **n8n** | `apps` | `https://n8n.vijaysingh.cloud` | NVMe (Tier 1) | Event-driven workflow automation engine and webhook ingestion handler. |
-| **BookOrbit** | `apps` | `https://books.vijaysingh.cloud` | SATA HDD (Tier 2) | Digital book catalog, metadata fetcher, and reading companion. |
-| **Miniflux** | `apps` | `https://rss.vijaysingh.cloud` | NVMe (Tier 1) | Lightweight, privacy-focused RSS news aggregator. |
-| **Linkding** | `apps` | `https://links.vijaysingh.cloud` | NVMe (Tier 1) | Minimalist bookmark manager with automatic archive caching. |
-| **Ryot** | `apps` | `https://ryot.vijaysingh.cloud` | NVMe (Tier 1) | Personal life-tracking and fitness metrics tracker. |
+| Workload Name | Namespace | In-Repo Manifests | Public Ingress URL | Storage Tier | Workload Function |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Homepage** | `platform` | [`kubernetes/platform/homepage/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/homepage) | `https://home.vijaysingh.cloud` | NVMe (Tier 1) | Centralized platform navigation portal and real-time service health board. |
+| **Platform Docs** | `platform` | [`kubernetes/platform/docs/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/docs) | `https://docs.vijaysingh.cloud` | NVMe (Tier 1) | Material MkDocs documentation portal and architecture handbook. |
+| **PostgreSQL** | `database` | [`kubernetes/platform/postgres-operator/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/postgres-operator) | Internal Service Only | NVMe (Tier 1) | Centralized, operator-managed database cluster for applications. |
+| **Paperless-ngx** | `apps` | [`kubernetes/apps/paperless/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/paperless) | `https://ocr.vijaysingh.cloud` | Hybrid (NVMe + SATA) | Document indexing, Optical Character Recognition (OCR), and searchable archive. |
+| **n8n** | `apps` | [`kubernetes/apps/n8n/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/n8n) | `https://n8n.vijaysingh.cloud` | NVMe (Tier 1) | Event-driven workflow automation engine and webhook ingestion handler. |
+| **BookOrbit** | `apps` | [`kubernetes/apps/bookorbit/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/bookorbit) | `https://books.vijaysingh.cloud` | SATA HDD (Tier 2) | Digital book catalog, metadata fetcher, and reading companion. |
+| **Miniflux** | `apps` | [`kubernetes/apps/miniflux/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/miniflux) | `https://rss.vijaysingh.cloud` | NVMe (Tier 1) | Lightweight, privacy-focused RSS news aggregator. |
+| **Linkding** | `apps` | [`kubernetes/apps/linkding/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/linkding) | `https://links.vijaysingh.cloud` | NVMe (Tier 1) | Minimalist bookmark manager with automatic archive caching. |
+| **Ryot / Wger** | `apps` | [`kubernetes/apps/wger/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/wger) | `https://ryot.vijaysingh.cloud` | NVMe (Tier 1) | Personal life-tracking and fitness metrics tracker. |
 
 ---
 

@@ -70,7 +70,7 @@ creation_rules:
 ```
 
 ### 2. Deterministic Stage Chaining (`dependsOn`)
-To prevent startup race conditions, the root Flux configuration partitions delivery into structured dependency phases:
+To prevent startup race conditions, the root Flux configuration partitions delivery into structured dependency phases in [`kubernetes/bootstrap/apps.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/bootstrap/apps.yaml) and [`kubernetes/bootstrap/platform.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/bootstrap/platform.yaml):
 
 ```yaml
 # Root Application Delivery (kubernetes/bootstrap/apps.yaml)
@@ -96,7 +96,7 @@ spec:
       name: sops-age
 ```
 
-Workloads in `apps` (such as n8n or Paperless) are held in pending state until the `platform` Kustomization (CloudNativePG operator, storage classes, `cloudflared`) reports healthy.
+Workloads in [`kubernetes/apps/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps) (such as [`n8n`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/n8n) or [`Paperless-ngx`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/apps/paperless)) are held in pending state until the [`kubernetes/platform/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform) Kustomization (CloudNativePG operator, storage classes, `cloudflared`) reports healthy.
 
 ### 3. Continuous Self-Healing & Drift Neutralization
 The Flux control loop continuously compares live cluster state against `origin/main` every 10 minutes (or immediately via GitHub push webhooks):
@@ -135,10 +135,10 @@ apps         main@sha1:d4ba838   False     True  Applied revision: main@sha1:d4b
 
 ### 3. In-Memory Decryption Verification
 ```bash
-# Verify decrypted secret in cluster memory
+# Verify decrypted secret in cluster memory (source: kubernetes/platform/postgres-operator/postgres-app-user.enc.yaml)
 kubectl get secret -n database postgres-credentials -o jsonpath='{.data.password}' | base64 -d
 ```
-*Actual Result:* Plaintext password returned instantly in cluster memory, while Git repository inspects strictly as ciphertext (`ENC[AES256_GCM...]`).
+*Actual Result:* Plaintext password returned instantly in cluster memory, while Git repository ([`kubernetes/platform/postgres-operator/postgres-app-user.enc.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/platform/postgres-operator/postgres-app-user.enc.yaml)) inspects strictly as ciphertext (`ENC[AES256_GCM...]`).
 
 ---
 

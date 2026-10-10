@@ -21,14 +21,14 @@ kubectl create secret generic n8n-credentials \
   --dry-run=client -o yaml > secret.yaml
 ```
 
-2. Encrypt in-place using SOPS (matching rules defined in `.sops.yaml`):
+2. Encrypt in-place using SOPS (matching rules defined in [`.sops.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/.sops.yaml)):
 ```bash
 sops --encrypt --in-place secret.yaml
 ```
 
-3. Rename to follow the encrypted secret standard:
+3. Rename to follow the encrypted secret standard ([`kubernetes/apps/n8n/secrets.enc.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/apps/n8n/secrets.enc.yaml)):
 ```bash
-mv secret.yaml kubernetes/apps/n8n/secret.enc.yaml
+mv secret.yaml kubernetes/apps/n8n/secrets.enc.yaml
 ```
 
 ### Editing an Existing Encrypted Secret
@@ -36,7 +36,7 @@ To update values in an already-encrypted secret without creating plaintext tempo
 ```bash
 # Opens decrypted manifest in your default terminal editor ($EDITOR)
 # Automatically re-encrypts upon save and clean exit
-sops kubernetes/apps/n8n/secret.enc.yaml
+sops kubernetes/apps/n8n/secrets.enc.yaml
 ```
 
 ### Age Keypair Backup & Disaster Recovery
@@ -92,14 +92,14 @@ flux reconcile source git flux-system
 
 ## 3. Node Maintenance, Kernel Updates & Graceful Host Reboot
 
-Host and guest patching is automated through the **Autonomous Sysadmin Maintenance Engine** (`sysadmin_maintenance.yml`), with manual commands retained as an emergency fallback.
+Host and guest patching is automated through the **Autonomous Sysadmin Maintenance Engine** ([`playbooks/sysadmin_maintenance.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/playbooks/sysadmin_maintenance.yml)), with inventory managed in [`inventory/hosts.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/inventory/hosts.yml). Manual commands are retained as an emergency fallback.
 
 ### Method A: Automated Sysadmin Maintenance Engine (Recommended)
 
 Execute the end-to-end maintenance pipeline across the bare-metal hypervisor, production K3s VM, and cloud monitoring node:
 
 ```bash
-cd configuration/
+cd configuration/ # (https://github.com/vsingh55/homelab-ops/tree/main/configuration)
 
 # 1. Run safe security patch maintenance (Non-disruptive, preserves minor/major kernel pins)
 ansible-playbook -i inventory/hosts.yml playbooks/sysadmin_maintenance.yml

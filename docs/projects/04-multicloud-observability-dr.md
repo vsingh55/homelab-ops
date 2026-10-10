@@ -58,14 +58,14 @@ Resilience Architecture:
 ## 4. Key Architectural Implementations
 
 ### 1. Independent Out-of-Band Health Probing (Uptime Kuma on OCI)
-An independent cloud compute instance in OCI Mumbai (`ap-mumbai-1`) runs **Uptime Kuma** in a dedicated container runtime:
+An independent cloud compute instance in OCI Mumbai (`ap-mumbai-1`) provisioned via [`infrastructure/oci/compute.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/oci/compute.tf) and configured with [`configuration/playbooks/deploy_uptime_kuma.yml`](https://github.com/vsingh55/homelab-ops/blob/main/configuration/playbooks/deploy_uptime_kuma.yml) runs **Uptime Kuma** in a dedicated container runtime:
 
 - Executes active HTTP status probes against public endpoints (`docs.vijaysingh.cloud`, `hooks.vijaysingh.cloud`, `dash.vijaysingh.cloud`) over the public internet every 60 seconds.
 - Pings hypervisor heartbeat endpoints over the private Tailscale WireGuard mesh.
 - If response status codes fail or latency exceeds SLA boundaries (TTFB > 2000ms), Uptime Kuma immediately dispatches high-priority incident notifications to Slack (`#homelab-alerts`) completely out-of-band.
 
 ### 2. Off-Site Terraform Remote State Backend with S3 State Locking
-Terraform state is decoupled from local disks and stored in an OCI Object Storage bucket using standard S3 compatibility API:
+Terraform state is decoupled from local disks and stored in an OCI Object Storage bucket using standard S3 compatibility API configured in [`infrastructure/on-prem/backend.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/on-prem/backend.tf) (with OCI state management in [`infrastructure/oci/backend.tf`](https://github.com/vsingh55/homelab-ops/blob/main/infrastructure/oci/backend.tf)):
 
 - **State Locking:** Eliminates race conditions and prevents catastrophic concurrent state mutations.
 - **Object Versioning:** Retains an immutable audit trail of every applied state change.
@@ -90,7 +90,7 @@ terraform {
 ```
 
 ### 3. True 3-2-1 Disaster Recovery with Encrypted Restic Replication
-The platform adheres strictly to the **3-2-1 Backup Rule**:
+The platform adheres strictly to the **3-2-1 Backup Rule** using bare-metal storage from [`infrastructure/on-prem/`](https://github.com/vsingh55/homelab-ops/tree/main/infrastructure/on-prem):
 1. **3 Copies of Data:** Production data, local snapshot dump, and offsite cloud repository.
 2. **2 Different Media Types:** Solid-state NVMe flash (hot transactional data) and mechanical SATA magnetic disk (local cold backups).
 3. **1 Offsite Geographically Independent Copy:** Automated systemd timers execute Restic, encrypting snapshot archives with client-side **AES-256-GCM** before uploading to OCI Object Storage in Mumbai.
