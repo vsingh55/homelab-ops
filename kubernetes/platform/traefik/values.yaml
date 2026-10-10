@@ -1,0 +1,31 @@
+# Traefik Ingress Controller Configuration Values
+# Managed via K3s / Helm & Ansible (configuration/roles/traefik)
+
+ingressRoute:
+  dashboard:
+    enabled: false
+
+persistence:
+  enabled: true
+  path: /data
+  size: 1Gi
+
+ports:
+  web:
+    expose:
+      default: true
+    nodePort: 30080
+  websecure:
+    expose:
+      default: true
+    nodePort: 30443
+
+globalArguments:
+  - "--global.checknewversion=false"
+  - "--global.sendanonymoususage=false"
+
+additionalArguments:
+  - "--providers.kubernetesingress.ingressclass=traefik"
+  - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+  - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+  - "--entrypoints.web.http.redirections.entrypoint.permanent=true"

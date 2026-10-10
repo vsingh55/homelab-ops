@@ -4,7 +4,7 @@
 | :--- | :--- |
 | **Architecture Pattern** | Zero Trust Network Access (ZTNA) & Edge Reverse Ingress |
 | **Core Technologies** | Cloudflare Zero Trust, `cloudflared` (QUIC/HTTP2), Traefik Ingress Controller |
-| **Primary Code Paths** | [`kubernetes/platform/cloudflared/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/cloudflared), [`kubernetes/platform/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/traefik) |
+| **Primary Code Paths** | [`kubernetes/platform/cloudflared/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/cloudflared), [`kubernetes/platform/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/traefik), [`configuration/roles/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/configuration/roles/traefik) |
 | **Relevant Decisions** | [ADR-006](../adr/README.md#adr-006), [ADR-012](../adr/README.md#adr-012) |
 | **Operational Status** | Production Verified (Latency <15ms, Zero Open Ports, Edge WAF Active) |
 
@@ -99,7 +99,7 @@ spec:
 ```
 
 ### 2. High-Availability Traefik Mapping
-Rather than maintaining discrete ingress tunnel connectors for every service, `cloudflared` proxies all incoming hostnames to the cluster's internal **Traefik Ingress Controller** ([`kubernetes/platform/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/traefik)):
+Rather than maintaining discrete ingress tunnel connectors for every service, `cloudflared` proxies all incoming hostnames to the cluster's internal **Traefik Ingress Controller** ([`kubernetes/platform/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/traefik), provisioned via [`configuration/roles/traefik/`](https://github.com/vsingh55/homelab-ops/tree/main/configuration/roles/traefik)):
 
 - `docs.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80` ([`kubernetes/platform/docs/`](https://github.com/vsingh55/homelab-ops/tree/main/kubernetes/platform/docs))
 - `hooks.vijaysingh.cloud` $\to$ `http://traefik.kube-system.svc.cluster.local:80` ([`kubernetes/apps/n8n/ingress.yaml`](https://github.com/vsingh55/homelab-ops/blob/main/kubernetes/apps/n8n/ingress.yaml))
